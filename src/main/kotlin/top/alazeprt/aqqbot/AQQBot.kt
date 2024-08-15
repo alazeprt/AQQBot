@@ -13,6 +13,15 @@ import top.alazeprt.aqqbot.qq.BotListener
 
 @RuntimeDependencies(
     RuntimeDependency(
+        value = "org.java-websocket:Java-WebSocket:1.5.5",
+    ),
+    RuntimeDependency(
+        value = "net.kyori:event-method:3.0.0",
+    ),
+    RuntimeDependency(
+        value = "net.kyori:event-api:3.0.0",
+    ),
+    RuntimeDependency(
         value = "cn.evole.onebot:OneBot-Client:0.4.0",
         repository = "https://maven.nova-committee.cn/releases"
     ),
@@ -44,7 +53,7 @@ object AQQBot : Plugin() {
         }
         submit(async = true) {
             info("Enabling bot...")
-            val url = "ws://" + botConfig.getString("host") + ":" + botConfig.getInt("port")
+            val url = "ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")
             oneBotClient = OneBotClient.create(BotConfig(url)).open().registerEvents(BotListener())
         }
     }
