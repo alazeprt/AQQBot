@@ -1,0 +1,15 @@
+# 通过QQ添加白名单
+whitelist:
+  # 是否启用该功能
+  enable: true
+
+  # 功能指令前缀
+  prefix:
+    # 绑定指令前缀
+    # 用户需要发送的消息: $command $name
+    bind: "绑定"
+
+    # 解绑指令前缀
+    # 用户需要发送的消息: $command $name
+    unbind: "解绑"
+
