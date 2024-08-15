@@ -3,20 +3,39 @@ package top.alazeprt.aqqbot.qq
 import cn.evole.onebot.client.annotations.SubscribeEvent
 import cn.evole.onebot.client.interfaces.Listener
 import cn.evole.onebot.sdk.event.message.GroupMessageEvent
+import taboolib.module.configuration.Configuration
+import taboolib.module.configuration.Type
+import taboolib.module.configuration.util.asMap
 import top.alazeprt.aqqbot.AQQBot
 
 class BotListener : Listener {
     @SubscribeEvent
     fun onGroupMessage(event: GroupMessageEvent) {
-        if (!AQQBot.config.getBoolean("whitelist.enable")) return
-        if (!AQQBot.enableGroups.contains(event.groupId.toString())) return
-        if (event.message.startsWith(AQQBot.config.getString("whitelist.prefix.bind")?: return)) {
+        if (!AQQBot.config.getBoolean("whitelist.enable")) {
+            return
+        }
+        if (!AQQBot.enableGroups.contains(event.groupId.toString())) {
+            return
+        }
+        val rawData = "{\"list\":" + event.message.toString() + "}"
+        val messageList = Configuration.loadFromString(rawData, Type.JSON)
+            .getMapList("list")
+        var message = ""
+        messageList.forEach {
+            if (it["type"] == "at") {
+                return
+            } else if (it["type"] == "text") {
+                val dataMap = it["data"] as? Map<*, *>
+                message += dataMap?.get("text").toString()
+            }
+        }
+        if (message.startsWith(AQQBot.config.getString("whitelist.prefix.bind")?: return)) {
             val qqId = event.sender.userId
             if (AQQBot.dataMap.containsKey(qqId)) {
                 AQQBot.oneBotClient.bot.sendGroupMsg(event.groupId, "你已经绑定过了!", true)
                 return
             }
-            val playerName = event.message.substring(
+            val playerName = message.substring(
                 AQQBot.config.getString("whitelist.prefix.bind")!!.length + 1
             )
             if (!validateName(playerName)) {
@@ -30,19 +49,21 @@ class BotListener : Listener {
                 }
             }
             AQQBot.dataMap[qqId] = playerName
+            AQQBot.onDataUpdate()
             AQQBot.oneBotClient.bot.sendGroupMsg(event.groupId, "绑定成功!", true)
-        } else if (event.message.startsWith(AQQBot.config.getString("whitelist.prefix.unbind")?: return)) {
+        } else if (message.startsWith(AQQBot.config.getString("whitelist.prefix.unbind")?: return)) {
             val qqId = event.sender.userId
             if (!AQQBot.dataMap.containsKey(qqId)) {
                 AQQBot.oneBotClient.bot.sendGroupMsg(event.groupId, "你还没有绑定过!", true)
                 return
             }
-            val playerName = event.message.substring(
+            val playerName = message.substring(
                 AQQBot.config.getString("whitelist.prefix.bind")!!.length + 1
             )
             AQQBot.dataMap.forEach { (k, v) ->
                 if (v == playerName && k == qqId) {
                     AQQBot.dataMap.remove(k)
+                    AQQBot.onDataUpdate()
                     AQQBot.oneBotClient.bot.sendGroupMsg(event.groupId, "解绑成功!", true)
                     return
                 } else if (k == qqId) {

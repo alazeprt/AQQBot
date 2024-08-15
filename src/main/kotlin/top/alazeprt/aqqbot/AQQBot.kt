@@ -57,4 +57,10 @@ object AQQBot : Plugin() {
             oneBotClient = OneBotClient.create(BotConfig(url)).open().registerEvents(BotListener())
         }
     }
+
+    fun onDataUpdate() {
+        dataMap.forEach {
+            dataConfig.set(it.key, it.value)
+        }
+    }
 }
