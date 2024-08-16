@@ -7,9 +7,13 @@ whitelist:
   prefix:
     # 绑定指令前缀
     # 用户需要发送的消息: $command $name
-    bind: "绑定"
+    bind:
+      - "/绑定"
+      - "/bind"
 
     # 解绑指令前缀
     # 用户需要发送的消息: $command $name
-    unbind: "解绑"
+    unbind:
+      - "/解绑"
+      - "/unbind"
 

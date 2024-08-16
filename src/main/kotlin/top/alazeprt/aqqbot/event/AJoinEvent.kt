@@ -10,7 +10,7 @@ class AJoinEvent : Listener {
     fun onJoin(event: PlayerJoinEvent) {
         if (event.player.name !in AQQBot.dataMap.values) {
             event.player.kickPlayer("[AQQBot] 你的账户还没有绑定QQ!" +
-                    "\n请通过在QQ群发送 \"${AQQBot.config.getString("whitelist.prefix.bind")} <游戏名称>\" 绑定账户")
+                    "\n请通过在QQ群发送 \"${AQQBot.config.getStringList("whitelist.prefix.bind").get(0)} <游戏名称>\" 绑定账户")
         }
     }
 }
