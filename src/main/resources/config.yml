@@ -1,4 +1,4 @@
-# 通过QQ添加白名单
+# 添加白名单
 whitelist:
   # 是否启用该功能
   enable: true
@@ -17,3 +17,18 @@ whitelist:
       - "/解绑"
       - "/unbind"
 
+# 查询服务器基本信息
+# 需要安装 spark 插件作为前置 (部分paper(包括下游)服务端内置, 后台执行 spark 若有反应则说明内置)
+information:
+  # 功能: 查询服务器TPS 输出结果:
+  # 服务器TPS: ${tps_5_seconds}, ${tps_10_seconds}, ${tps_1_min}, ${tps_5_min}, ${tps_15_min}
+  tps:
+    # 是否启用该功能
+    enable: true
+
+    # 获取指令
+    command:
+      - "/tps"
+      - "tps"
+      - "服务器tps"
+      - "/服务器tps"

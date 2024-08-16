@@ -6,6 +6,7 @@ import cn.evole.onebot.sdk.event.message.GroupMessageEvent
 import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.Type
 import top.alazeprt.aqqbot.AQQBot
+import top.alazeprt.aqqbot.handler.InformationHandler
 import top.alazeprt.aqqbot.handler.WhitelistHandler
 
 class BotListener : Listener {
@@ -30,16 +31,22 @@ class BotListener : Listener {
             }
         }
         AQQBot.config.getStringList("whitelist.prefix.bind").forEach {
-            if (message.startsWith(it)) {
+            if (message.lowercase().startsWith(it)) {
                 val playerName = message.substring(it.length + 1)
                 WhitelistHandler.bind(event.sender.userId, event.groupId, playerName)
                 return
             }
         }
         AQQBot.config.getStringList("whitelist.prefix.unbind").forEach {
-            if (message.startsWith(it)) {
+            if (message.lowercase().startsWith(it)) {
                 val playerName = message.substring(it.length + 1)
                 WhitelistHandler.unbind(event.sender.userId, event.groupId, playerName)
+                return
+            }
+        }
+        AQQBot.config.getStringList("information.tps.command").forEach {
+            if (message.lowercase().startsWith(it)) {
+                InformationHandler.getTPS(event.groupId)
                 return
             }
         }
