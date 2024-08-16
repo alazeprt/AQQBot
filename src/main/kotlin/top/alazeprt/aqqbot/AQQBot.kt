@@ -5,11 +5,13 @@ import cn.evole.onebot.client.core.BotConfig
 import taboolib.common.env.RuntimeDependencies
 import taboolib.common.env.RuntimeDependency
 import taboolib.common.platform.Plugin
+import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.info
 import taboolib.common.platform.function.submit
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.ConfigFile
 import top.alazeprt.aqqbot.qq.BotListener
+import java.io.File
 
 @RuntimeDependencies(
     RuntimeDependency(
@@ -58,9 +60,10 @@ object AQQBot : Plugin() {
         }
     }
 
-    fun onDataUpdate() {
+    override fun onDisable() {
         dataMap.forEach {
-            dataConfig.set(it.key, it.value)
+            dataConfig[it.key] = it.value
         }
+        dataConfig.saveToFile(File(getDataFolder(), "data.yml"))
     }
 }

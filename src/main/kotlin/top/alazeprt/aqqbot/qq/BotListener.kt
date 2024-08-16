@@ -49,7 +49,6 @@ class BotListener : Listener {
                 }
             }
             AQQBot.dataMap[qqId] = playerName
-            AQQBot.onDataUpdate()
             AQQBot.oneBotClient.bot.sendGroupMsg(event.groupId, "绑定成功!", true)
         } else if (message.startsWith(AQQBot.config.getString("whitelist.prefix.unbind")?: return)) {
             val qqId = event.sender.userId
@@ -63,7 +62,6 @@ class BotListener : Listener {
             AQQBot.dataMap.forEach { (k, v) ->
                 if (v == playerName && k == qqId) {
                     AQQBot.dataMap.remove(k)
-                    AQQBot.onDataUpdate()
                     AQQBot.oneBotClient.bot.sendGroupMsg(event.groupId, "解绑成功!", true)
                     return
                 } else if (k == qqId) {
