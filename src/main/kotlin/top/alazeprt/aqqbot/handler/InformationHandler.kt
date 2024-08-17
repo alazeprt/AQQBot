@@ -1,9 +1,9 @@
 package top.alazeprt.aqqbot.handler
 
 import me.lucko.spark.api.statistic.StatisticWindow
+import org.bukkit.Bukkit
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.AQQBot.spark
-import kotlin.math.round
 
 class InformationHandler {
     companion object {
@@ -31,6 +31,12 @@ class InformationHandler {
             } else {
                 String.format("%.2f", tps)
             }
+        }
+
+        fun getPlayerList(groupId: Long) {
+            val playerList = Bukkit.getOnlinePlayers()
+            AQQBot.oneBotClient.bot.sendGroupMsg(groupId, "服务器在线玩家(${playerList.size}): " +
+                    playerList.joinToString(), true)
         }
     }
 }

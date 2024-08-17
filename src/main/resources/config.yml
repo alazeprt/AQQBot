@@ -32,3 +32,18 @@ information:
       - "tps"
       - "服务器tps"
       - "/服务器tps"
+
+  # 功能: 查询服务器在线玩家 输出结果:
+  # 服务器在线玩家(${amount}): ${player_list}
+  list:
+    # 是否启用该功能
+    enable: true
+
+    # 获取指令
+    command:
+      - "/list"
+      - "list"
+      - "在线玩家"
+      - "/在线玩家"
+      - "服务器在线玩家"
+      - "/服务器在线玩家"

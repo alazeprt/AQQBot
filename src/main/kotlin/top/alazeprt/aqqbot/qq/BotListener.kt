@@ -50,5 +50,11 @@ class BotListener : Listener {
                 return
             }
         }
+        AQQBot.config.getStringList("information.list.command").forEach {
+            if (message.lowercase().startsWith(it)) {
+                InformationHandler.getPlayerList(event.groupId)
+                return
+            }
+        }
     }
 }
