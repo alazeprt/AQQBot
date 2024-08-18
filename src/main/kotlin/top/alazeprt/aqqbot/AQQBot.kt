@@ -2,7 +2,6 @@ package top.alazeprt.aqqbot
 
 import cn.evole.onebot.client.OneBotClient
 import cn.evole.onebot.client.core.BotConfig
-import me.lucko.spark.api.Spark
 import org.bukkit.Bukkit
 import taboolib.common.env.RuntimeDependencies
 import taboolib.common.env.RuntimeDependency
@@ -45,8 +44,6 @@ object AQQBot : Plugin() {
 
     lateinit var oneBotClient: OneBotClient
 
-    var spark: Spark? = null
-
     val enableGroups: MutableList<String> = mutableListOf()
 
     val dataMap: MutableMap<String, String> = mutableMapOf()
@@ -60,14 +57,7 @@ object AQQBot : Plugin() {
             enableGroups.add(it)
         }
         info("Loading soft dependency...")
-        val provider = Bukkit.getServicesManager().getRegistration(
-            Spark::class.java
-        )
-        if (provider != null) {
-            spark = provider.provider
-        } else {
-            warning("You don't install soft dependency: Spark! You can't get server status via this plugin!")
-        }
+        DependencyImpl.loadSpark()
         submit(async = true) {
             info("Enabling bot...")
             val url = "ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")

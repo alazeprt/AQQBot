@@ -3,7 +3,7 @@ package top.alazeprt.aqqbot.handler
 import me.lucko.spark.api.statistic.StatisticWindow
 import org.bukkit.Bukkit
 import top.alazeprt.aqqbot.AQQBot
-import top.alazeprt.aqqbot.AQQBot.spark
+import top.alazeprt.aqqbot.DependencyImpl.Companion.spark
 
 class InformationHandler {
     companion object {
