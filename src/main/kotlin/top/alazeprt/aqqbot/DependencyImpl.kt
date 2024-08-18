@@ -2,7 +2,9 @@ package top.alazeprt.aqqbot
 
 import me.lucko.spark.api.Spark
 import me.lucko.spark.api.SparkProvider
+import org.bukkit.Bukkit
 import taboolib.common.platform.function.warning
+import top.alazeprt.aqqbot.event.AJoinEvent
 
 class DependencyImpl {
     companion object {

@@ -3,6 +3,7 @@ package top.alazeprt.aqqbot.qq
 import cn.evole.onebot.client.annotations.SubscribeEvent
 import cn.evole.onebot.client.interfaces.Listener
 import cn.evole.onebot.sdk.event.message.GroupMessageEvent
+import org.bukkit.Bukkit
 import taboolib.module.configuration.Configuration
 import taboolib.module.configuration.Type
 import top.alazeprt.aqqbot.AQQBot
@@ -55,6 +56,11 @@ class BotListener : Listener {
                 InformationHandler.getPlayerList(event.groupId)
                 return
             }
+        }
+        if(AQQBot.config.getBoolean("chat.group_to_server")) {
+            Bukkit.broadcastMessage(
+
+                "[QQ群(${event.groupId})] ${event.sender.nickname}: $message")
         }
     }
 }

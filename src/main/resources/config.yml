@@ -47,3 +47,14 @@ information:
       - "/在线玩家"
       - "服务器在线玩家"
       - "/服务器在线玩家"
+
+# 聊天(群服互联)功能
+# * 该功能仅支持Bukkit类服务端
+chat:
+  # 是否启用群->服聊天转发功能 转发结果:
+  # [QQ群(${groupId})] ${sender}: ${message}
+  group_to_server: true
+
+  # 是否启用服->群聊天转发功能 转发结果:
+  # [服务器] ${sender}: ${message}
+  server_to_group: true

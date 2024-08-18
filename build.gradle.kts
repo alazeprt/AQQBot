@@ -1,6 +1,5 @@
 import io.izzel.taboolib.gradle.BUKKIT
 import io.izzel.taboolib.gradle.UNIVERSAL
-import io.izzel.taboolib.gradle.VELOCITY
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -12,7 +11,7 @@ plugins {
 taboolib {
     env {
         // 安装模块
-        install(UNIVERSAL, BUKKIT, VELOCITY)
+        install(UNIVERSAL, BUKKIT)
     }
     description {
         dependencies {

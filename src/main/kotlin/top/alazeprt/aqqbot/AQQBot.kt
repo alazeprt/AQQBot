@@ -2,14 +2,12 @@ package top.alazeprt.aqqbot
 
 import cn.evole.onebot.client.OneBotClient
 import cn.evole.onebot.client.core.BotConfig
-import org.bukkit.Bukkit
 import taboolib.common.env.RuntimeDependencies
 import taboolib.common.env.RuntimeDependency
 import taboolib.common.platform.Plugin
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.info
 import taboolib.common.platform.function.submit
-import taboolib.common.platform.function.warning
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.ConfigFile
 import top.alazeprt.aqqbot.qq.BotListener
