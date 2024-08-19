@@ -19,8 +19,10 @@ class AJoinEvent : Listener {
         @SubscribeEvent
         fun onChat(event: AsyncPlayerChatEvent) {
             if(AQQBot.config.getBoolean("chat.server_to_group")) {
-                AQQBot.enableGroups.forEach {
-                    AQQBot.oneBotClient.bot.sendGroupMsg(it.toLong(), "[服务器] ${event.player.name}: ${event.message}", true)
+                submit (async = true) {
+                    AQQBot.enableGroups.forEach {
+                        AQQBot.oneBotClient.bot.sendGroupMsg(it.toLong(), "[服务器] ${event.player.name}: ${event.message}", true)
+                    }
                 }
             }
         }

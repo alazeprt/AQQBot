@@ -36,7 +36,7 @@ class InformationHandler {
         fun getPlayerList(groupId: Long) {
             val playerList = Bukkit.getOnlinePlayers()
             AQQBot.oneBotClient.bot.sendGroupMsg(groupId, "服务器在线玩家(${playerList.size}): " +
-                    playerList.joinToString(), true)
+                    playerList.map{ it.name }.joinToString(", "), true)
         }
     }
 }
