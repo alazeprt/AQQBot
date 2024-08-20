@@ -27,7 +27,7 @@ class InformationHandler {
 
         private fun roundTPS(tps: Double): String {
             return if (tps > 20) {
-                String.format("%.2f", tps.toInt().toDouble())
+                String.format("%.2f", 20.00)
             } else {
                 String.format("%.2f", tps)
             }
