@@ -3,11 +3,11 @@ package top.alazeprt.aqqbot.handler
 import cn.evole.onebot.sdk.event.message.GroupMessageEvent
 import top.alazeprt.aqqbot.AQQBot
 
-class WhitelistHandler {
+class WhitelistAdminHandler {
     companion object {
         private fun bind(userId: String, groupId: Long, playerName: String) {
             if (AQQBot.dataMap.containsKey(userId)) {
-                AQQBot.oneBotClient.bot.sendGroupMsg(groupId, "你已经绑定过了!", true)
+                AQQBot.oneBotClient.bot.sendGroupMsg(groupId, "他(${userId})已经绑定过了!", true)
                 return
             }
             if (!validateName(playerName)) {
@@ -23,10 +23,10 @@ class WhitelistHandler {
             AQQBot.dataMap[userId] = playerName
             AQQBot.oneBotClient.bot.sendGroupMsg(groupId, "绑定成功!", true)
         }
-        
+
         private fun unbind(userId: String, groupId: Long, playerName: String) {
             if (!AQQBot.dataMap.containsKey(userId)) {
-                AQQBot.oneBotClient.bot.sendGroupMsg(groupId, "你还没有绑定过!", true)
+                AQQBot.oneBotClient.bot.sendGroupMsg(groupId, "他(${userId})还没有绑定过!", true)
                 return
             }
             AQQBot.dataMap.forEach { (k, v) ->
@@ -35,12 +35,12 @@ class WhitelistHandler {
                     AQQBot.oneBotClient.bot.sendGroupMsg(groupId, "解绑成功!", true)
                     return
                 } else if (k == userId) {
-                    AQQBot.oneBotClient.bot.sendGroupMsg(groupId, "该名称不是你绑定的! " +
+                    AQQBot.oneBotClient.bot.sendGroupMsg(groupId, "该名称不是他(${userId})绑定的! " +
                             "你绑定的名称为: $v", true)
                     return
                 }
             }
-            AQQBot.oneBotClient.bot.sendGroupMsg(groupId, "该名称尚未绑定过/不是你绑定的!", true)
+            AQQBot.oneBotClient.bot.sendGroupMsg(groupId, "该名称尚未绑定过/不是他(${userId})绑定的!", true)
         }
 
         private fun validateName(name: String): Boolean {
@@ -48,31 +48,24 @@ class WhitelistHandler {
             return name.matches(regex.toRegex())
         }
 
-        fun handle(message: String, event: GroupMessageEvent) {
-            if (!AQQBot.config.getBoolean("whitelist.enable")) {
+        fun handle(message: String, event: GroupMessageEvent, action: String) {
+            if (!AQQBot.config.getBoolean("whitelist.admin")) {
                 return
             }
-            AQQBot.config.getStringList("whitelist.prefix.bind").forEach {
-                if (message.lowercase().startsWith(it.lowercase())) {
-                    val playerName = message.split(" ")[1]
-                    if (message.split(" ").size == 2 && (event.sender.role.equals("admin") || event.sender.role.equals("owner"))) {
-                        WhitelistAdminHandler.handle(message, event, "bind")
-                    } else {
-                        bind(event.sender.userId, event.groupId, playerName)
-                    }
-                    return
-                }
+            val userId = message.split(" ")[1].toLongOrNull()
+            if (userId == null) {
+                AQQBot.oneBotClient.bot.sendGroupMsg(event.groupId, "请输入正确的QQ号!", true)
+                return
             }
-            AQQBot.config.getStringList("whitelist.prefix.unbind").forEach {
-                if (message.lowercase().startsWith(it.lowercase())) {
-                    val playerName = message.substring(it.length + 1)
-                    if (message.split(" ").size == 2 && (event.sender.role.equals("admin") || event.sender.role.equals("owner"))) {
-                        WhitelistAdminHandler.handle(message, event, "unbind")
-                    } else {
-                        unbind(event.sender.userId, event.groupId, playerName)
-                    }
-                    return
-                }
+            val playerName = message.split(" ")[2]
+            if (AQQBot.oneBotClient.bot.getGroupMemberInfo(event.groupId, userId, false) == null) {
+                AQQBot.oneBotClient.bot.sendGroupMsg(event.groupId, "该用户不在本群!", true)
+                return
+            }
+            if (action == "bind") {
+                bind(userId.toString(), event.groupId, playerName)
+            } else if (action == "unbind") {
+                unbind(userId.toString(), event.groupId, playerName)
             }
         }
     }

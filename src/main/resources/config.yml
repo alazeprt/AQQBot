@@ -17,6 +17,10 @@ whitelist:
       - "/解绑"
       - "/unbind"
 
+  # 是否启用管理员管理
+  # 管理员可通过/${prefix} $userId $name 进行绑定/解绑
+  admin: true
+
 # 查询服务器基本信息
 # 需要安装 spark 插件作为前置 (部分paper(包括下游)服务端内置, 后台执行 spark 若有反应则说明内置)
 information:

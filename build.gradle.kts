@@ -28,12 +28,14 @@ taboolib {
 repositories {
     maven("https://maven.nova-committee.cn/releases")
     maven("https://oss.sonatype.org/content/repositories/snapshots")
+    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     mavenCentral()
 }
 
 dependencies {
-    taboo("cn.evole.onebot:OneBot-Client:0.4.0")
+    compileOnly("cn.evole.onebot:OneBot-Client:0.4.1")
     compileOnly("me.lucko:spark-api:0.1-SNAPSHOT")
+    compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("ink.ptms.core:v12004:12004:mapped")
     compileOnly("ink.ptms.core:v12004:12004:universal")
     compileOnly(kotlin("stdlib"))

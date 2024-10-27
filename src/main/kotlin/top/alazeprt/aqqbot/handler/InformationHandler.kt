@@ -1,5 +1,6 @@
 package top.alazeprt.aqqbot.handler
 
+import cn.evole.onebot.sdk.event.message.GroupMessageEvent
 import me.lucko.spark.api.statistic.StatisticWindow
 import org.bukkit.Bukkit
 import top.alazeprt.aqqbot.AQQBot
@@ -7,7 +8,7 @@ import top.alazeprt.aqqbot.DependencyImpl.Companion.spark
 
 class InformationHandler {
     companion object {
-        fun getTPS(groupId: Long) {
+        private fun getTPS(groupId: Long) {
             if(spark == null) {
                 AQQBot.oneBotClient.bot.sendGroupMsg(groupId,
                     "服务器尚未安装spark插件, 无法获取TPS! 请联系服务器管理员!", true)
@@ -33,10 +34,29 @@ class InformationHandler {
             }
         }
 
-        fun getPlayerList(groupId: Long) {
+        private fun getPlayerList(groupId: Long) {
             val playerList = Bukkit.getOnlinePlayers()
             AQQBot.oneBotClient.bot.sendGroupMsg(groupId, "服务器在线玩家(${playerList.size}): " +
                     playerList.map{ it.name }.joinToString(", "), true)
+        }
+
+        fun handle(message: String, event: GroupMessageEvent) {
+            AQQBot.config.getStringList("information.tps.command").forEach {
+                if (message.lowercase() == it.lowercase()) {
+                    getTPS(event.groupId)
+                    return
+                }
+            }
+            AQQBot.config.getStringList("information.list.command").forEach {
+                if (message.lowercase() == it.lowercase()) {
+                    getPlayerList(event.groupId)
+                    return
+                }
+            }
+            if(AQQBot.config.getBoolean("chat.group_to_server")) {
+                Bukkit.broadcastMessage(
+                    "§8[§aQQ群(${event.groupId})§8] §b${event.sender.nickname}: §f$message")
+            }
         }
     }
 }
