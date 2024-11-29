@@ -2,10 +2,13 @@ package top.alazeprt.aqqbot.handler
 
 import me.lucko.spark.api.statistic.StatisticWindow
 import org.bukkit.Bukkit
-import taboolib.common.platform.function.info
+import taboolib.platform.VelocityExecutor
+import taboolib.platform.VelocityPlugin
+import taboolib.platform.type.VelocityPlayer
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aqqbot.AQQBot
+import top.alazeprt.aqqbot.AQQBot.isBukkit
 import top.alazeprt.aqqbot.DependencyImpl.Companion.spark
 
 class InformationHandler {
@@ -81,19 +84,19 @@ class InformationHandler {
 
         fun handle(message: String, event: GroupMessageEvent): Boolean {
             AQQBot.config.getStringList("information.tps.command").forEach {
-                if (message.lowercase() == it.lowercase()) {
+                if (message.lowercase() == it.lowercase() && isBukkit) {
                     getTPS(event.groupId)
                     return true
                 }
             }
             AQQBot.config.getStringList("information.mspt.command").forEach {
-                if (message.lowercase() == it.lowercase()) {
+                if (message.lowercase() == it.lowercase() && isBukkit) {
                     getMSPT(event.groupId)
                     return true
                 }
             }
             AQQBot.config.getStringList("information.list.command").forEach {
-                if (message.lowercase() == it.lowercase()) {
+                if (message.lowercase() == it.lowercase() && isBukkit) {
                     getPlayerList(event.groupId)
                     return true
                 }

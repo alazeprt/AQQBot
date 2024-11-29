@@ -1,11 +1,11 @@
 package top.alazeprt.aqqbot
 
+import taboolib.common.io.newFile
 import taboolib.common.platform.Plugin
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.info
 import taboolib.common.platform.function.submit
-import taboolib.module.configuration.Config
-import taboolib.module.configuration.ConfigFile
+import taboolib.module.configuration.Configuration
 import top.alazeprt.aonebot.BotClient
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.qq.BotListener
@@ -14,25 +14,36 @@ import java.net.URI
 
 object AQQBot : Plugin() {
 
-    @Config("bot.yml")
-    lateinit var botConfig: ConfigFile
+    lateinit var botConfig: Configuration
 
-    @Config("data.yml")
-    lateinit var dataConfig: ConfigFile
+    lateinit var dataConfig: Configuration
 
-    @Config("config.yml")
-    lateinit var config: ConfigFile
+    lateinit var config: Configuration
 
     lateinit var oneBotClient: BotClient
 
-    var alsoNoticed = false
+    private var alsoNoticed = false
+
+    var isBukkit = true
 
     val enableGroups: MutableList<String> = mutableListOf()
 
     val dataMap: MutableMap<String, String> = mutableMapOf()
 
     override fun onActive() {
+        info("Checking server type...")
+        try {
+            Class.forName("org.bukkit.Bukkit")
+        } catch (e: ClassNotFoundException) {
+            isBukkit = false
+        }
         info("Loading data...")
+        val configFile = newFile(getDataFolder(), "config.yml", create = true)
+        config = Configuration.loadFromFile(configFile)
+        val dataFile = newFile(getDataFolder(), "data.yml", create = true)
+        dataConfig = Configuration.loadFromFile(dataFile)
+        val botFile = newFile(getDataFolder(), "bot.yml", create = true)
+        botConfig = Configuration.loadFromFile(botFile)
         dataConfig.getKeys(false).forEach {
             dataMap[it] = (dataConfig.getString(it)?: return@forEach)
         }
@@ -41,8 +52,10 @@ object AQQBot : Plugin() {
         }
         info("Loading soft dependency...")
         DependencyImpl.loadSpark()
-        DependencyImpl.loadPlayerStats()
-        DependencyImpl.loadPAPI()
+        if (isBukkit) {
+            DependencyImpl.loadPlayerStats()
+            DependencyImpl.loadPAPI()
+        }
         submit(async = true) {
             info("Enabling bot...")
             val url = "ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")

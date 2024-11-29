@@ -1,7 +1,4 @@
-import io.izzel.taboolib.gradle.BUKKIT
-import io.izzel.taboolib.gradle.Basic
-import io.izzel.taboolib.gradle.Bukkit
-import io.izzel.taboolib.gradle.UNIVERSAL
+import io.izzel.taboolib.gradle.*
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -13,14 +10,9 @@ plugins {
 taboolib {
     env {
         // 安装模块
-        install(Bukkit, Basic)
+        install(Bukkit, Basic, Velocity)
     }
     description {
-        dependencies {
-            name("spark").optional(true)
-            name("PlayerStats").optional(true)
-            name("PlaceholderAPI").optional(true)
-        }
         contributors {
             name("alazeprt")
         }
@@ -44,6 +36,7 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("ink.ptms.core:v12101:12101:mapped")
     compileOnly("ink.ptms.core:v12101:12101:universal")
+    compileOnly("io.papermc:velocity:3.3.0:376")
     compileOnly(kotlin("stdlib"))
     compileOnly(fileTree("libs"))
 }
