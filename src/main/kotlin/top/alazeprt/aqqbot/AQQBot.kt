@@ -1,9 +1,9 @@
 package top.alazeprt.aqqbot
 
-import taboolib.common.io.newFile
 import taboolib.common.platform.Plugin
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.info
+import taboolib.common.platform.function.releaseResourceFile
 import taboolib.common.platform.function.submit
 import taboolib.module.configuration.Configuration
 import top.alazeprt.aonebot.BotClient
@@ -38,11 +38,11 @@ object AQQBot : Plugin() {
             isBukkit = false
         }
         info("Loading data...")
-        val configFile = newFile(getDataFolder(), "config.yml", create = true)
+        val configFile = releaseResourceFile("config.yml", replace = false)
         config = Configuration.loadFromFile(configFile)
-        val dataFile = newFile(getDataFolder(), "data.yml", create = true)
+        val dataFile = releaseResourceFile("data.yml", replace = false)
         dataConfig = Configuration.loadFromFile(dataFile)
-        val botFile = newFile(getDataFolder(), "bot.yml", create = true)
+        val botFile = releaseResourceFile("bot.yml", replace = false)
         botConfig = Configuration.loadFromFile(botFile)
         dataConfig.getKeys(false).forEach {
             dataMap[it] = (dataConfig.getString(it)?: return@forEach)

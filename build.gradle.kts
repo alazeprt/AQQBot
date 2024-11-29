@@ -1,4 +1,6 @@
-import io.izzel.taboolib.gradle.*
+import io.izzel.taboolib.gradle.Basic
+import io.izzel.taboolib.gradle.Bukkit
+import io.izzel.taboolib.gradle.Velocity
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {

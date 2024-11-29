@@ -11,8 +11,8 @@ import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.AQQBot.config
-import top.alazeprt.aqqbot.DependencyImpl.Companion.withPAPI
 import top.alazeprt.aqqbot.DependencyImpl.Companion.playerStats
+import top.alazeprt.aqqbot.DependencyImpl.Companion.withPAPI
 import java.text.SimpleDateFormat
 
 class StatsHandler {

@@ -1,6 +1,5 @@
 package top.alazeprt.aqqbot.handler
 
-import taboolib.common.platform.function.info
 import top.alazeprt.aonebot.action.GetGroupMemberInfo
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
@@ -61,7 +60,6 @@ class WhitelistHandler {
             AQQBot.config.getStringList("whitelist.prefix.bind").forEach {
                 if (message.lowercase().startsWith(it.lowercase())) {
                     val playerName = message.split(" ")[1]
-                    message.split(" ").forEach { a -> info(a) }
                     AQQBot.oneBotClient.action(GetGroupMemberInfo(event.groupId, event.senderId)) { sender ->
                         if (message.split(" ").size == 3 && (sender.role == GroupRole.ADMIN || sender.role == GroupRole.OWNER)) {
                             WhitelistAdminHandler.handle(message, event, "bind")

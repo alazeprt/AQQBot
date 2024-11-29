@@ -2,9 +2,6 @@ package top.alazeprt.aqqbot.handler
 
 import me.lucko.spark.api.statistic.StatisticWindow
 import org.bukkit.Bukkit
-import taboolib.platform.VelocityExecutor
-import taboolib.platform.VelocityPlugin
-import taboolib.platform.type.VelocityPlayer
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aqqbot.AQQBot

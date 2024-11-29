@@ -37,5 +37,5 @@ groups:
 
 4. Restart the server, if there is no error and warning, the connection is successful.
 
-## Protocol
+## License
 This plugin is open source based on LGPL-2.1 agreement, please abide by the agreement, the final interpretation right belongs to *alazeprt* all rights reserved.
