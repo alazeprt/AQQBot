@@ -52,6 +52,34 @@ information:
       - "服务器在线玩家"
       - "/服务器在线玩家"
 
+  # 功能: 查看服务器CPU占用信息 输出结果:
+  # 服务器CPU占用率: ${cpu_10_seconds}, ${cpu_1_min}, ${cpu_15_min}
+  cpu:
+    # 是否启用该功能
+    enable: true
+
+    # 获取指令
+    command:
+      - "/cpu"
+      - "cpu"
+      - "服务器cpu"
+      - "/服务器cpu"
+      - "cpu占用率"
+      - "/cpu占用率"
+      -
+  # 功能: 查看服务器MSPT(均为平均值) 输出结果:
+  # 服务器MSPT: ${mspt_10_seconds}, ${mspt_1_min}, ${mspt_15_min}
+  mspt:
+    # 是否启用该功能
+    enable: true
+
+    # 获取指令
+    command:
+      - "/mspt"
+      - "mspt"
+      - "服务器mspt"
+      - "/服务器mspt"
+
 # 聊天(群服互联)功能
 # * 该功能仅支持Bukkit类服务端
 chat:
@@ -62,3 +90,55 @@ chat:
   # 是否启用服->群聊天转发功能 转发结果:
   # [服务器] ${sender}: ${message}
   server_to_group: true
+
+# 玩家统计信息
+# * 该功能仅支持Bukkit类服务端
+# 大部分信息需要安装PlayerStats插件作为前置
+# 权限 & 组织 信息需要安装PlaceholderAPI插件作为前置
+stats:
+  # 是否开启该功能
+  enable: true
+
+  # 获取指令
+  command:
+    - "/stats"
+    - "stats"
+    - "统计信息"
+    - "/统计信息"
+    - "玩家统计信息"
+    - "/玩家统计信息"
+
+  # 组织信息来源
+  party:
+    # 是否启用该功能
+    enable: false
+
+    # 获取的PlaceholderAPI变量
+    placeholder: "%parties_name%"
+
+    # 将颜色符号格式化
+    format: false
+
+  # 称号信息来源
+  prefix:
+    # 是否启用该功能
+    enable: true
+
+    # 获取的PlaceholderAPI变量
+    placeholder: "%luckperms_prefix%"
+
+    # 将颜色符号格式化
+    format: true
+
+# 服务器开启/关闭通知
+notify:
+  # 是否开启该功能
+  enable: true
+
+  # 通知信息:
+  messages:
+    # 开启时:
+    start: "[AQQBot] XXX服务器已启动!"
+
+    # 关闭时:
+    stop: "[AQQBot] XXX服务器已关闭!"

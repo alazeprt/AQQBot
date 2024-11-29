@@ -3,9 +3,9 @@ package top.alazeprt.aqqbot.event
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
-import org.bukkit.event.player.PlayerJoinEvent
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
+import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.AQQBot
 
 class AJoinEvent : Listener {
@@ -23,7 +23,7 @@ class AJoinEvent : Listener {
             if(AQQBot.config.getBoolean("chat.server_to_group")) {
                 submit (async = true) {
                     AQQBot.enableGroups.forEach {
-                        AQQBot.oneBotClient.bot.sendGroupMsg(it.toLong(), "[服务器] ${event.player.name}: ${event.message}", true)
+                        AQQBot.oneBotClient.action(SendGroupMessage(it.toLong(), "[服务器] ${event.player.name}: ${event.message}", true))
                     }
                 }
             }

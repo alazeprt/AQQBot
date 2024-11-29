@@ -1,34 +1,17 @@
 package top.alazeprt.aqqbot
 
-import cn.evole.onebot.client.OneBotClient
-import cn.evole.onebot.client.core.BotConfig
-import taboolib.common.env.RuntimeDependencies
-import taboolib.common.env.RuntimeDependency
 import taboolib.common.platform.Plugin
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.info
 import taboolib.common.platform.function.submit
 import taboolib.module.configuration.Config
 import taboolib.module.configuration.ConfigFile
+import top.alazeprt.aonebot.BotClient
+import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.qq.BotListener
 import java.io.File
+import java.net.URI
 
-
-@RuntimeDependencies(
-    RuntimeDependency(
-        value = "org.java-websocket:Java-WebSocket:1.5.5",
-    ),
-    RuntimeDependency(
-        value = "net.kyori:event-method:3.0.0",
-    ),
-    RuntimeDependency(
-        value = "net.kyori:event-api:3.0.0",
-    ),
-    RuntimeDependency(
-        value = "cn.evole.onebot:OneBot-Client:0.4.0",
-        repository = "https://maven.nova-committee.cn/releases"
-    ),
-)
 object AQQBot : Plugin() {
 
     @Config("bot.yml")
@@ -40,7 +23,9 @@ object AQQBot : Plugin() {
     @Config("config.yml")
     lateinit var config: ConfigFile
 
-    lateinit var oneBotClient: OneBotClient
+    lateinit var oneBotClient: BotClient
+
+    var alsoNoticed = false
 
     val enableGroups: MutableList<String> = mutableListOf()
 
@@ -56,10 +41,21 @@ object AQQBot : Plugin() {
         }
         info("Loading soft dependency...")
         DependencyImpl.loadSpark()
+        DependencyImpl.loadPlayerStats()
+        DependencyImpl.loadPAPI()
         submit(async = true) {
             info("Enabling bot...")
             val url = "ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")
-            oneBotClient = OneBotClient.create(BotConfig(url)).open().registerEvents(BotListener())
+            oneBotClient = BotClient(URI.create(url))
+            oneBotClient.connect()
+            if (config.getBoolean("notify.enable") && !alsoNoticed) {
+                enableGroups.forEach {
+                    val msg = config.getString("notify.messages.start")?: return@forEach
+                    oneBotClient.action(SendGroupMessage(it.toLong(), msg))
+                }
+                alsoNoticed = true
+            }
+            oneBotClient.registerEvent(BotListener())
         }
     }
 
@@ -68,5 +64,16 @@ object AQQBot : Plugin() {
             dataConfig[it.key] = it.value
         }
         dataConfig.saveToFile(File(getDataFolder(), "data.yml"))
+        if (config.getBoolean("notify.enable")) {
+            enableGroups.forEach {
+                val msg = config.getString("notify.messages.stop")?: return@forEach
+                if (oneBotClient.isConnected) {
+                    oneBotClient.action(SendGroupMessage(it.toLong(), msg))
+                }
+            }
+        }
+        if (oneBotClient.isConnected) {
+            oneBotClient.disconnect()
+        }
     }
 }
