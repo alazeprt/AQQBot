@@ -81,24 +81,28 @@ class InformationHandler {
 
         fun handle(message: String, event: GroupMessageEvent): Boolean {
             AQQBot.config.getStringList("information.tps.command").forEach {
+                if (!AQQBot.config.getBoolean("information.tps.enable")) return@forEach
                 if (message.lowercase() == it.lowercase() && isBukkit) {
                     getTPS(event.groupId)
                     return true
                 }
             }
             AQQBot.config.getStringList("information.mspt.command").forEach {
+                if (!AQQBot.config.getBoolean("information.mspt.enable")) return@forEach
                 if (message.lowercase() == it.lowercase() && isBukkit) {
                     getMSPT(event.groupId)
                     return true
                 }
             }
             AQQBot.config.getStringList("information.list.command").forEach {
+                if (!AQQBot.config.getBoolean("information.list.enable")) return@forEach
                 if (message.lowercase() == it.lowercase() && isBukkit) {
                     getPlayerList(event.groupId)
                     return true
                 }
             }
             AQQBot.config.getStringList("information.cpu.command").forEach {
+                if (!AQQBot.config.getBoolean("information.cpu.enable")) return@forEach
                 if (message.lowercase() == it.lowercase()) {
                     getCPUInfo(event.groupId)
                     return true

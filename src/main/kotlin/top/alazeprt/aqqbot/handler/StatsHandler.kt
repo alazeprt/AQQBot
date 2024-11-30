@@ -100,6 +100,7 @@ class StatsHandler {
 
         fun handle(message: String, event: GroupMessageEvent): Boolean {
             config.getStringList("stats.command").forEach {
+                if (!config.getBoolean("stats.enable")) return@forEach
                 if (message.lowercase() == it.lowercase()) {
                     getStats(event.groupId, event.senderId)
                     return true
