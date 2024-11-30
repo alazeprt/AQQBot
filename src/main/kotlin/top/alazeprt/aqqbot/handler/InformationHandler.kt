@@ -7,13 +7,14 @@ import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.AQQBot.isBukkit
 import top.alazeprt.aqqbot.DependencyImpl.Companion.spark
+import top.alazeprt.aqqbot.util.AI18n.get
 
 class InformationHandler {
     companion object {
         private fun getTPS(groupId: Long) {
             if (spark == null) {
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId,
-                    "服务器尚未安装spark插件, 无法获取TPS! 请联系服务器管理员!", true))
+                    get("qq.information.tps.not_installed_dependency"), true))
                 return
             } else {
                 val tps = spark?.tps()
@@ -22,23 +23,31 @@ class InformationHandler {
                 val tps1Min = roundTPS(tps?.poll(StatisticWindow.TicksPerSecond.MINUTES_1)?: -1.0)
                 val tps5Min = roundTPS(tps?.poll(StatisticWindow.TicksPerSecond.MINUTES_5)?: -1.0)
                 val tps15Min = roundTPS(tps?.poll(StatisticWindow.TicksPerSecond.MINUTES_15)?: -1.0)
-                AQQBot.oneBotClient.action(SendGroupMessage(groupId,
-                    "服务器TPS: $tps5Secs, $tps10Secs, $tps1Min, $tps5Min, $tps15Min", true))
+                AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.information.tps.result", mutableMapOf(
+                    Pair("tps_5_seconds", tps5Secs),
+                    Pair("tps_10_seconds", tps10Secs),
+                    Pair("tps_1_minute", tps1Min),
+                    Pair("tps_5_minutes", tps5Min),
+                    Pair("tps_15_minutes", tps15Min)
+                )), true))
             }
         }
         
         private fun getMSPT(groupId: Long) {
             if (spark == null) {
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId,
-                    "服务器尚未安装spark插件, 无法获取MSPT! 请联系服务器管理员!", true))
+                    get("qq.information.mspt.not_installed_dependency"), true))
                 return
             } else {
                 val mspt = spark?.mspt()
                 val mspt10Secs = roundMSPT(mspt?.poll(StatisticWindow.MillisPerTick.SECONDS_10)?.median()?: -1.0)
                 val mspt1Min = roundMSPT(mspt?.poll(StatisticWindow.MillisPerTick.MINUTES_1)?.median()?: -1.0)
                 val mspt5Min = roundMSPT(mspt?.poll(StatisticWindow.MillisPerTick.MINUTES_5)?.median()?: -1.0)
-                AQQBot.oneBotClient.action(SendGroupMessage(groupId,
-                    "服务器MSPT: $mspt10Secs, $mspt1Min, $mspt5Min", true))
+                AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.information.mspt.result", mutableMapOf(
+                    Pair("mspt_10_seconds", mspt10Secs),
+                    Pair("mspt_1_minute", mspt1Min),
+                    Pair("mspt_5_minutes", mspt5Min)
+                )), true))
             }
         }
 
@@ -61,21 +70,27 @@ class InformationHandler {
         private fun getPlayerList(groupId: Long) {
             val playerList = Bukkit.getOnlinePlayers()
             AQQBot.oneBotClient.action(
-                SendGroupMessage(groupId, "服务器在线玩家(${playerList.size}): " +
-                    playerList.map{ it.name }.joinToString(", "), true))
+                SendGroupMessage(groupId, get("qq.information.player_list.result", mutableMapOf(
+                    Pair("count", playerList.size.toString()),
+                    Pair("player_list", playerList.joinToString { it.name })
+                )), true))
         }
 
         private fun getCPUInfo(groupId: Long) {
             if (spark == null) {
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId,
-                    "服务器尚未安装spark插件, 无法获取CPU信息! 请联系服务器管理员!", true))
+                    get("qq.information.cpu.not_installed_dependency"), true))
                 return
             } else {
                 val cpu = spark?.cpuSystem()
                 val cpu10Secs = roundCPU(cpu?.poll(StatisticWindow.CpuUsage.SECONDS_10)?: -1.0)
                 val cpu1Min = roundCPU(cpu?.poll(StatisticWindow.CpuUsage.MINUTES_1)?: -1.0)
                 val cpu15Min = roundCPU(cpu?.poll(StatisticWindow.CpuUsage.MINUTES_15)?: -1.0)
-                AQQBot.oneBotClient.action(SendGroupMessage(groupId, "服务器CPU占用率: $cpu10Secs%, $cpu1Min%, $cpu15Min%", true))
+                AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.information.cpu.result", mutableMapOf(
+                    Pair("cpu_10_seconds", cpu10Secs),
+                    Pair("cpu_1_minute", cpu1Min),
+                    Pair("cpu_15_minutes", cpu15Min)
+                )), true))
             }
         }
 

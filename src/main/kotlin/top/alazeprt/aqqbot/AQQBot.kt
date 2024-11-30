@@ -20,6 +20,8 @@ object AQQBot : Plugin() {
 
     lateinit var config: Configuration
 
+    lateinit var messageConfig: Configuration
+
     lateinit var oneBotClient: BotClient
 
     private var alsoNoticed = false
@@ -44,6 +46,8 @@ object AQQBot : Plugin() {
         dataConfig = Configuration.loadFromFile(dataFile)
         val botFile = releaseResourceFile("bot.yml", replace = false)
         botConfig = Configuration.loadFromFile(botFile)
+        val messageFile = releaseResourceFile("messages.yml", replace = false)
+        messageConfig = Configuration.loadFromFile(messageFile)
         dataConfig.getKeys(false).forEach {
             dataMap[it] = (dataConfig.getString(it)?: return@forEach)
         }

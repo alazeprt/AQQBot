@@ -7,12 +7,16 @@ import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.Statistic
 import org.bukkit.ban.ProfileBanList
+import taboolib.common5.util.replace
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.AQQBot.config
 import top.alazeprt.aqqbot.DependencyImpl.Companion.playerStats
 import top.alazeprt.aqqbot.DependencyImpl.Companion.withPAPI
+import top.alazeprt.aqqbot.util.AI18n.get
+import top.alazeprt.aqqbot.util.AI18n.getList
+import top.alazeprt.aqqbot.util.AI18n.getOriginList
 import java.text.SimpleDateFormat
 
 class StatsHandler {
@@ -41,25 +45,30 @@ class StatsHandler {
         private fun getStats(groupId: Long, userId: Long) {
             if (playerStats == null) {
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId,
-                    "服务器尚未安装PlayerStats插件, 无法获取玩家统计信息! 请联系服务器管理员!", true))
+                    get("qq.stats.not_installed_dependency"), true))
                 return
             }
             if (!AQQBot.dataMap.containsKey(userId.toString())) {
-                AQQBot.oneBotClient.action(SendGroupMessage(groupId, "你尚未绑定账号! 无法获取玩家统计信息!", true))
+                AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.stats.not_bind"), true))
                 return
             }
             val name = AQQBot.dataMap[userId.toString()]!!
             val banEntry = Bukkit.getBanList<ProfileBanList>(BanList.Type.PROFILE).getBanEntry(name)
+            val uuid = Bukkit.getOfflinePlayer(name).uniqueId
+            val lastLogin = Bukkit.getOfflinePlayer(uuid).lastPlayed
             if (banEntry != null) {
                 val banTime = banEntry.created
                 val expireTime = banEntry.expiration
                 val reason = banEntry.reason
-                AQQBot.oneBotClient.action(SendGroupMessage(groupId, "QQ号: ${userId}\n" +
-                        "游戏名: ${name}\n" +
-                        "在线状态: 封禁\n" +
-                        "封禁原因: ${reason}\n" +
-                        "封禁时间: ${format.format(banTime)}\n" +
-                        "解封时间: ${if (expireTime == null) "永久封禁" else format.format(expireTime)}"))
+                AQQBot.oneBotClient.action(SendGroupMessage(groupId, getList("qq.stats.result.ban", mutableMapOf(
+                    Pair("userId", userId.toString()),
+                    Pair("name", name),
+                    Pair("reason", reason ?: get("qq.stats.result.dont_have_reason")),
+                    Pair("ban_time", format.format(banTime)),
+                    Pair("unban_time", if (expireTime == null) "永久封禁" else format.format(expireTime)),
+                    Pair("last_login_time", if (lastLogin == 0L) get("qq.stats.result.did_not_login") else format.format(lastLogin)),
+                    Pair("uuid", uuid.toString())
+                ))))
                 return
             }
             val mob_killed = playerStats!!.statManager.executePlayerStatRequest(PlayerStatRequest(name)
@@ -72,29 +81,39 @@ class StatsHandler {
                 .untyped(Statistic.SPRINT_ONE_CM)).value
             val mine_ancient_debris = playerStats!!.statManager.executePlayerStatRequest(PlayerStatRequest(name)
                 .blockOrItemType(Statistic.MINE_BLOCK, Material.ANCIENT_DEBRIS)).value
-            val uuid = Bukkit.getOfflinePlayer(name).uniqueId
-            val lastLogin = Bukkit.getOfflinePlayer(uuid).lastPlayed
-            var message = "QQ号: ${userId}\n" +
-                    "游戏名: ${name}\n" +
-                    "在线状态: ${if (Bukkit.getOfflinePlayer(name).isOnline) "在线" else "离线"}\n" +
-                    "上次登录时间: ${if (lastLogin == 0L) "你还没有有玩过捏" else format.format(lastLogin)}\n" +
-                    "UUID: ${uuid}\n" +
-                    "击杀怪物数: ${mob_killed ?: 0}\n" +
-                    "在线时长: ${if (online_time == null) 0 else formatDuration(online_time/20)}\n" +
-                    "行走距离: ${if (walk_distance == null && run_distance == null) 0 else if (walk_distance == null) run_distance/100.0 
-                    else if (run_distance == null) walk_distance/100.0 else (run_distance+walk_distance)/100}m\n" +
-                    "挖掘残骸数: ${mine_ancient_debris ?: 0}"
+            var messageList = getOriginList("qq.stats.result.normal", mutableMapOf(
+                Pair("userId", userId.toString()),
+                Pair("name", name),
+                Pair("online", if (Bukkit.getOfflinePlayer(name).isOnline) "在线" else "离线"),
+                Pair("last_login_time", if (lastLogin == 0L) "你还没有有玩过捏" else format.format(lastLogin)),
+                Pair("uuid", uuid.toString()),
+                Pair("kill_mobs_count", mob_killed?.toString() ?: "0"),
+                Pair("online_time", if (online_time == null) "0" else formatDuration(online_time/20)),
+                Pair("walk_distance", if (walk_distance == null && run_distance == null) "0" else if (walk_distance == null) (run_distance/100.0).toString()
+                else if (run_distance == null) (walk_distance/100.0).toString() else ((run_distance+walk_distance)/100).toString()),
+                Pair("break_ancient_debris_count", mine_ancient_debris?.toString() ?: "0")
+            ))
             if (config.getBoolean("stats.party.enable") && withPAPI && Bukkit.getOfflinePlayer(name).isOnline) {
                 var party = PlaceholderAPI.setPlaceholders(Bukkit.getOfflinePlayer(name), config.getString("stats.party.placeholder")!!)
                 if (config.getBoolean("stats.party.format")) party = formatString(party)
-                message += "\n组织: ${party.ifEmpty { "你还没有加入组织捏" }}"
+                messageList = messageList.replace(Pair("\${organization}", party.ifEmpty { get("qq.stats.result.dont_have_organization") }))
+                    .toMutableList()
+            } else {
+                messageList.removeIf {
+                    it.contains("\${organization}")
+                }
             }
             if (config.getBoolean("stats.prefix.enable") && withPAPI && Bukkit.getOfflinePlayer(name).isOnline) {
                 var prefix = PlaceholderAPI.setPlaceholders(Bukkit.getOfflinePlayer(name), config.getString("stats.prefix.placeholder")!!)
                 if (config.getBoolean("stats.prefix.format")) prefix = formatString(prefix)
-                message += "\n称号: ${prefix.ifEmpty { "你还没有称号捏" }}"
+                messageList =
+                    messageList.replace(Pair("\${prefix}", prefix.ifEmpty { get("qq.stats.result.dont_have_prefix") })).toMutableList()
+            } else {
+                messageList.removeIf {
+                    it.contains("\${prefix}")
+                }
             }
-            AQQBot.oneBotClient.action(SendGroupMessage(groupId, message, true))
+            AQQBot.oneBotClient.action(SendGroupMessage(groupId, messageList.joinToString("\n"), true))
         }
 
 

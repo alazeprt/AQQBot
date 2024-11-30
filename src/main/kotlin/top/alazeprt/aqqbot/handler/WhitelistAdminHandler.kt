@@ -4,31 +4,32 @@ import top.alazeprt.aonebot.action.GetGroupMemberList
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aqqbot.AQQBot
+import top.alazeprt.aqqbot.util.AI18n.get
 
 class WhitelistAdminHandler {
     companion object {
         private fun bind(userId: String, groupId: Long, playerName: String) {
             if (AQQBot.dataMap.containsKey(userId)) {
-                AQQBot.oneBotClient.action(SendGroupMessage(groupId, "他(${userId})已经绑定过了!"))
+                AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.admin.already_bind", mutableMapOf(Pair("userId", userId)))))
                 return
             }
             if (!validateName(playerName)) {
-                AQQBot.oneBotClient.action(SendGroupMessage(groupId, "名称不合法! (名称只能由字母、数字、下划线组成)", true))
+                AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.invalid_name"), true))
                 return
             }
             AQQBot.dataMap.values.forEach {
                 if (it == playerName) {
-                    AQQBot.oneBotClient.action(SendGroupMessage(groupId, "该名称已被他人占用!", true))
+                    AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.already_exist"), true))
                     return
                 }
             }
             AQQBot.dataMap[userId] = playerName
-            AQQBot.oneBotClient.action(SendGroupMessage(groupId, "绑定成功!", true))
+            AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.bind_successful"), true))
         }
 
         private fun unbind(userId: String, groupId: Long, playerName: String) {
             if (!AQQBot.dataMap.containsKey(userId)) {
-                AQQBot.oneBotClient.action(SendGroupMessage(groupId, "他(${userId})还没有绑定过!", true))
+                AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.admin.not_bind", mutableMapOf(Pair("userId", userId))), true))
                 return
             }
             AQQBot.dataMap.forEach { (k, v) ->
@@ -37,12 +38,11 @@ class WhitelistAdminHandler {
                     AQQBot.oneBotClient.action(SendGroupMessage(groupId, "解绑成功!", true))
                     return
                 } else if (k == userId) {
-                    AQQBot.oneBotClient.action(SendGroupMessage(groupId, "该名称不是他(${userId})绑定的! " +
-                            "你绑定的名称为: $v", true))
+                    AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.admin.bind_by_other", mutableMapOf(Pair("name", v))), true))
                     return
                 }
             }
-            AQQBot.oneBotClient.action(SendGroupMessage(groupId, "该名称尚未绑定过/不是他(${userId})绑定的!", true))
+            AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.admin.invalid_bind", mutableMapOf(Pair("userId", userId))), true))
         }
 
         private fun validateName(name: String): Boolean {
@@ -56,7 +56,7 @@ class WhitelistAdminHandler {
             }
             val userId = message.split(" ")[1].toLongOrNull()
             if (userId == null) {
-                AQQBot.oneBotClient.action(SendGroupMessage(event.groupId, "请输入正确的QQ号!", true))
+                AQQBot.oneBotClient.action(SendGroupMessage(event.groupId, get("qq.whitelist.admin.invalid_user_id"), true))
                 return
             }
             val playerName = message.split(" ")[2]
@@ -69,7 +69,7 @@ class WhitelistAdminHandler {
                     }
                 }
                 if (!has) {
-                    AQQBot.oneBotClient.action(SendGroupMessage(event.groupId, "该用户不在本群!", true))
+                    AQQBot.oneBotClient.action(SendGroupMessage(event.groupId, get("qq.whitelist.admin.user_not_in_group"), true))
                     return@action
                 } else {
                     if (action == "bind") {

@@ -1,0 +1,64 @@
+# 语言文件
+# 以${开头, }结尾 (如${name}) 的是占位符, 在实际中会被替换
+
+# 此部分为发送到Q群的消息
+qq:
+  whitelist:
+    already_bind: "你已经绑定过了"
+    invalid_name: "名称不合法! (名称只能由字母、数字、下划线组成)"
+    already_exist: "该名称已被他人占用!"
+    bind_successful: "绑定成功!"
+    not_bind: "你还没有绑定过!"
+    unbind_successful: "解绑成功!"
+    bind_by_other: "该名称不是你绑定的! 你绑定的名称是: ${name}"
+    invalid_bind: "该名称尚未绑定过/不是你绑定的!"
+    admin:
+      already_bind: "他(${userId})已经绑定过了!"
+      not_bind: "他(${userId})还没有绑定过!"
+      bind_by_other: "该名称不是他绑定的! 他绑定的名称是: ${name}"
+      invalid_bind: "该名称尚未绑定过/不是他(${userId})绑定的!"
+      invalid_user_id: "请输入正确的QQ号!"
+      user_not_in_group: "该用户不在本群!"
+
+  information:
+    tps:
+      not_installed_dependency: "服务器尚未安装spark插件, 无法获取TPS! 请联系服务器管理员!"
+      result: "服务器TPS: ${tps_5_seconds}, ${tps_10_seconds}, ${tps_1_minute}, ${tps_5_minutes}, ${tps_15_minutes}"
+    mspt:
+      not_installed_dependency: "服务器尚未安装spark插件, 无法获取MSPT! 请联系服务器管理员!"
+      result: "服务器MSPT: ${mspt_10_seconds}, ${mspt_1_minute}, ${mspt_5_minutes}"
+    cpu:
+      not_installed_dependency: "服务器尚未安装spark插件, 无法获取CPU占用情况信息! 请联系服务器管理员!"
+      result: "服务器CPU占用率: ${cpu_10_seconds}%, ${cpu_1_minute}%, ${cpu_15_minutes}%"
+    player_list:
+      result: "服务器在线玩家(${count}): ${player_list}"
+
+  stats:
+    not_installed_dependency: "服务器尚未安装PlayerStats插件, 无法获取玩家统计信息! 请联系服务器管理员!"
+    not_bind: "你尚未绑定账号! 无法获取玩家统计信息!"
+    result:
+      ban: # 含有自动换行
+        - "QQ号: ${userId}"
+        - "游戏名: ${name}"
+        - "在线状态: 封禁"
+        - "上次登录时间: ${last_login_time}"
+        - "UUID: ${uuid}"
+        - "封禁原因: ${reason}"
+        - "封禁时间: ${ban_time}"
+        - "解封时间: ${unban_time}"
+      normal:
+        - "QQ号: ${userId}"
+        - "游戏名: ${name}"
+        - "在线状态: ${online}" # 在线 / 离线
+        - "上次登录时间: ${last_login_time}"
+        - "UUID: ${uuid}"
+        - "击杀怪物数: ${kill_mobs_count}"
+        - "在线时长: ${online_time}"
+        - "行走距离: ${walk_distance}"
+        - "挖掘残骸数: ${break_ancient_debris_count}"
+        - "组织: ${organization}" # 若不开启该功能则不会显示含有 ${organization} 的项
+        - "称号: ${prefix}" # 与 组织 同理
+      dont_have_reason: "无" # 当封禁原因没有时, 显示这个
+      did_not_login: "从未登录过" # 当上次登录时间为0时, 显示这个
+      dont_have_organization: "你还没有加入组织捏" # 若所对应的变量为空, 则显示这个
+      dont_have_prefix: "你还没有称号捏" # 与 上一项 同理
