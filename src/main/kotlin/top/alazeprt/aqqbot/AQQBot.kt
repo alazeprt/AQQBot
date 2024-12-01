@@ -6,11 +6,13 @@ import taboolib.common.platform.function.info
 import taboolib.common.platform.function.releaseResourceFile
 import taboolib.common.platform.function.submit
 import taboolib.module.configuration.Configuration
+import taboolib.module.database.*
 import top.alazeprt.aonebot.BotClient
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.qq.BotListener
 import java.io.File
 import java.net.URI
+import javax.sql.DataSource
 
 object AQQBot : Plugin() {
 
@@ -32,6 +34,12 @@ object AQQBot : Plugin() {
 
     val dataMap: MutableMap<String, String> = mutableMapOf()
 
+    lateinit var table: Table<*, *>
+
+    lateinit var dataSource: DataSource
+
+    var isFileStorage: Boolean = false
+
     override fun onActive() {
         info("Checking server type...")
         try {
@@ -44,6 +52,42 @@ object AQQBot : Plugin() {
         config = Configuration.loadFromFile(configFile)
         val dataFile = releaseResourceFile("data.yml", replace = false)
         dataConfig = Configuration.loadFromFile(dataFile)
+        if (config.getString("storage.type")!!.lowercase() == "file") isFileStorage = true
+        else if (config.getString("storage.type")!!.lowercase() == "sqlite") {
+            val host = HostSQLite(File(getDataFolder(), config.getString("storage.sqlite.file")?: "aqqbot.db"))
+            val dataSource by lazy { host.createDataSource() }
+            table = Table("account_data", host) {
+                add("userId") {
+                    type(ColumnTypeSQLite.INTEGER) {
+                        options(ColumnOptionSQLite.PRIMARY_KEY)
+                    }
+                }
+                add("name") {
+                    type(ColumnTypeSQLite.TEXT) {
+                        options(ColumnOptionSQLite.NOTNULL)
+                    }
+                }
+            }
+            AQQBot.dataSource = dataSource
+            table.createTable(dataSource)
+        } else if (config.getString("storage.type")!!.lowercase() == "mysql") {
+            val host = config.getHost("storage.mysql")
+            val dataSource by lazy { host.createDataSource() }
+            table = Table("account_data", host) {
+                add("userId") {
+                    type(ColumnTypeSQL.BIGINT) {
+                        options(ColumnOptionSQL.PRIMARY_KEY)
+                    }
+                }
+                add("name") {
+                    type(ColumnTypeSQL.VARCHAR) {
+                        options(ColumnOptionSQL.NOTNULL)
+                    }
+                }
+            }
+            AQQBot.dataSource = dataSource
+            table.createTable(dataSource)
+        }
         val botFile = releaseResourceFile("bot.yml", replace = false)
         botConfig = Configuration.loadFromFile(botFile)
         val messageFile = releaseResourceFile("messages.yml", replace = false)
@@ -77,10 +121,12 @@ object AQQBot : Plugin() {
     }
 
     override fun onDisable() {
-        dataMap.forEach {
-            dataConfig[it.key] = it.value
+        if (isFileStorage) {
+            dataMap.forEach {
+                dataConfig[it.key] = it.value
+            }
+            dataConfig.saveToFile(File(getDataFolder(), "data.yml"))
         }
-        dataConfig.saveToFile(File(getDataFolder(), "data.yml"))
         if (config.getBoolean("notify.enable")) {
             enableGroups.forEach {
                 val msg = config.getString("notify.messages.stop")?: return@forEach
@@ -92,5 +138,6 @@ object AQQBot : Plugin() {
         if (oneBotClient.isConnected) {
             oneBotClient.disconnect()
         }
+        if (!isFileStorage) dataSource.connection.close()
     }
 }

@@ -62,3 +62,10 @@ qq:
       did_not_login: "从未登录过" # 当上次登录时间为0时, 显示这个
       dont_have_organization: "你还没有加入组织捏" # 若所对应的变量为空, 则显示这个
       dont_have_prefix: "你还没有称号捏" # 与 上一项 同理
+
+  chat_from_game: "[服务器] ${player}: ${message}"
+
+# 此部分为发送到游戏/在游戏内提示的消息 (使用&代表颜色符号)
+game:
+  not_bind: "[AQQBot] 你的账号还没有绑定QQ!\n请通过在QQ群发送${command} <游戏名称> 来绑定!" # ${command}为你设置的第一个绑定命令, 如: /bind
+  chat_from_qq: "&8[&aQQ群(${groupId})&8] &b${userName}: &f${message}"

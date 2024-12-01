@@ -12,11 +12,13 @@ import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.AQQBot.config
+import top.alazeprt.aqqbot.AQQBot.isFileStorage
 import top.alazeprt.aqqbot.DependencyImpl.Companion.playerStats
 import top.alazeprt.aqqbot.DependencyImpl.Companion.withPAPI
 import top.alazeprt.aqqbot.util.AI18n.get
 import top.alazeprt.aqqbot.util.AI18n.getList
 import top.alazeprt.aqqbot.util.AI18n.getOriginList
+import top.alazeprt.aqqbot.util.DBQuery.qqInDatabase
 import java.text.SimpleDateFormat
 
 class StatsHandler {
@@ -48,11 +50,14 @@ class StatsHandler {
                     get("qq.stats.not_installed_dependency"), true))
                 return
             }
-            if (!AQQBot.dataMap.containsKey(userId.toString())) {
+            if (isFileStorage && !AQQBot.dataMap.containsKey(userId.toString())) {
+                AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.stats.not_bind"), true))
+                return
+            } else if (!isFileStorage && qqInDatabase(userId) == null) {
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.stats.not_bind"), true))
                 return
             }
-            val name = AQQBot.dataMap[userId.toString()]!!
+            val name = if(isFileStorage) AQQBot.dataMap[userId.toString()]!! else qqInDatabase(userId)!!
             val banEntry = Bukkit.getBanList<ProfileBanList>(BanList.Type.PROFILE).getBanEntry(name)
             val uuid = Bukkit.getOfflinePlayer(name).uniqueId
             val lastLogin = Bukkit.getOfflinePlayer(uuid).lastPlayed

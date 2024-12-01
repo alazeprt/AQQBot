@@ -9,6 +9,7 @@ import top.alazeprt.aqqbot.AQQBot.isBukkit
 import top.alazeprt.aqqbot.handler.InformationHandler
 import top.alazeprt.aqqbot.handler.StatsHandler
 import top.alazeprt.aqqbot.handler.WhitelistHandler
+import top.alazeprt.aqqbot.util.AI18n.get
 
 class BotListener : Listener {
     @SubscribeBotEvent
@@ -24,8 +25,15 @@ class BotListener : Listener {
             handleStats = StatsHandler.handle(message, event)
         }
         if(AQQBot.config.getBoolean("chat.group_to_server") && !(handleInfo || handleWl || handleStats) && isBukkit) {
-            Bukkit.broadcastMessage(
-                "§8[§aQQ群(${event.groupId})§8] §b${event.senderNickName}: §f$message")
+            Bukkit.broadcastMessage(formatString(get("game.chat_from_qq", mutableMapOf("groupId" to event.groupId.toString(),
+                "userName" to event.senderNickName,
+                "message" to message))))
+        }
+    }
+
+    private fun formatString(input: String): String {
+        return input.replace(Regex("&([0-9a-fklmnor])")) { matchResult ->
+            "§" + matchResult.groupValues[1]
         }
     }
 }

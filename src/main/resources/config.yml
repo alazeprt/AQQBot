@@ -1,3 +1,21 @@
+# 存储相关配置
+storage:
+  # 存储方式
+  # 可选方式: file, sqlite, mysql
+  type: "file"
+
+  # SQLite 数据库配置
+  sqlite:
+    file: "aqqbot.db"
+
+  # MySQL 数据库配置
+  mysql:
+    host: "127.0.0.1"
+    port: 3306
+    user: "root"
+    password: "123456"
+    database: "aqqbot"
+
 # 添加白名单
 whitelist:
   # 是否启用该功能
