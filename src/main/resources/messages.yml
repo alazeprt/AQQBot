@@ -1,5 +1,6 @@
 # 语言文件
 # 以${开头, }结尾 (如${name}) 的是占位符, 在实际中会被替换
+# 可使用 /aqqbot reload 重载
 
 # 此部分为发送到Q群的消息
 qq:
@@ -69,3 +70,4 @@ qq:
 game:
   not_bind: "[AQQBot] 你的账号还没有绑定QQ!\n请通过在QQ群发送${command} <游戏名称> 来绑定!" # ${command}为你设置的第一个绑定命令, 如: /bind
   chat_from_qq: "&8[&aQQ群(${groupId})&8] &b${userName}: &f${message}"
+  reload: "&a[AQQBot] 重载完成! 耗时 &e${time} ms"

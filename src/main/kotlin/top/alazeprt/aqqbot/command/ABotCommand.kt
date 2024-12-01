@@ -17,6 +17,7 @@ import top.alazeprt.aqqbot.AQQBot.messageConfig
 import top.alazeprt.aqqbot.AQQBot.oneBotClient
 import top.alazeprt.aqqbot.DependencyImpl
 import top.alazeprt.aqqbot.qq.BotListener
+import top.alazeprt.aqqbot.util.AI18n.get
 import java.net.URI
 
 @CommandHeader("aqqbot", ["abot", "qqbot"], permission = "aqqbot.command")
@@ -24,7 +25,6 @@ object ABotCommand {
     @CommandBody
     val reload = subCommand {
         execute<CommandSender> { sender, _, _ ->
-            sender.sendMessage("§a正在重载插件配置文件...")
             val s = System.currentTimeMillis()
             submit(async = true) {
                 info("Reloading AQQBot ...")
@@ -50,9 +50,15 @@ object ABotCommand {
                 oneBotClient = BotClient(URI.create(url))
                 oneBotClient.connect()
                 oneBotClient.registerEvent(BotListener())
-                sender.sendMessage("§a重载完成！耗时 §e${System.currentTimeMillis() - s} ms")
+                sender.sendMessage(formatString(get("game.reload", mutableMapOf("time" to (System.currentTimeMillis() - s).toString()))))
                 info("Reloaded AQQBot in ${System.currentTimeMillis() - s} ms")
             }
+        }
+    }
+
+    private fun formatString(input: String): String {
+        return input.replace(Regex("&([0-9a-fklmnor])")) { matchResult ->
+            "§" + matchResult.groupValues[1]
         }
     }
 }

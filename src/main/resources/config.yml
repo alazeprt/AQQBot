@@ -1,4 +1,7 @@
-# 存储相关配置
+# AQQBot 配置文件
+# 可使用 /aqqbot reload 重载
+
+# 存储相关配置 (重启后生效)
 storage:
   # 存储方式
   # 可选方式: file, sqlite, mysql
