@@ -33,7 +33,7 @@ repositories {
 }
 
 dependencies {
-    taboo("com.github.alazeprt:AOneBot:1.0.3-beta")
+    taboo("com.github.alazeprt:AOneBot:1.0.4-beta")
     compileOnly("me.lucko:spark-api:0.1-SNAPSHOT")
     compileOnly("io.github.ithotl:PlayerStats:2.0-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
