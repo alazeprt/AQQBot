@@ -1,5 +1,6 @@
 package top.alazeprt.aqqbot
 
+import taboolib.common.platform.Platform
 import taboolib.common.platform.Plugin
 import taboolib.common.platform.function.getDataFolder
 import taboolib.common.platform.function.info
@@ -7,6 +8,7 @@ import taboolib.common.platform.function.releaseResourceFile
 import taboolib.common.platform.function.submit
 import taboolib.module.configuration.Configuration
 import taboolib.module.database.*
+import taboolib.module.metrics.Metrics
 import top.alazeprt.aonebot.BotClient
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.qq.BotListener
@@ -47,6 +49,7 @@ object AQQBot : Plugin() {
         } catch (e: ClassNotFoundException) {
             isBukkit = false
         }
+        val metrics = Metrics(24071, "1.0.5", Platform.CURRENT)
         info("Loading data...")
         val configFile = releaseResourceFile("config.yml", replace = false)
         config = Configuration.loadFromFile(configFile)

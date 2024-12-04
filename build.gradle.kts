@@ -1,7 +1,4 @@
-import io.izzel.taboolib.gradle.Basic
-import io.izzel.taboolib.gradle.Bukkit
-import io.izzel.taboolib.gradle.Database
-import io.izzel.taboolib.gradle.Velocity
+import io.izzel.taboolib.gradle.*
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -13,7 +10,7 @@ plugins {
 taboolib {
     env {
         // 安装模块
-        install(Bukkit, Basic, Velocity, Database)
+        install(Bukkit, Basic, Velocity, Database, Metrics)
     }
     description {
         contributors {
