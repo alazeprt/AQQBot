@@ -11,12 +11,14 @@ import taboolib.module.configuration.Configuration
 import top.alazeprt.aonebot.BotClient
 import top.alazeprt.aqqbot.AQQBot.botConfig
 import top.alazeprt.aqqbot.AQQBot.config
+import top.alazeprt.aqqbot.AQQBot.customCommands
 import top.alazeprt.aqqbot.AQQBot.enableGroups
 import top.alazeprt.aqqbot.AQQBot.isBukkit
 import top.alazeprt.aqqbot.AQQBot.messageConfig
 import top.alazeprt.aqqbot.AQQBot.oneBotClient
 import top.alazeprt.aqqbot.DependencyImpl
 import top.alazeprt.aqqbot.qq.BotListener
+import top.alazeprt.aqqbot.util.ACustom
 import top.alazeprt.aqqbot.util.AI18n.get
 import java.net.URI
 
@@ -38,6 +40,18 @@ object ABotCommand {
                 botConfig = Configuration.loadFromFile(botFile)
                 val messageFile = releaseResourceFile("messages.yml", replace = false)
                 messageConfig = Configuration.loadFromFile(messageFile)
+                customCommands.clear()
+                val customFile = releaseResourceFile("custom.yml", replace = false)
+                val customConfig = Configuration.loadFromFile(customFile)
+                customConfig.getKeys(false).forEach {
+                    if (customConfig.getBoolean("$it.enable")) {
+                        val command = customConfig.getStringList("$it.command")
+                        val output = customConfig.getStringList("$it.output")
+                        val unbind_output = customConfig.getStringList("$it.unbind_output")
+                        val format = customConfig.getBoolean("$it.format")
+                        customCommands.add(ACustom(command, output, unbind_output, format))
+                    }
+                }
                 botConfig.getStringList("groups").forEach {
                     enableGroups.add(it)
                 }

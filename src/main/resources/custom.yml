@@ -1,0 +1,26 @@
+# 自定义命令配置文件
+# 在QQ中执行该命令时返回指定结果
+# 支持掺杂 PlaceholderAPI 所提供的变量
+
+# 例 1
+# 输入 /prefix 或 /称号 时返回玩家的称号 (对应PAPI变量 %vault_prefix%)
+prefix:
+  # 是否开启该命令
+  enable: true
+
+  # 获取命令
+  command:
+    - "/prefix"
+    - "/称号"
+
+  # 输出结果
+  output:
+    - "你的称号是: %vault_prefix%"
+
+  # 未绑定账号的玩家输出 (不支持 PAPI)
+  unbind_output:
+    - "你还没有绑定账号!"
+
+  # 是否格式化颜色符号 (如: &7普通&a玩家 -> 普通玩家)
+  format: true
+

@@ -112,45 +112,6 @@ chat:
   # [服务器] ${sender}: ${message}
   server_to_group: true
 
-# 玩家统计信息
-# * 该功能仅支持Bukkit类服务端
-# 大部分信息需要安装PlayerStats插件作为前置
-# 权限 & 组织 信息需要安装PlaceholderAPI插件作为前置
-stats:
-  # 是否开启该功能
-  enable: true
-
-  # 获取指令
-  command:
-    - "/stats"
-    - "stats"
-    - "统计信息"
-    - "/统计信息"
-    - "玩家统计信息"
-    - "/玩家统计信息"
-
-  # 组织信息来源
-  party:
-    # 是否启用该功能
-    enable: false
-
-    # 获取的PlaceholderAPI变量
-    placeholder: "%parties_name%"
-
-    # 将颜色符号格式化
-    format: false
-
-  # 称号信息来源
-  prefix:
-    # 是否启用该功能
-    enable: true
-
-    # 获取的PlaceholderAPI变量
-    placeholder: "%luckperms_prefix%"
-
-    # 将颜色符号格式化
-    format: true
-
 # 服务器开启/关闭通知
 notify:
   # 是否开启该功能

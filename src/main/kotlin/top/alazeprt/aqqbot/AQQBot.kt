@@ -12,6 +12,7 @@ import taboolib.module.metrics.Metrics
 import top.alazeprt.aonebot.BotClient
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.qq.BotListener
+import top.alazeprt.aqqbot.util.ACustom
 import java.io.File
 import java.net.URI
 import javax.sql.DataSource
@@ -35,6 +36,8 @@ object AQQBot : Plugin() {
     val enableGroups: MutableList<String> = mutableListOf()
 
     val dataMap: MutableMap<String, String> = mutableMapOf()
+
+    val customCommands: MutableList<ACustom> = mutableListOf()
 
     lateinit var table: Table<*, *>
 
@@ -95,6 +98,17 @@ object AQQBot : Plugin() {
         botConfig = Configuration.loadFromFile(botFile)
         val messageFile = releaseResourceFile("messages.yml", replace = false)
         messageConfig = Configuration.loadFromFile(messageFile)
+        val customFile = releaseResourceFile("custom.yml", replace = false)
+        val customConfig = Configuration.loadFromFile(customFile)
+        customConfig.getKeys(false).forEach {
+            if (customConfig.getBoolean("$it.enable")) {
+                val command = customConfig.getStringList("$it.command")
+                val output = customConfig.getStringList("$it.output")
+                val unbind_output = customConfig.getStringList("$it.unbind_output")
+                val format = customConfig.getBoolean("$it.format")
+                customCommands.add(ACustom(command, output, unbind_output, format))
+            }
+        }
         dataConfig.getKeys(false).forEach {
             dataMap[it] = (dataConfig.getString(it)?: return@forEach)
         }
