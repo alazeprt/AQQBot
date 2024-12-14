@@ -24,6 +24,9 @@ whitelist:
   # 是否启用该功能
   enable: true
 
+  # 是否必须绑定后才能进入游戏
+  need_bind_to_login: true
+
   # 功能指令前缀
   prefix:
     # 绑定指令前缀

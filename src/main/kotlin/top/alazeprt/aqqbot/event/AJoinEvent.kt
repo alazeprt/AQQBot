@@ -10,6 +10,7 @@ import taboolib.common.platform.function.info
 import taboolib.common.platform.function.submit
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.AQQBot
+import top.alazeprt.aqqbot.AQQBot.config
 import top.alazeprt.aqqbot.AQQBot.isFileStorage
 import top.alazeprt.aqqbot.util.AI18n.get
 import top.alazeprt.aqqbot.util.DBQuery.playerInDatabase
@@ -19,6 +20,7 @@ object AJoinEvent {
     @Ghost
     @SubscribeEvent
     fun onJoin(event: AsyncPlayerPreLoginEvent) {
+        if (!config.getBoolean("enable") || !config.getBoolean("whitelist.need_bind_to_login")) return
         if (isFileStorage && event.name !in AQQBot.dataMap.values) {
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, formatString(get("game.not_bind", mutableMapOf(Pair("command", AQQBot.config.getStringList("whitelist.prefix.bind")[0])))))
         }
@@ -43,6 +45,7 @@ object AJoinEvent {
     @Ghost
     @SubscribeEvent
     fun onVCJoin(event: PostLoginEvent) {
+        if (!config.getBoolean("enable") || !config.getBoolean("whitelist.need_bind_to_login")) return
         if (isFileStorage && event.player.username !in AQQBot.dataMap.values) {
             event.player.disconnect(Component.text(formatString(get("game.not_bind", mutableMapOf(Pair("command", AQQBot.config.getStringList("whitelist.prefix.bind")[0]))))))
         }
