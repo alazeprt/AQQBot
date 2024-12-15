@@ -20,7 +20,7 @@ object AJoinEvent {
     @Ghost
     @SubscribeEvent
     fun onJoin(event: AsyncPlayerPreLoginEvent) {
-        if (!config.getBoolean("enable") || !config.getBoolean("whitelist.need_bind_to_login")) return
+        if (!config.getBoolean("whitelist.enable") || !config.getBoolean("whitelist.need_bind_to_login")) return
         if (isFileStorage && event.name !in AQQBot.dataMap.values) {
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, formatString(get("game.not_bind", mutableMapOf(Pair("command", AQQBot.config.getStringList("whitelist.prefix.bind")[0])))))
         }
@@ -45,7 +45,7 @@ object AJoinEvent {
     @Ghost
     @SubscribeEvent
     fun onVCJoin(event: PostLoginEvent) {
-        if (!config.getBoolean("enable") || !config.getBoolean("whitelist.need_bind_to_login")) return
+        if (!config.getBoolean("whitelist.enable") || !config.getBoolean("whitelist.need_bind_to_login")) return
         if (isFileStorage && event.player.username !in AQQBot.dataMap.values) {
             event.player.disconnect(Component.text(formatString(get("game.not_bind", mutableMapOf(Pair("command", AQQBot.config.getStringList("whitelist.prefix.bind")[0]))))))
         }
