@@ -34,37 +34,10 @@ qq:
     player_list:
       result: "服务器在线玩家(${count}): ${player_list}"
 
-  stats:
-    not_installed_dependency: "服务器尚未安装PlayerStats插件, 无法获取玩家统计信息! 请联系服务器管理员!"
-    not_bind: "你尚未绑定账号! 无法获取玩家统计信息!"
-    result:
-      ban: # 含有自动换行
-        - "QQ号: ${userId}"
-        - "游戏名: ${name}"
-        - "在线状态: 封禁"
-        - "上次登录时间: ${last_login_time}"
-        - "UUID: ${uuid}"
-        - "封禁原因: ${reason}"
-        - "封禁时间: ${ban_time}"
-        - "解封时间: ${unban_time}"
-      normal:
-        - "QQ号: ${userId}"
-        - "游戏名: ${name}"
-        - "在线状态: ${online}" # 在线 / 离线
-        - "上次登录时间: ${last_login_time}"
-        - "UUID: ${uuid}"
-        - "击杀怪物数: ${kill_mobs_count}"
-        - "在线时长: ${online_time}"
-        - "行走距离: ${walk_distance}"
-        - "挖掘残骸数: ${break_ancient_debris_count}"
-        - "组织: ${organization}" # 若不开启该功能则不会显示含有 ${organization} 的项
-        - "称号: ${prefix}" # 与 组织 同理
-      dont_have_reason: "无" # 当封禁原因没有时, 显示这个
-      did_not_login: "从未登录过" # 当上次登录时间为0时, 显示这个
-      dont_have_organization: "你还没有加入组织捏" # 若所对应的变量为空, 则显示这个
-      dont_have_prefix: "你还没有称号捏" # 与 上一项 同理
-
   chat_from_game: "[服务器] ${player}: ${message}"
+  executing_command: "正在执行命令..."
+  no_permission: "你没有权限使用这项功能!"
+  execution_finished: "指令执行完成, 无返回值"
 
 # 此部分为发送到游戏/在游戏内提示的消息 (使用&代表颜色符号)
 game:

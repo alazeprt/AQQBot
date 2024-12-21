@@ -90,7 +90,7 @@ information:
       - "/服务器cpu"
       - "cpu占用率"
       - "/cpu占用率"
-      -
+
   # 功能: 查看服务器MSPT(均为平均值) 输出结果:
   # 服务器MSPT: ${mspt_10_seconds}, ${mspt_1_min}, ${mspt_15_min}
   mspt:
@@ -127,3 +127,33 @@ notify:
 
     # 关闭时:
     stop: "[AQQBot] XXX服务器已关闭!"
+
+# 服务器命令远程执行
+# * 该功能仅支持Bukkit类服务端
+# 通过在QQ发送指定前缀消息来执行服务器命令
+# 执行命令时, 不需要再加 / 号, 只需要填写命令前缀
+# 如: 在游戏里执行 /spark health -> 在QQ群内执行 /sudo spark health
+command_execution:
+  # 是否启用该功能
+  enable: true
+
+  # 允许使用该功能的人
+  # $ADMIN 代表所有管理员
+  # $OWNER 代表群主
+  # $USER 代表所有用户
+  # 范围覆盖: $USER > $ADMIN > $OWNER
+  # 如果你想指定除了这里的人以外的特定用户, 你可填写用户的QQ号到这里
+  allow:
+    - "$ADMIN"
+
+  # 指令前缀
+  prefix:
+    - "/sudo"
+    - "/执行"
+
+  # 是否格式化消息 (将颜色符号去除)
+  format: true
+
+  # 等待输出结果多长时间
+  # 单位: 秒
+  delay: 2

@@ -7,6 +7,7 @@ import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.AQQBot.customCommands
 import top.alazeprt.aqqbot.AQQBot.isBukkit
+import top.alazeprt.aqqbot.handler.CommandHandler
 import top.alazeprt.aqqbot.handler.InformationHandler
 import top.alazeprt.aqqbot.handler.WhitelistHandler
 import top.alazeprt.aqqbot.util.AI18n.get
@@ -20,6 +21,7 @@ class BotListener : Listener {
         val message = event.message
         val handleInfo = InformationHandler.handle(message, event)
         val handleWl = WhitelistHandler.handle(message, event)
+        val handleCommand = CommandHandler.handle(message, event)
         var handleCustom = false
         customCommands.forEach {
             if (it.handle(message?: return@forEach, event.senderId.toString(), event.groupId.toString())) {
@@ -27,7 +29,7 @@ class BotListener : Listener {
                 return@forEach
             }
         }
-        if(AQQBot.config.getBoolean("chat.group_to_server") && !(handleInfo || handleWl || handleCustom) && isBukkit) {
+        if(AQQBot.config.getBoolean("chat.group_to_server") && !(handleInfo || handleWl || handleCustom || handleCommand) && isBukkit) {
             Bukkit.broadcastMessage(formatString(get("game.chat_from_qq", mutableMapOf("groupId" to event.groupId.toString(),
                 "userName" to event.senderNickName,
                 "message" to message))))
