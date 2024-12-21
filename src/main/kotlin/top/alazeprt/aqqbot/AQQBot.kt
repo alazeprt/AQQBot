@@ -118,7 +118,6 @@ object AQQBot : Plugin() {
         info("Loading soft dependency...")
         DependencyImpl.loadSpark()
         if (isBukkit) {
-            DependencyImpl.loadPlayerStats()
             DependencyImpl.loadPAPI()
         }
         submit(async = true) {

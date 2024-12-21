@@ -57,7 +57,6 @@ object ABotCommand {
                 }
                 DependencyImpl.loadSpark()
                 if (isBukkit) {
-                    DependencyImpl.loadPlayerStats()
                     DependencyImpl.loadPAPI()
                 }
                 val url = "ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")
