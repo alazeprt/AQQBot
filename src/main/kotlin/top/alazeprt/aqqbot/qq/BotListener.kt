@@ -21,14 +21,7 @@ class BotListener : Listener {
         if (!AQQBot.enableGroups.contains(event.groupId.toString())) {
             return
         }
-        val memberList = mutableListOf<Long>()
         var message = ""
-        event.jsonMessage.forEach {
-            val jsonObject = it.asJsonObject?: return@forEach
-            if (jsonObject.get("type").asString == "at") {
-                memberList.add(jsonObject.get("data").asJsonObject.get("qq").asLong)
-            }
-        }
         oneBotClient.action(GetGroupMemberList(event.groupId), { memberList ->
             event.jsonMessage.forEach {
                 val jsonObject = it.asJsonObject?: return@forEach
