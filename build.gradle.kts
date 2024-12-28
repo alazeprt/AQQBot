@@ -17,6 +17,7 @@ taboolib {
             name("alazeprt")
         }
     }
+    relocate("com.google", "top.alazeprt.aonebot.lib.google")
 
     version { taboolib = "6.2.0" }
 }
