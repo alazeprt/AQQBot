@@ -6,7 +6,6 @@ import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import taboolib.common.platform.Ghost
 import taboolib.common.platform.event.SubscribeEvent
-import taboolib.common.platform.function.info
 import taboolib.common.platform.function.submit
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.AQQBot
@@ -15,7 +14,7 @@ import top.alazeprt.aqqbot.AQQBot.isFileStorage
 import top.alazeprt.aqqbot.util.AI18n.get
 import top.alazeprt.aqqbot.util.DBQuery.playerInDatabase
 
-object AJoinEvent {
+object AGameEvent {
     // Bukkit
     @Ghost
     @SubscribeEvent
@@ -32,10 +31,10 @@ object AJoinEvent {
     @Ghost
     @SubscribeEvent
     fun onChat(event: AsyncPlayerChatEvent) {
-        if(AQQBot.config.getBoolean("chat.server_to_group")) {
+        if (canForwardMessage(event.message) != null) {
             submit (async = true) {
                 AQQBot.enableGroups.forEach {
-                    AQQBot.oneBotClient.action(SendGroupMessage(it.toLong(), get("qq.chat_from_game", mutableMapOf("player" to event.player.name, "message" to event.message)), true))
+                    AQQBot.oneBotClient.action(SendGroupMessage(it.toLong(), get("qq.chat_from_game", mutableMapOf("player" to event.player.name, "message" to canForwardMessage(event.message)!!)), true))
                 }
             }
         }
@@ -58,5 +57,20 @@ object AJoinEvent {
         return input.replace(Regex("&([0-9a-fklmnor])")) { matchResult ->
             "§" + matchResult.groupValues[1]
         }
+    }
+
+    private fun canForwardMessage(message: String): String? {
+        if (!config.getBoolean("chat.server_to_group.enable")) {
+            return null
+        }
+        if (config.getStringList("chat.server_to_group.prefix").contains("")) {
+            return message
+        }
+        config.getStringList("chat.server_to_group.prefix").forEach {
+             if (message.startsWith(it)) {
+                 return message.substring(it.length)
+             }
+        }
+        return null
     }
 }

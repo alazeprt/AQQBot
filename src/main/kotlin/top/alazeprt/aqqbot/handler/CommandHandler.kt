@@ -48,7 +48,7 @@ class CommandHandler {
                             AQQBot.oneBotClient.action(SendGroupMessage(event.groupId, messageConfig.getString("qq.no_permission")))
                         } else {
                             val commandList = message.split(" ").toMutableList()
-                            commandList.removeFirst()
+                                commandList.removeAt(0)
                             val command = commandList.joinToString(" ")
                             AQQBot.oneBotClient.action(SendGroupMessage(event.groupId, messageConfig.getString("qq.executing_command")))
                             submit {

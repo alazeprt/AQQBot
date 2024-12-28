@@ -10,6 +10,8 @@ import org.bukkit.permissions.Permission
 import org.bukkit.permissions.PermissionAttachment
 import org.bukkit.permissions.PermissionAttachmentInfo
 import org.bukkit.plugin.Plugin
+import taboolib.common.platform.function.info
+import top.alazeprt.aqqbot.AQQBot.config
 import java.util.*
 
 class ASender : ConsoleCommandSender {
@@ -130,10 +132,22 @@ class ASender : ConsoleCommandSender {
     }
 
     fun getFormatString(): String {
-        return messageList.joinToString("\n").replace(Regex("§([0-9a-fklmnor])"), "")
+        var str = messageList.joinToString("\n").replace(Regex("§([0-9a-fklmnor])"), "")
+        config.getStringList("command_execution.format_list").forEach {
+            if (it != "") {
+                str = str.replace(it, "")
+            }
+        }
+        return str
     }
 
     fun getRawString(): String {
-        return messageList.joinToString("\n")
+        var str = messageList.joinToString("\n")
+        config.getStringList("command_execution.format_list").forEach {
+            if (it != "") {
+                str = str.replace(it, "")
+            }
+        }
+        return str
     }
 }

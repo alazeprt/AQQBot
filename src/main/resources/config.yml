@@ -107,13 +107,25 @@ information:
 # 聊天(群服互联)功能
 # * 该功能仅支持Bukkit类服务端
 chat:
-  # 是否启用群->服聊天转发功能 转发结果:
+  # 群->服聊天转发功能 转发结果:
   # [QQ群(${groupId})] ${sender}: ${message}
-  group_to_server: true
+  group_to_server:
+    # 是否启用该功能
+    enable: true
 
-  # 是否启用服->群聊天转发功能 转发结果:
+    # 若转发, 需要发送什么作为前缀的消息 (空代表不需要前缀)
+    prefix:
+      - ""
+
+  # 服->群聊天转发功能 转发结果:
   # [服务器] ${sender}: ${message}
-  server_to_group: true
+  server_to_group:
+    # 是否启用该功能
+    enable: true
+
+    # 若转发, 需要发送什么作为前缀的消息 (空代表不需要前缀)
+    prefix:
+      - ""
 
 # 服务器开启/关闭通知
 notify:
@@ -152,7 +164,14 @@ command_execution:
     - "/执行"
 
   # 是否格式化消息 (将颜色符号去除)
+  # 默认包含 §0, §1 , ... , §9, §a, ..., §f, §k, §l, §m, §n, §o, §r
   format: true
+
+  # 特定格式化 (将以下列表中的符号去除) 不需要开启格式化消息选项即可使用
+  # 如: 在列表中含有 "§x" 则将 "§xA§xB" 转换为 "AB"
+  # 只填写 "" (如下) 代表不进行特定格式化
+  format_list:
+    - ""
 
   # 等待输出结果多长时间
   # 单位: 秒

@@ -1,12 +1,15 @@
 package top.alazeprt.aqqbot.qq
 
 import org.bukkit.Bukkit
+import top.alazeprt.aonebot.action.GetGroupMemberList
 import top.alazeprt.aonebot.event.Listener
 import top.alazeprt.aonebot.event.SubscribeBotEvent
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aqqbot.AQQBot
+import top.alazeprt.aqqbot.AQQBot.config
 import top.alazeprt.aqqbot.AQQBot.customCommands
 import top.alazeprt.aqqbot.AQQBot.isBukkit
+import top.alazeprt.aqqbot.AQQBot.oneBotClient
 import top.alazeprt.aqqbot.handler.CommandHandler
 import top.alazeprt.aqqbot.handler.InformationHandler
 import top.alazeprt.aqqbot.handler.WhitelistHandler
@@ -18,27 +21,65 @@ class BotListener : Listener {
         if (!AQQBot.enableGroups.contains(event.groupId.toString())) {
             return
         }
-        val message = event.message
-        val handleInfo = InformationHandler.handle(message, event)
-        val handleWl = WhitelistHandler.handle(message, event)
-        val handleCommand = CommandHandler.handle(message, event)
-        var handleCustom = false
-        customCommands.forEach {
-            if (it.handle(message?: return@forEach, event.senderId.toString(), event.groupId.toString())) {
-                handleCustom = true
-                return@forEach
+        val memberList = mutableListOf<Long>()
+        var message = ""
+        event.jsonMessage.forEach {
+            val jsonObject = it.asJsonObject?: return@forEach
+            if (jsonObject.get("type").asString == "at") {
+                memberList.add(jsonObject.get("data").asJsonObject.get("qq").asLong)
             }
         }
-        if(AQQBot.config.getBoolean("chat.group_to_server") && !(handleInfo || handleWl || handleCustom || handleCommand) && isBukkit) {
-            Bukkit.broadcastMessage(formatString(get("game.chat_from_qq", mutableMapOf("groupId" to event.groupId.toString(),
-                "userName" to event.senderNickName,
-                "message" to message))))
-        }
+        oneBotClient.action(GetGroupMemberList(event.groupId), { memberList ->
+            event.jsonMessage.forEach {
+                val jsonObject = it.asJsonObject?: return@forEach
+                if (jsonObject.get("type").asString == "text") {
+                    message += jsonObject.get("data").asJsonObject.get("text").asString
+                } else if (jsonObject.get("type").asString == "image") {
+                    message += "[图片]"
+                } else if (jsonObject.get("type").asString == "at") {
+                    memberList.forEach { member ->
+                        if (member.member.userId == jsonObject.get("data").asJsonObject.get("qq").asLong) {
+                            message += "@${member.member.nickname}"
+                        }
+                    }
+                }
+            }
+            val handleInfo = InformationHandler.handle(message, event)
+            val handleWl = WhitelistHandler.handle(message, event)
+            val handleCommand = CommandHandler.handle(message, event)
+            var handleCustom = false
+            customCommands.forEach {
+                if (it.handle(message, event.senderId.toString(), event.groupId.toString())) {
+                    handleCustom = true
+                    return@forEach
+                }
+            }
+            if(canForwardMessage(message) != null && !(handleInfo || handleWl || handleCustom || handleCommand) && isBukkit) {
+                Bukkit.broadcastMessage(formatString(get("game.chat_from_qq", mutableMapOf("groupId" to event.groupId.toString(),
+                    "userName" to event.senderNickName,
+                    "message" to (canForwardMessage(message)?: return@action)))))
+            }
+        })
     }
 
     private fun formatString(input: String): String {
         return input.replace(Regex("&([0-9a-fklmnor])")) { matchResult ->
             "§" + matchResult.groupValues[1]
         }
+    }
+
+    private fun canForwardMessage(message: String): String? {
+        if (!config.getBoolean("chat.group_to_server.enable")) {
+            return null
+        }
+        if (config.getStringList("chat.group_to_server.prefix").contains("")) {
+            return message
+        }
+        config.getStringList("chat.group_to_server.prefix").forEach {
+            if (message.startsWith(it)) {
+                return message.substring(it.length)
+            }
+        }
+        return null
     }
 }
