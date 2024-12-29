@@ -41,6 +41,19 @@ whitelist:
       - "/解绑"
       - "/unbind"
 
+  # 是否开启退群自动解绑
+  unbind_on_leave: true
+
+  # 绑定后修改群名称
+  # * 该功能要求 QQ 机器人有群管理员权限
+  change_nickname_on_bind:
+    # 是否启用该功能
+    enable: false
+
+    # 修改群昵称的格式
+    # 可用变量: ${playerName} -> 游戏名, ${qq} -> QQ号, ${nickName} -> 当前用户群昵称
+    format: "[${nickName}] ${playerName}"
+
   # 是否启用管理员管理
   # 管理员可通过/${prefix} $userId $name 进行绑定/解绑
   admin: true

@@ -4,6 +4,7 @@ import org.bukkit.Bukkit
 import taboolib.common.platform.function.info
 import top.alazeprt.aonebot.action.GetGroupMemberInfo
 import top.alazeprt.aonebot.action.SendGroupMessage
+import top.alazeprt.aonebot.action.SetGroupCard
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aonebot.util.GroupRole
 import top.alazeprt.aqqbot.AQQBot
@@ -46,6 +47,15 @@ class WhitelistHandler {
             if (isFileStorage) AQQBot.dataMap[userId] = playerName
             else addPlayer(userId.toLong(), playerName)
             AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.bind_successful"), true))
+            if (AQQBot.config.getBoolean("whitelist.change_nickname_on_bind.enable")) {
+                AQQBot.oneBotClient.action(GetGroupMemberInfo(groupId, userId.toLong()), {
+                    val newName = AQQBot.config.getString("whitelist.change_nickname_on_bind.format")!!
+                        .replace("\${playerName}", playerName)
+                        .replace("\${qq}", userId)
+                        .replace("\${nickName}", it.member.nickname)
+                    AQQBot.oneBotClient.action(SetGroupCard(groupId, userId.toLong(), newName))
+                })
+            }
         }
         
         private fun unbind(userId: String, groupId: Long, playerName: String) {

@@ -2,18 +2,23 @@ package top.alazeprt.aqqbot.qq
 
 import org.bukkit.Bukkit
 import top.alazeprt.aonebot.action.GetGroupMemberList
+import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aonebot.event.Listener
 import top.alazeprt.aonebot.event.SubscribeBotEvent
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
+import top.alazeprt.aonebot.event.notice.GroupMemberDecreaseEvent
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.AQQBot.config
 import top.alazeprt.aqqbot.AQQBot.customCommands
 import top.alazeprt.aqqbot.AQQBot.isBukkit
+import top.alazeprt.aqqbot.AQQBot.isFileStorage
 import top.alazeprt.aqqbot.AQQBot.oneBotClient
 import top.alazeprt.aqqbot.handler.CommandHandler
 import top.alazeprt.aqqbot.handler.InformationHandler
 import top.alazeprt.aqqbot.handler.WhitelistHandler
 import top.alazeprt.aqqbot.util.AI18n.get
+import top.alazeprt.aqqbot.util.DBQuery.qqInDatabase
+import top.alazeprt.aqqbot.util.DBQuery.removePlayer
 
 class BotListener : Listener {
     @SubscribeBotEvent
@@ -53,6 +58,32 @@ class BotListener : Listener {
                     "message" to (canForwardMessage(message)?: return@action)))))
             }
         })
+    }
+
+    @SubscribeBotEvent
+    fun onMemberLeave(event: GroupMemberDecreaseEvent) {
+        val userId = event.userId.toString()
+        if (isFileStorage && !AQQBot.dataMap.containsKey(userId)) {
+            return
+        } else if (!isFileStorage && qqInDatabase(userId.toLong()) == null) {
+            return
+        }
+        if (isFileStorage) {
+            AQQBot.dataMap.forEach { (k, v) ->
+                if (k == userId) {
+                    AQQBot.dataMap.remove(k)
+                    return
+                }
+            }
+        } else {
+            val playerName = qqInDatabase(userId.toLong())!!
+            removePlayer(userId.toLong(), playerName)
+            for (player in Bukkit.getOnlinePlayers()) {
+                if (player.name == playerName) {
+                    player.kickPlayer(get("qq.whitelist.unbind_kick"))
+                }
+            }
+        }
     }
 
     private fun formatString(input: String): String {
