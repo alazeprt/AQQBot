@@ -6,6 +6,7 @@ import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.AQQBot.isFileStorage
 import top.alazeprt.aqqbot.util.AI18n.get
+import top.alazeprt.aqqbot.util.DBQuery
 import top.alazeprt.aqqbot.util.DBQuery.addPlayer
 import top.alazeprt.aqqbot.util.DBQuery.playerInDatabase
 import top.alazeprt.aqqbot.util.DBQuery.qqInDatabase
@@ -15,27 +16,28 @@ class WhitelistAdminHandler {
     companion object {
         private fun bind(userId: String, groupId: Long, playerName: String) {
             if (isFileStorage && AQQBot.dataMap.containsKey(userId)) {
-                AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.admin.already_bind", mutableMapOf(Pair("userId", userId)))))
-                return
+                AQQBot.dataMap.remove(userId)
             } else if (!isFileStorage && qqInDatabase(userId.toLong()) != null) {
-                AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.admin.already_bind", mutableMapOf(Pair("userId", userId)))))
-                return
+                DBQuery.removePlayerByUserId(userId.toLong())
             }
             if (!validateName(playerName)) {
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.invalid_name"), true))
                 return
             }
             if (isFileStorage) {
-                AQQBot.dataMap.values.forEach {
-                    if (it == playerName) {
-                        AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.already_exist"), true))
-                        return
+                var existUserId = ""
+                AQQBot.dataMap.forEach { k, v ->
+                    if (v == playerName) {
+                        existUserId = k
+                        return@forEach
                     }
+                }
+                if (existUserId != "") {
+                    AQQBot.dataMap.remove(existUserId)
                 }
             } else {
                 if (playerInDatabase(playerName)) {
-                    AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.already_exist"), true))
-                    return
+                    DBQuery.removePlayerByName(playerName)
                 }
             }
             if (isFileStorage) AQQBot.dataMap[userId] = playerName
@@ -72,7 +74,7 @@ class WhitelistAdminHandler {
             AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.admin.invalid_bind", mutableMapOf(Pair("userId", userId))), true))
         }
 
-        private fun validateName(name: String): Boolean {
+        fun validateName(name: String): Boolean {
             val regex = "^\\w+\$"
             return name.matches(regex.toRegex())
         }

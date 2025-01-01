@@ -1,30 +1,42 @@
 package top.alazeprt.aqqbot.command
 
+import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
-import taboolib.common.platform.command.CommandBody
-import taboolib.common.platform.command.CommandHeader
-import taboolib.common.platform.command.subCommand
+import taboolib.common.platform.command.*
 import taboolib.common.platform.function.info
 import taboolib.common.platform.function.releaseResourceFile
 import taboolib.common.platform.function.submit
 import taboolib.module.configuration.Configuration
 import top.alazeprt.aonebot.BotClient
+import top.alazeprt.aonebot.action.SendGroupMessage
+import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.AQQBot.botConfig
 import top.alazeprt.aqqbot.AQQBot.config
 import top.alazeprt.aqqbot.AQQBot.customCommands
 import top.alazeprt.aqqbot.AQQBot.enableGroups
 import top.alazeprt.aqqbot.AQQBot.isBukkit
+import top.alazeprt.aqqbot.AQQBot.isFileStorage
 import top.alazeprt.aqqbot.AQQBot.messageConfig
 import top.alazeprt.aqqbot.AQQBot.oneBotClient
 import top.alazeprt.aqqbot.DependencyImpl
+import top.alazeprt.aqqbot.handler.WhitelistAdminHandler.Companion.validateName
 import top.alazeprt.aqqbot.qq.BotListener
 import top.alazeprt.aqqbot.util.ACustom
 import top.alazeprt.aqqbot.util.AI18n.get
+import top.alazeprt.aqqbot.util.AI18n.getList
+import top.alazeprt.aqqbot.util.DBQuery
+import top.alazeprt.aqqbot.util.DBQuery.addPlayer
+import top.alazeprt.aqqbot.util.DBQuery.getUserIdByName
+import top.alazeprt.aqqbot.util.DBQuery.playerInDatabase
+import top.alazeprt.aqqbot.util.DBQuery.qqInDatabase
+import top.alazeprt.aqqbot.util.DBQuery.removePlayer
+import top.alazeprt.aqqbot.util.DBQuery.removePlayerByName
+import top.alazeprt.aqqbot.util.DBQuery.removePlayerByUserId
 import java.net.URI
 
-@CommandHeader("aqqbot", ["abot", "qqbot"], permission = "aqqbot.command")
+@CommandHeader("aqqbot", ["abot", "qqbot"])
 object ABotCommand {
-    @CommandBody
+    @CommandBody(permission = "aqqbot.reload")
     val reload = subCommand {
         execute<CommandSender> { sender, _, _ ->
             val s = System.currentTimeMillis()
@@ -65,6 +77,147 @@ object ABotCommand {
                 oneBotClient.registerEvent(BotListener())
                 sender.sendMessage(formatString(get("game.reload", mutableMapOf("time" to (System.currentTimeMillis() - s).toString()))))
                 info("Reloaded AQQBot in ${System.currentTimeMillis() - s} ms")
+            }
+        }
+    }
+
+    @CommandBody(permission = "aqqbot.forcebind")
+    val forcebind = subCommand {
+        dynamic("userId") {
+            player("playerName") {
+                suggestion<CommandSender>(uncheck = true) { _, _ ->
+                    if (isBukkit) Bukkit.getOnlinePlayers().map { it.name }.toList() else emptyList()
+                }
+                execute<CommandSender> { sender, context, _ ->
+                    val userId = context["userId"]
+                    val playerName = context.player("playerName").name
+                    if (isFileStorage && AQQBot.dataMap.containsKey(userId)) {
+                        AQQBot.dataMap.remove(userId)
+                    } else if (!isFileStorage && qqInDatabase(userId.toLong()) != null) {
+                        DBQuery.removePlayerByUserId(userId.toLong())
+                    }
+                    if (!validateName(playerName)) {
+                        sender.sendMessage(formatString(get("game.invalid_arguments")))
+                        return@execute
+                    }
+                    if (isFileStorage) {
+                        var existUserId = ""
+                        AQQBot.dataMap.forEach { k, v ->
+                            if (v == playerName) {
+                                existUserId = k
+                                return@forEach
+                            }
+                        }
+                        if (existUserId != "") {
+                            AQQBot.dataMap.remove(existUserId)
+                        }
+                    } else {
+                        if (playerInDatabase(playerName)) {
+                            DBQuery.removePlayerByName(playerName)
+                        }
+                    }
+                    if (isFileStorage) AQQBot.dataMap[userId] = playerName
+                    else addPlayer(userId.toLong(), playerName)
+                    sender.sendMessage(formatString(get("game.successfully_bind")))
+                }
+            }
+        }
+    }
+
+    @CommandBody(permission = "aqqbot.forceunbind")
+    val forceunbind = subCommand {
+        dynamic("mode") {
+            dynamic("dataValue") {
+                suggestion<CommandSender> { _, context ->
+                    if (isBukkit && context["mode"].contains("qq")) Bukkit.getOnlinePlayers().map { it.name }.toList() else emptyList()
+                }
+                execute<CommandSender> { sender, context, _ ->
+                    val mode = context["mode"]
+                    val data = context["data"]
+                    if (mode.contains("qq")) {
+                        if (isFileStorage && !AQQBot.dataMap.containsKey(data)) {
+                            sender.sendMessage(formatString(get("game.invalid_arguments")))
+                            return@execute
+                        } else if (!isFileStorage && qqInDatabase(data.toLong()) == null) {
+                            sender.sendMessage(formatString(get("game.invalid_arguments")))
+                            return@execute
+                        }
+                        if (isFileStorage) {
+                            AQQBot.dataMap.forEach { (k, _) ->
+                                if (k == data) {
+                                    AQQBot.dataMap.remove(k)
+                                    sender.sendMessage(formatString(get("game.successfully_unbind")))
+                                    return@execute
+                                }
+                            }
+                            sender.sendMessage(formatString(get("game.invalid_arguments")))
+                        } else {
+                            removePlayerByUserId(data.toLong())
+                            sender.sendMessage(formatString(get("game.successfully_unbind")))
+                        }
+                    } else {
+                        if (isFileStorage && !AQQBot.dataMap.containsValue(data)) {
+                            sender.sendMessage(formatString(get("game.invalid_arguments")))
+                            return@execute
+                        } else if (!isFileStorage && !playerInDatabase(data)) {
+                            sender.sendMessage(formatString(get("game.invalid_arguments")))
+                            return@execute
+                        }
+                        if (isFileStorage) {
+                            AQQBot.dataMap.forEach { (_, v) ->
+                                if (v == data) {
+                                    AQQBot.dataMap.remove(v)
+                                    sender.sendMessage(formatString(get("game.successfully_unbind")))
+                                    return@execute
+                                }
+                            }
+                            sender.sendMessage(formatString(get("game.invalid_arguments")))
+                        } else {
+                            removePlayerByName(data)
+                            sender.sendMessage(formatString(get("game.successfully_unbind")))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @CommandBody(permission = "aqqbot.query")
+    val query = subCommand {
+        dynamic("mode") {
+            dynamic("dataValue") {
+                suggestion<CommandSender> { _, context ->
+                    if (isBukkit && context["mode"].contains("qq")) Bukkit.getOnlinePlayers().map { it.name }.toList() else emptyList()
+                }
+                execute<CommandSender> { sender, context, _ ->
+                    val mode = context["mode"]
+                    val data = context["dataValue"]
+                    var userId = "未知"
+                    var playerName = "未知"
+                    if (mode.contains("qq")) {
+                        userId = data
+                        if (isFileStorage) {
+                            playerName = AQQBot.dataMap[userId] ?: "未知"
+                        } else {
+                            playerName = qqInDatabase(userId.toLong()) ?: "未知"
+                        }
+                    } else {
+                        playerName = data
+                        if (isFileStorage) {
+                            AQQBot.dataMap.forEach { k, v ->
+                                if (v == data) {
+                                    userId = k
+                                    return@forEach
+                                }
+                            }
+                        } else {
+                            userId = if (playerInDatabase(playerName)) getUserIdByName(playerName).toString() else "未知"
+                        }
+                    }
+                    sender.sendMessage(formatString(getList("game.query_result",
+                        mutableMapOf("userId" to userId, "playerName" to playerName)
+                    )))
+                }
             }
         }
     }

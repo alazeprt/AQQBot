@@ -1,6 +1,5 @@
 package top.alazeprt.aqqbot.util;
 
-import taboolib.common.platform.function.info
 import taboolib.common5.util.replace
 import top.alazeprt.aqqbot.AQQBot.messageConfig
 

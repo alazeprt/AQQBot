@@ -44,3 +44,16 @@ game:
   not_bind: "[AQQBot] 你的账号还没有绑定QQ!\n请通过在QQ群发送${command} <游戏名称> 来绑定!" # ${command}为你设置的第一个绑定命令, 如: /bind
   chat_from_qq: "&8[&aQQ群(${groupId})&8] &b${userName}: &f${message}"
   reload: "&a[AQQBot] 重载完成! 耗时 &e${time} ms"
+  invalid_arguments: "&c[AQQBot] 参数不合法或过多或过少!"
+  successfully_bind: "&b[AQQBot] 绑定成功!"
+  successfully_unbind: "&b[AQQBot] 解绑成功!"
+  query_result:
+    - "&a[AQQBot] 查询结果: "
+    - "&bQQ号: ${userId}"
+    - "&d游戏名: ${playerName}"
+  help:
+    - "&a[AQQBot] 帮助页面"
+    - "&b/aqqbot forcebind <QQ号> <游戏名>   &e强制绑定(会清除之前已有的绑定)"
+    - "&b/aqqbot forceunbind <qq|player> <数据>   &e强制解除绑定(qq: QQ号, player: 游戏名, 根据数据选择其一)"
+    - "&b/aqqbot query <qq|player> <数据>   &e根据QQ号或游戏名查询对应的游戏名或QQ号"
+    - "&b/aqqbot help   &e查看此帮助页面"

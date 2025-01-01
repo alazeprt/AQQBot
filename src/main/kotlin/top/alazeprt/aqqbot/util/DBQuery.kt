@@ -31,4 +31,24 @@ object DBQuery {
             where(("userId" eq userId) and ("name" eq name))
         }
     }
+
+    fun removePlayerByUserId(userId: Long) {
+        table.delete(dataSource) {
+            where("userId" eq userId)
+        }
+    }
+
+    fun removePlayerByName(name: String) {
+        table.delete(dataSource) {
+            where("name" eq name)
+        }
+    }
+
+    fun getUserIdByName(name: String): Long? {
+        return table.select(dataSource) {
+            rows("userId")
+            where("name" eq name)
+            limit(1)
+        }.firstOrNull { getLong("userId") }
+    }
 }
