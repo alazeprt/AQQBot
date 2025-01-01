@@ -2,7 +2,6 @@ package top.alazeprt.aqqbot.qq
 
 import org.bukkit.Bukkit
 import top.alazeprt.aonebot.action.GetGroupMemberList
-import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aonebot.event.Listener
 import top.alazeprt.aonebot.event.SubscribeBotEvent
 import top.alazeprt.aonebot.event.message.GroupMessageEvent

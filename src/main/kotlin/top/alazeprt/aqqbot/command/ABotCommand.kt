@@ -2,13 +2,15 @@ package top.alazeprt.aqqbot.command
 
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
-import taboolib.common.platform.command.*
+import taboolib.common.platform.command.CommandBody
+import taboolib.common.platform.command.CommandHeader
+import taboolib.common.platform.command.player
+import taboolib.common.platform.command.subCommand
 import taboolib.common.platform.function.info
 import taboolib.common.platform.function.releaseResourceFile
 import taboolib.common.platform.function.submit
 import taboolib.module.configuration.Configuration
 import top.alazeprt.aonebot.BotClient
-import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.AQQBot.botConfig
 import top.alazeprt.aqqbot.AQQBot.config
@@ -29,7 +31,6 @@ import top.alazeprt.aqqbot.util.DBQuery.addPlayer
 import top.alazeprt.aqqbot.util.DBQuery.getUserIdByName
 import top.alazeprt.aqqbot.util.DBQuery.playerInDatabase
 import top.alazeprt.aqqbot.util.DBQuery.qqInDatabase
-import top.alazeprt.aqqbot.util.DBQuery.removePlayer
 import top.alazeprt.aqqbot.util.DBQuery.removePlayerByName
 import top.alazeprt.aqqbot.util.DBQuery.removePlayerByUserId
 import java.net.URI
@@ -127,9 +128,9 @@ object ABotCommand {
     @CommandBody(permission = "aqqbot.forceunbind")
     val forceunbind = subCommand {
         dynamic("mode") {
-            dynamic("dataValue") {
-                suggestion<CommandSender> { _, context ->
-                    if (isBukkit && context["mode"].contains("qq")) Bukkit.getOnlinePlayers().map { it.name }.toList() else emptyList()
+            dynamic("data") {
+                suggestion<CommandSender>(uncheck = true) { _, context ->
+                    if (isBukkit && !context["mode"].contains("qq")) Bukkit.getOnlinePlayers().map { it.name }.toList() else emptyList()
                 }
                 execute<CommandSender> { sender, context, _ ->
                     val mode = context["mode"]
@@ -185,13 +186,13 @@ object ABotCommand {
     @CommandBody(permission = "aqqbot.query")
     val query = subCommand {
         dynamic("mode") {
-            dynamic("dataValue") {
-                suggestion<CommandSender> { _, context ->
+            dynamic("data") {
+                suggestion<CommandSender>(uncheck = true) { _, context ->
                     if (isBukkit && context["mode"].contains("qq")) Bukkit.getOnlinePlayers().map { it.name }.toList() else emptyList()
                 }
                 execute<CommandSender> { sender, context, _ ->
                     val mode = context["mode"]
-                    val data = context["dataValue"]
+                    val data = context["data"]
                     var userId = "未知"
                     var playerName = "未知"
                     if (mode.contains("qq")) {
@@ -219,6 +220,13 @@ object ABotCommand {
                     )))
                 }
             }
+        }
+    }
+
+    @CommandBody(permission = "aqqbot.help")
+    val help = subCommand {
+        execute<CommandSender> { sender, _, _ ->
+            sender.sendMessage(formatString(getList("game.help")))
         }
     }
 

@@ -1,7 +1,6 @@
 package top.alazeprt.aqqbot.handler
 
 import org.bukkit.Bukkit
-import taboolib.common.platform.function.info
 import top.alazeprt.aonebot.action.GetGroupMemberInfo
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aonebot.action.SetGroupCard

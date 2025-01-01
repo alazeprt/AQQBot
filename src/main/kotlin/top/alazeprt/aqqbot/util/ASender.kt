@@ -10,7 +10,6 @@ import org.bukkit.permissions.Permission
 import org.bukkit.permissions.PermissionAttachment
 import org.bukkit.permissions.PermissionAttachmentInfo
 import org.bukkit.plugin.Plugin
-import taboolib.common.platform.function.info
 import top.alazeprt.aqqbot.AQQBot.config
 import java.util.*
 
