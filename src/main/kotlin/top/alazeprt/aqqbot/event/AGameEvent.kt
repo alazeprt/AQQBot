@@ -11,8 +11,10 @@ import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.AQQBot.config
 import top.alazeprt.aqqbot.AQQBot.isFileStorage
+import top.alazeprt.aqqbot.AQQBot.verifyCodeMap
 import top.alazeprt.aqqbot.util.AI18n.get
 import top.alazeprt.aqqbot.util.DBQuery.playerInDatabase
+import java.util.UUID
 
 object AGameEvent {
     // Bukkit
@@ -21,10 +23,22 @@ object AGameEvent {
     fun onJoin(event: AsyncPlayerPreLoginEvent) {
         if (!config.getBoolean("whitelist.enable") || !config.getBoolean("whitelist.need_bind_to_login")) return
         if (isFileStorage && event.name !in AQQBot.dataMap.values) {
-            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, formatString(get("game.not_bind", mutableMapOf(Pair("command", AQQBot.config.getStringList("whitelist.prefix.bind")[0])))))
+            if (config.getString("whitelist.verify_method")?.uppercase() == "GROUP_NAME") {
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, formatString(get("game.not_bind", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0])))))
+            } else if (config.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {
+                val verifyCode = if (verifyCodeMap.containsKey(event.name)) verifyCodeMap.get(event.name)!!.first else UUID.randomUUID().toString().substring(0, 6)
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, formatString(get("game.not_verified", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0]), Pair("code", verifyCode)))))
+                if (!verifyCodeMap.containsKey(event.name)) verifyCodeMap.put(event.name, Pair(verifyCode, System.currentTimeMillis()))
+            }
         }
         if (!isFileStorage && !playerInDatabase(event.name)) {
-            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, formatString(get("game.not_bind", mutableMapOf(Pair("command", AQQBot.config.getStringList("whitelist.prefix.bind")[0])))))
+            if (config.getString("whitelist.verify_method")?.uppercase() == "GROUP_NAME") {
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, formatString(get("game.not_bind", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0])))))
+            } else if (config.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {
+                val verifyCode = if (verifyCodeMap.containsKey(event.name)) verifyCodeMap.get(event.name)!!.first else UUID.randomUUID().toString().substring(0, 6)
+                event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, formatString(get("game.not_verified", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0]), Pair("code", verifyCode)))))
+                if (!verifyCodeMap.containsKey(event.name)) verifyCodeMap.put(event.name, Pair(verifyCode, System.currentTimeMillis()))
+            }
         }
     }
 
@@ -46,10 +60,22 @@ object AGameEvent {
     fun onVCJoin(event: PostLoginEvent) {
         if (!config.getBoolean("whitelist.enable") || !config.getBoolean("whitelist.need_bind_to_login")) return
         if (isFileStorage && event.player.username !in AQQBot.dataMap.values) {
-            event.player.disconnect(Component.text(formatString(get("game.not_bind", mutableMapOf(Pair("command", AQQBot.config.getStringList("whitelist.prefix.bind")[0]))))))
+            if (config.getString("whitelist.verify_method")?.uppercase() == "GROUP_NAME") {
+                event.player.disconnect(Component.text(formatString(get("game.not_bind", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0]))))))
+            } else if (config.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {
+                val verifyCode = if (verifyCodeMap.containsKey(event.player.username)) verifyCodeMap.get(event.player.username)!!.first else UUID.randomUUID().toString().substring(0, 6)
+                event.player.disconnect(Component.text(formatString(get("game.not_verified", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0]), Pair("code", verifyCode))))))
+                if (!verifyCodeMap.containsKey(event.player.username)) verifyCodeMap.put(event.player.username, Pair(verifyCode, System.currentTimeMillis()))
+            }
         }
         if (!isFileStorage && !playerInDatabase(event.player.username)) {
-            event.player.disconnect(Component.text(formatString(get("game.not_bind", mutableMapOf(Pair("command", AQQBot.config.getStringList("whitelist.prefix.bind")[0]))))))
+            if (config.getString("whitelist.verify_method")?.uppercase() == "GROUP_NAME") {
+                event.player.disconnect(Component.text(formatString(get("game.not_bind", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0]))))))
+            } else if (config.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {
+                val verifyCode = if (verifyCodeMap.containsKey(event.player.username)) verifyCodeMap.get(event.player.username)!!.first else UUID.randomUUID().toString().substring(0, 6)
+                event.player.disconnect(Component.text(formatString(get("game.not_verified", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0]), Pair("code", verifyCode))))))
+                if (!verifyCodeMap.containsKey(event.player.username)) verifyCodeMap.put(event.player.username, Pair(verifyCode, System.currentTimeMillis()))
+            }
         }
     }
 

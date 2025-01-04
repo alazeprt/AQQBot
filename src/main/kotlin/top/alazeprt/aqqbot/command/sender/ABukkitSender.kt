@@ -1,4 +1,4 @@
-package top.alazeprt.aqqbot.util
+package top.alazeprt.aqqbot.command.sender
 
 import org.bukkit.Bukkit
 import org.bukkit.Server

@@ -9,8 +9,8 @@ import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.AQQBot.config
 import top.alazeprt.aqqbot.AQQBot.isBukkit
 import top.alazeprt.aqqbot.AQQBot.messageConfig
-import top.alazeprt.aqqbot.util.ABukkitSender
-import top.alazeprt.aqqbot.util.AVCSender
+import top.alazeprt.aqqbot.command.sender.ABukkitSender
+import top.alazeprt.aqqbot.command.sender.AVCSender
 
 class CommandHandler {
     companion object {

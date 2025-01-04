@@ -1,4 +1,4 @@
-package top.alazeprt.aqqbot.util
+package top.alazeprt.aqqbot.command.sender
 
 import com.velocitypowered.api.command.CommandSource
 import com.velocitypowered.api.permission.Tristate

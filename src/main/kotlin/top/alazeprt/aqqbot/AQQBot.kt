@@ -37,6 +37,8 @@ object AQQBot : Plugin() {
 
     val dataMap: MutableMap<String, String> = mutableMapOf()
 
+    val verifyCodeMap: MutableMap<String, Pair<String, Long>> = mutableMapOf() // <name, <code, time>>
+
     val customCommands: MutableList<ACustom> = mutableListOf()
 
     lateinit var table: Table<*, *>
@@ -93,6 +95,18 @@ object AQQBot : Plugin() {
             }
             AQQBot.dataSource = dataSource
             table.createTable(dataSource)
+        }
+        if (config.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {
+            submit(async = true) {
+                while (true) {
+                    verifyCodeMap.forEach {
+                        if (System.currentTimeMillis() - it.value.second > config.getLong("whitelist.verify_code_expire_time") * 1000L) {
+                            verifyCodeMap.remove(it.key)
+                        }
+                    }
+                    Thread.sleep(5000)
+                }
+            }
         }
         val botFile = releaseResourceFile("bot.yml", replace = false)
         botConfig = Configuration.loadFromFile(botFile)

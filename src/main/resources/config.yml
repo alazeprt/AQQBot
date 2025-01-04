@@ -27,10 +27,20 @@ whitelist:
   # 是否必须绑定后才能进入游戏
   need_bind_to_login: true
 
+  # 验证方法
+  # - GROUP_NAME: 在QQ群中发送 $command $name 来给自己的QQ绑定指定的游戏账户(名称)
+  # - VERIFY_CODE: 玩家在进入游戏后获取一个6位数验证码, 在QQ群发送 $command $code 后方可绑定游戏账户(名称)
+  verify_method: "GROUP_NAME"
+
+  # 验证码过期时间 (单位: 秒)
+  # 在验证方法为 VERIFY_CODE 时可用
+  verify_code_expire_time: 300
+
   # 功能指令前缀
   prefix:
     # 绑定指令前缀
     # 用户需要发送的消息: $command $name
+    # ! 如果验证方法为 VERIFY_CODE, 则用户需要发送的消息为: $command $code
     bind:
       - "/绑定"
       - "/bind"
@@ -55,7 +65,8 @@ whitelist:
     format: "[${nickName}] ${playerName}"
 
   # 是否启用管理员管理
-  # 管理员可通过/${prefix} $userId $name 进行绑定/解绑
+  # 管理员可通过/$command $userId $name 进行绑定/解绑
+  # ! 验证方法不影响该功能的使用
   admin: true
 
 # 查询服务器基本信息

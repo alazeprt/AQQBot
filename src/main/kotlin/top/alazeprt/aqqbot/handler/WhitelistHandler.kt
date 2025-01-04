@@ -7,6 +7,7 @@ import top.alazeprt.aonebot.action.SetGroupCard
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aonebot.util.GroupRole
 import top.alazeprt.aqqbot.AQQBot
+import top.alazeprt.aqqbot.AQQBot.config
 import top.alazeprt.aqqbot.AQQBot.isFileStorage
 import top.alazeprt.aqqbot.util.AI18n.get
 import top.alazeprt.aqqbot.util.DBQuery.addPlayer
@@ -16,7 +17,8 @@ import top.alazeprt.aqqbot.util.DBQuery.removePlayer
 
 class WhitelistHandler {
     companion object {
-        private fun bind(userId: String, groupId: Long, playerName: String) {
+        private fun bind(userId: String, groupId: Long, data: String) {
+            val playerName: String
             if (isFileStorage && AQQBot.dataMap.containsKey(userId)) {
                 AQQBot.oneBotClient.action(
                     SendGroupMessage(groupId, get("qq.whitelist.already_bind"), true))
@@ -26,9 +28,25 @@ class WhitelistHandler {
                     SendGroupMessage(groupId, get("qq.whitelist.already_bind"), true))
                 return
             }
-            if (!validateName(playerName)) {
-                AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.invalid_name"), true))
-                return
+            if (config.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {
+                var name: String? = null
+                AQQBot.verifyCodeMap.forEach { (k, v) ->
+                    if (v.first == data) {
+                        name = k
+                        return@forEach
+                    }
+                }
+                if (name == null) {
+                    AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.verify_code_not_exist"), true))
+                    return
+                }
+                playerName = name!!
+            } else {
+                playerName = data
+                if (!validateName(playerName)) {
+                    AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.invalid_name"), true))
+                    return
+                }
             }
             if (isFileStorage) {
                 AQQBot.dataMap.values.forEach {
@@ -46,14 +64,17 @@ class WhitelistHandler {
             if (isFileStorage) AQQBot.dataMap[userId] = playerName
             else addPlayer(userId.toLong(), playerName)
             AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.bind_successful"), true))
-            if (AQQBot.config.getBoolean("whitelist.change_nickname_on_bind.enable")) {
-                AQQBot.oneBotClient.action(GetGroupMemberInfo(groupId, userId.toLong()), {
-                    val newName = AQQBot.config.getString("whitelist.change_nickname_on_bind.format")!!
+            if (config.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {
+                AQQBot.verifyCodeMap.remove(playerName)
+            }
+            if (config.getBoolean("whitelist.change_nickname_on_bind.enable")) {
+                AQQBot.oneBotClient.action(GetGroupMemberInfo(groupId, userId.toLong())) {
+                    val newName = config.getString("whitelist.change_nickname_on_bind.format")!!
                         .replace("\${playerName}", playerName)
                         .replace("\${qq}", userId)
                         .replace("\${nickName}", it.member.nickname)
                     AQQBot.oneBotClient.action(SetGroupCard(groupId, userId.toLong(), newName))
-                })
+                }
             }
         }
         
@@ -98,11 +119,11 @@ class WhitelistHandler {
         }
 
         fun handle(message: String, event: GroupMessageEvent): Boolean {
-            if (!AQQBot.config.getBoolean("whitelist.enable")) {
+            if (!config.getBoolean("whitelist.enable")) {
                 return false
             }
             if (message.split(" ").size < 2) return false
-            AQQBot.config.getStringList("whitelist.prefix.bind").forEach {
+            config.getStringList("whitelist.prefix.bind").forEach {
                 if (message.lowercase().startsWith(it.lowercase())) {
                     val playerName = message.split(" ")[1]
                     AQQBot.oneBotClient.action(GetGroupMemberInfo(event.groupId, event.senderId)) { sender ->
@@ -115,7 +136,7 @@ class WhitelistHandler {
                     return true
                 }
             }
-            AQQBot.config.getStringList("whitelist.prefix.unbind").forEach {
+            config.getStringList("whitelist.prefix.unbind").forEach {
                 if (message.lowercase().startsWith(it.lowercase())) {
                     val playerName = message.substring(it.length + 1)
                     AQQBot.oneBotClient.action(GetGroupMemberInfo(event.groupId, event.senderId)) { sender ->

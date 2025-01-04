@@ -8,6 +8,7 @@ qq:
     already_bind: "你已经绑定过了"
     invalid_name: "名称不合法! (名称只能由字母、数字、下划线组成)"
     already_exist: "该名称已被他人占用!"
+    verify_code_not_exist: "验证码不存在或已过期!"
     bind_successful: "绑定成功!"
     not_bind: "你还没有绑定过!"
     unbind_successful: "解绑成功!"
@@ -41,7 +42,8 @@ qq:
 
 # 此部分为发送到游戏/在游戏内提示的消息 (使用&代表颜色符号)
 game:
-  not_bind: "[AQQBot] 你的账号还没有绑定QQ!\n请通过在QQ群发送${command} <游戏名称> 来绑定!" # ${command}为你设置的第一个绑定命令, 如: /bind
+  not_bind: "[AQQBot] 你的账号还没有绑定QQ!\n请通过在QQ群发送${command} <游戏名称> 来绑定!" # 在GROUP_NAME模式下使用, ${command}为你设置的第一个绑定命令, 如: /bind
+  not_verified: "[AQQBot] 你的账号还没有绑定QQ!\n请通过在QQ群发送${command} ${code} 来绑定!" # 在VERIFY_CODE模式下可用, ${code}为验证码
   chat_from_qq: "&8[&aQQ群(${groupId})&8] &b${userName}: &f${message}"
   reload: "&a[AQQBot] 重载完成! 耗时 &e${time} ms"
   invalid_arguments: "&c[AQQBot] 参数不合法或过多或过少!"

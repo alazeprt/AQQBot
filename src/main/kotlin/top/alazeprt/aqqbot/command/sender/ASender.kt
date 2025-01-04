@@ -1,4 +1,4 @@
-package top.alazeprt.aqqbot.util
+package top.alazeprt.aqqbot.command.sender
 
 interface ASender {
     fun getFormatString(): String
