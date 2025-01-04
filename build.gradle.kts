@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
-    id("io.izzel.taboolib") version "2.0.17"
+    id("io.izzel.taboolib") version "2.0.22"
     id("org.jetbrains.kotlin.jvm") version "1.8.22"
 }
 
@@ -17,9 +17,9 @@ taboolib {
             name("alazeprt")
         }
     }
-    relocate("com.google", "top.alazeprt.aonebot.lib.google")
+    relocate("com.google.code.gson", "top.alazeprt.aonebot.lib.google.code.gson")
 
-    version { taboolib = "6.2.0" }
+    version { taboolib = "6.2.1-df22fb1" }
 }
 
 repositories {
