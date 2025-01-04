@@ -2,17 +2,16 @@ package top.alazeprt.aqqbot.util
 
 import com.velocitypowered.api.command.CommandSource
 import com.velocitypowered.api.permission.Tristate
+import com.velocitypowered.proxy.util.TranslatableMapper
 import net.kyori.adventure.audience.MessageType
-import net.kyori.adventure.chat.ChatType
-import net.kyori.adventure.chat.SignedMessage
-import net.kyori.adventure.identity.Identified
 import net.kyori.adventure.identity.Identity
 import net.kyori.adventure.permission.PermissionChecker
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.ComponentLike
 import net.kyori.adventure.text.TextComponent
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
+import net.kyori.adventure.text.TranslatableComponent
+import net.kyori.adventure.text.serializer.ansi.ANSIComponentSerializer
 import net.kyori.adventure.util.TriState
+import net.kyori.ansi.ColorLevel
 import taboolib.platform.VelocityPlugin
 import top.alazeprt.aqqbot.AQQBot.config
 import java.util.concurrent.CompletableFuture
@@ -20,6 +19,8 @@ import java.util.concurrent.CompletableFuture
 class AVCSender : CommandSource, ASender {
 
     val messageList = mutableListOf<String>()
+
+    var tmpMessage = ""
 
     lateinit var future: CompletableFuture<Boolean>;
 
@@ -35,111 +36,24 @@ class AVCSender : CommandSource, ASender {
         return PermissionChecker.always(TriState.TRUE)
     }
 
-    override fun sendRichMessage(message: String, vararg resolvers: TagResolver) {
-        messageList.add(message)
-    }
-
-    override fun sendMessage(message: Component) {
-        if (message is TextComponent) {
-            messageList.add(message.content())
-        }
-    }
-
-    override fun sendMessage(message: ComponentLike) {
-        val component = message.asComponent()
-        if (component is TextComponent) {
-            messageList.add(component.content())
-        }
-    }
-
-    override fun sendMessage(source: Identified, message: Component, type: MessageType) {
-        if (message is TextComponent) {
-            messageList.add(message.content())
-        }
-    }
-
-    override fun sendMessage(source: Identified, message: ComponentLike, type: MessageType) {
-        val component = message.asComponent()
-        if (component is TextComponent) {
-            messageList.add(component.content())
+    fun addContent(message: Component) {
+        if (message.children().isEmpty()) {
+            if (message is TextComponent) {
+                tmpMessage += message.content()
+            } else if (message is TranslatableComponent) {
+                val serializer = ANSIComponentSerializer.builder().flattener(TranslatableMapper.FLATTENER).colorLevel(ColorLevel.NONE).build()
+                tmpMessage += serializer.serialize(message)
+            }
+        } else {
+            message.children().forEach {
+                addContent(it)
+            }
         }
     }
 
     override fun sendMessage(source: Identity, message: Component, type: MessageType) {
-        if (message is TextComponent) {
-            messageList.add(message.content())
-        }
-    }
-
-    override fun sendMessage(source: Identity, message: ComponentLike, type: MessageType) {
-        val component = message.asComponent()
-        if (component is TextComponent) {
-            messageList.add(component.content())
-        }
-    }
-
-    override fun sendMessage(message: Component, type: MessageType) {
-        if (message is TextComponent) {
-            messageList.add(message.content())
-        }
-    }
-
-    override fun sendMessage(message: ComponentLike, type: MessageType) {
-        val component = message.asComponent()
-        if (component is TextComponent) {
-            messageList.add(component.content())
-        }
-    }
-
-    override fun sendMessage(source: Identified, message: Component) {
-        if (message is TextComponent) {
-            messageList.add(message.content())
-        }
-    }
-
-    override fun sendMessage(source: Identified, message: ComponentLike) {
-        val component = message.asComponent()
-        if (component is TextComponent) {
-            messageList.add(component.content())
-        }
-    }
-
-    override fun sendMessage(source: Identity, message: Component) {
-        if (message is TextComponent) {
-            messageList.add(message.content())
-        }
-    }
-
-    override fun sendMessage(source: Identity, message: ComponentLike) {
-        val component = message.asComponent()
-        if (component is TextComponent) {
-            messageList.add(component.content())
-        }
-    }
-
-    override fun sendRichMessage(message: String) {
-        messageList.add(message)
-    }
-
-    override fun sendPlainMessage(message: String) {
-        messageList.add(message)
-    }
-
-    override fun sendMessage(signedMessage: SignedMessage, boundChatType: ChatType.Bound) {
-        messageList.add(signedMessage.message())
-    }
-
-    override fun sendMessage(message: ComponentLike, boundChatType: ChatType.Bound) {
-        val component = message.asComponent()
-        if (component is TextComponent) {
-            messageList.add(component.content())
-        }
-    }
-
-    override fun sendMessage(message: Component, boundChatType: ChatType.Bound) {
-        if (message is TextComponent) {
-            messageList.add(message.content())
-        }
+        addContent(message)
+        messageList.addAll(tmpMessage.split("\n"))
     }
 
     override fun getFormatString(): String {
