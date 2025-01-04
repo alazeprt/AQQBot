@@ -1,9 +1,6 @@
 package top.alazeprt.aqqbot.handler
 
-import org.bukkit.Bukkit
-import taboolib.common.platform.function.info
 import taboolib.common.platform.function.submit
-import taboolib.platform.VelocityPlugin
 import top.alazeprt.aonebot.action.GetGroupMemberInfo
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
@@ -13,7 +10,6 @@ import top.alazeprt.aqqbot.AQQBot.config
 import top.alazeprt.aqqbot.AQQBot.isBukkit
 import top.alazeprt.aqqbot.AQQBot.messageConfig
 import top.alazeprt.aqqbot.util.ABukkitSender
-import top.alazeprt.aqqbot.util.ASender
 import top.alazeprt.aqqbot.util.AVCSender
 
 class CommandHandler {
@@ -60,9 +56,9 @@ class CommandHandler {
                                 sender.execute(command)
                                 submit(delay = config.getInt("command_execution.delay")*20L, async = true) {
                                     if (config.getBoolean("command_execution.format")) {
-                                        AQQBot.oneBotClient.action(SendGroupMessage(event.groupId, if (sender.getFormatString().isEmpty()) messageConfig.getString("qq.execution_return_empty") else sender.getFormatString()))
+                                        AQQBot.oneBotClient.action(SendGroupMessage(event.groupId, if (sender.getFormatString().isEmpty()) messageConfig.getString("qq.execution_finished") else sender.getFormatString()))
                                     } else {
-                                        AQQBot.oneBotClient.action(SendGroupMessage(event.groupId, if (sender.getRawString().isEmpty()) messageConfig.getString("qq.execution_return_empty") else sender.getRawString()))
+                                        AQQBot.oneBotClient.action(SendGroupMessage(event.groupId, if (sender.getRawString().isEmpty()) messageConfig.getString("qq.execution_finished") else sender.getRawString()))
                                     }
                                 }
                             }
