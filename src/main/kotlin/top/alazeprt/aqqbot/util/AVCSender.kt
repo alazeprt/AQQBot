@@ -54,6 +54,7 @@ class AVCSender : CommandSource, ASender {
     override fun sendMessage(source: Identity, message: Component, type: MessageType) {
         addContent(message)
         messageList.addAll(tmpMessage.split("\n"))
+        tmpMessage = ""
     }
 
     override fun getFormatString(): String {

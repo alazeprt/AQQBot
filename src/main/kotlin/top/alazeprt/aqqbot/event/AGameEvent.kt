@@ -63,12 +63,21 @@ object AGameEvent {
         if (!config.getBoolean("chat.server_to_group.enable")) {
             return null
         }
+        var formattedMessage = message
+        if (config.getBoolean("chat.server_to_group.format")) {
+            formattedMessage = message.replace(Regex("§([0-9a-fklmnor])"), "")
+        }
+        config.getStringList("command_execution.format_list").forEach {
+            if (it != "") {
+                formattedMessage = formattedMessage.replace(it, "")
+            }
+        }
         if (config.getStringList("chat.server_to_group.prefix").contains("")) {
-            return message
+            return formattedMessage
         }
         config.getStringList("chat.server_to_group.prefix").forEach {
-             if (message.startsWith(it)) {
-                 return message.substring(it.length)
+             if (formattedMessage.startsWith(it)) {
+                 return formattedMessage.substring(it.length)
              }
         }
         return null
