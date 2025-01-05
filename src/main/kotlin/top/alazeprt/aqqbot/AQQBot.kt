@@ -47,7 +47,7 @@ object AQQBot : Plugin() {
 
     var isFileStorage: Boolean = false
 
-    override fun onActive() {
+    override fun onEnable() {
         info("Checking server type...")
         try {
             Class.forName("org.bukkit.Bukkit")
