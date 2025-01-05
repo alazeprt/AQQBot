@@ -1,10 +1,16 @@
 package top.alazeprt.aqqbot.handler
 
+import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
+import taboolib.common.platform.function.submit
+import taboolib.platform.VelocityPlugin
 import top.alazeprt.aonebot.action.GetGroupMemberList
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aqqbot.AQQBot
+import top.alazeprt.aqqbot.AQQBot.isBukkit
 import top.alazeprt.aqqbot.AQQBot.isFileStorage
+import top.alazeprt.aqqbot.debug.ALogger
 import top.alazeprt.aqqbot.util.AI18n.get
 import top.alazeprt.aqqbot.util.DBQuery
 import top.alazeprt.aqqbot.util.DBQuery.addPlayer
@@ -14,7 +20,7 @@ import top.alazeprt.aqqbot.util.DBQuery.removePlayer
 
 class WhitelistAdminHandler {
     companion object {
-        private fun bind(userId: String, groupId: Long, playerName: String) {
+        private fun bind(operatorId: String, userId: String, groupId: Long, playerName: String) {
             if (isFileStorage && AQQBot.dataMap.containsKey(userId)) {
                 AQQBot.dataMap.remove(userId)
             } else if (!isFileStorage && qqInDatabase(userId.toLong()) != null) {
@@ -43,9 +49,10 @@ class WhitelistAdminHandler {
             if (isFileStorage) AQQBot.dataMap[userId] = playerName
             else addPlayer(userId.toLong(), playerName)
             AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.bind_successful"), true))
+            ALogger.log("$operatorId bind $userId to account $playerName")
         }
 
-        private fun unbind(userId: String, groupId: Long, playerName: String) {
+        private fun unbind(operatorId: String, userId: String, groupId: Long, playerName: String) {
             if (isFileStorage && !AQQBot.dataMap.containsKey(userId)) {
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.admin.not_bind", mutableMapOf(Pair("userId", userId))), true))
                 return
@@ -58,6 +65,22 @@ class WhitelistAdminHandler {
                     if (v == playerName && k == userId) {
                         AQQBot.dataMap.remove(k)
                         AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.unbind_successful"), true))
+                        ALogger.log("$operatorId unbind $userId to account $playerName")
+                        submit {
+                            if (isBukkit) {
+                                for (player in Bukkit.getOnlinePlayers()) {
+                                    if (player.name == playerName) {
+                                        player.kickPlayer(get("game.kick_when_unbind"))
+                                    }
+                                }
+                            } else {
+                                for (player in VelocityPlugin.getInstance().server.allPlayers) {
+                                    if (player.username == playerName) {
+                                        player.disconnect(Component.text(get("game.kick_when_unbind")))
+                                    }
+                                }
+                            }
+                        }
                         return
                     } else if (k == userId) {
                         AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.admin.bind_by_other", mutableMapOf(Pair("name", v))), true))
@@ -70,6 +93,22 @@ class WhitelistAdminHandler {
                 }
                 removePlayer(userId.toLong(), playerName)
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.unbind_successful"), true))
+                ALogger.log("$operatorId unbind $userId to account $playerName")
+                submit {
+                    if (isBukkit) {
+                        for (player in Bukkit.getOnlinePlayers()) {
+                            if (player.name == playerName) {
+                                player.kickPlayer(get("game.kick_when_unbind"))
+                            }
+                        }
+                    } else {
+                        for (player in VelocityPlugin.getInstance().server.allPlayers) {
+                            if (player.username == playerName) {
+                                player.disconnect(Component.text(get("game.kick_when_unbind")))
+                            }
+                        }
+                    }
+                }
             }
             AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.admin.invalid_bind", mutableMapOf(Pair("userId", userId))), true))
         }
@@ -102,9 +141,9 @@ class WhitelistAdminHandler {
                     return@action
                 } else {
                     if (action == "bind") {
-                        bind(userId.toString(), event.groupId, playerName)
+                        bind(event.senderId.toString(), userId.toString(), event.groupId, playerName)
                     } else if (action == "unbind") {
-                        unbind(userId.toString(), event.groupId, playerName)
+                        unbind(event.senderId.toString(), userId.toString(), event.groupId, playerName)
                     }
                 }
             }

@@ -1,6 +1,9 @@
 package top.alazeprt.aqqbot.qq
 
+import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
+import taboolib.common.platform.function.submit
+import taboolib.platform.VelocityPlugin
 import top.alazeprt.aonebot.action.GetGroupMemberList
 import top.alazeprt.aonebot.event.Listener
 import top.alazeprt.aonebot.event.SubscribeBotEvent
@@ -77,9 +80,19 @@ class BotListener : Listener {
         } else {
             val playerName = qqInDatabase(userId.toLong())!!
             removePlayer(userId.toLong(), playerName)
-            for (player in Bukkit.getOnlinePlayers()) {
-                if (player.name == playerName) {
-                    player.kickPlayer(get("qq.whitelist.unbind_kick"))
+            submit {
+                if (isBukkit) {
+                    for (player in Bukkit.getOnlinePlayers()) {
+                        if (player.name == playerName) {
+                            player.kickPlayer(get("game.kick_when_unbind"))
+                        }
+                    }
+                } else {
+                    for (player in VelocityPlugin.getInstance().server.allPlayers) {
+                        if (player.username == playerName) {
+                            player.disconnect(Component.text(get("game.kick_when_unbind")))
+                        }
+                    }
                 }
             }
         }

@@ -11,6 +11,7 @@ import taboolib.module.database.*
 import taboolib.module.metrics.Metrics
 import top.alazeprt.aonebot.BotClient
 import top.alazeprt.aonebot.action.SendGroupMessage
+import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.qq.BotListener
 import top.alazeprt.aqqbot.util.ACustom
 import java.io.File
@@ -47,6 +48,8 @@ object AQQBot : Plugin() {
 
     var isFileStorage: Boolean = false
 
+    lateinit var dataFolder: File
+
     override fun onEnable() {
         info("Checking server type...")
         try {
@@ -57,6 +60,7 @@ object AQQBot : Plugin() {
         val metrics = Metrics(24071, "1.0.12", Platform.CURRENT)
         info("Loading data...")
         val configFile = releaseResourceFile("config.yml", replace = false)
+        dataFolder = getDataFolder()
         config = Configuration.loadFromFile(configFile)
         val dataFile = releaseResourceFile("data.yml", replace = false)
         dataConfig = Configuration.loadFromFile(dataFile)
@@ -129,6 +133,7 @@ object AQQBot : Plugin() {
         botConfig.getStringList("groups").forEach {
             enableGroups.add(it)
         }
+        if (config.getBoolean("debug.enable")) ADebug.initialize()
         info("Loading soft dependency...")
         DependencyImpl.loadSpark()
         if (isBukkit) {
@@ -165,6 +170,7 @@ object AQQBot : Plugin() {
                 }
             }
         }
+        if (config.getBoolean("debug.enable")) ADebug.shutdown()
         if (oneBotClient.isConnected) {
             oneBotClient.disconnect()
         }

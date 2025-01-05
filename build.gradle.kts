@@ -16,6 +16,9 @@ taboolib {
         contributors {
             name("alazeprt")
         }
+        dependencies {
+            name("spark").optional(true).loadbefore(true)
+        }
     }
     relocate("com.google.code.gson", "top.alazeprt.aonebot.lib.google.code.gson")
 

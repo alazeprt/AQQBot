@@ -44,6 +44,7 @@ qq:
 game:
   not_bind: "[AQQBot] 你的账号还没有绑定QQ!\n请通过在QQ群发送${command} <游戏名称> 来绑定!" # 在GROUP_NAME模式下使用, ${command}为你设置的第一个绑定命令, 如: /bind
   not_verified: "[AQQBot] 你的账号还没有绑定QQ!\n请通过在QQ群发送${command} ${code} 来绑定!" # 在VERIFY_CODE模式下可用, ${code}为验证码
+  kick_when_unbind: "[AQQBot] 你的账号已被解绑!\n请重新绑定!"
   chat_from_qq: "&8[&aQQ群(${groupId})&8] &b${userName}: &f${message}"
   reload: "&a[AQQBot] 重载完成! 耗时 &e${time} ms"
   invalid_arguments: "&c[AQQBot] 参数不合法或过多或过少!"
