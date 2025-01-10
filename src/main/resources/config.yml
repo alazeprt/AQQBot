@@ -162,18 +162,29 @@ chat:
     format_list:
       - ""
 
-# 服务器开启/关闭通知
+# 有关服务器的通知
 notify:
-  # 是否开启该功能
-  enable: true
+  # 服务器启停通知
+  server_status:
+    # 是否开启该功能
+    enable: true
 
-  # 通知信息:
-  messages:
-    # 开启时:
+    # 开启时发送的消息:
     start: "[AQQBot] XXX服务器已启动!"
 
-    # 关闭时:
+    # 关闭时发送的消息:
     stop: "[AQQBot] XXX服务器已关闭!"
+
+  # 玩家进出通知 (若玩家未绑定账号, 则会将userId这一参数设为 -1)
+  player_status:
+    # 是否开启该功能
+    enable: true
+
+    # 进入时发送的消息:
+    join: "[AQQBot] ${playerName}(${userId}) 进入了服务器!"
+
+    # 离开时发送的消息:
+    leave: "[AQQBot] ${playerName}(${userId}) 离开了服务器!"
 
 # 服务器命令远程执行
 # * 该功能仅支持Bukkit类服务端

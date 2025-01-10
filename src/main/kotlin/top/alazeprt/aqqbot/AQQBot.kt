@@ -144,9 +144,9 @@ object AQQBot : Plugin() {
             val url = "ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")
             oneBotClient = BotClient(URI.create(url))
             oneBotClient.connect()
-            if (config.getBoolean("notify.enable") && !alsoNoticed) {
+            if (config.getBoolean("notify.server_status.enable") && !alsoNoticed) {
                 enableGroups.forEach {
-                    val msg = config.getString("notify.messages.start")?: return@forEach
+                    val msg = config.getString("notify.server_status.start")?: return@forEach
                     oneBotClient.action(SendGroupMessage(it.toLong(), msg))
                 }
                 alsoNoticed = true
@@ -162,9 +162,9 @@ object AQQBot : Plugin() {
             }
             dataConfig.saveToFile(File(getDataFolder(), "data.yml"))
         }
-        if (config.getBoolean("notify.enable")) {
+        if (config.getBoolean("notify.server_status.enable")) {
             enableGroups.forEach {
-                val msg = config.getString("notify.messages.stop")?: return@forEach
+                val msg = config.getString("notify.server_status.stop")?: return@forEach
                 if (oneBotClient.isConnected) {
                     oneBotClient.action(SendGroupMessage(it.toLong(), msg))
                 }
