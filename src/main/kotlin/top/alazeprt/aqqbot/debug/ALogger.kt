@@ -31,7 +31,7 @@ object ALogger {
     }
 
     fun log(message: String) {
-        if (!config.getBoolean("debug.logger.enable")) return
+        if (!config.getBoolean("debug.enable") || !config.getBoolean("debug.logger.enable")) return
         val time = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
         if (config.getLong("debug.logger.save_interval") == 0L) {
             loggerFile.appendText("[$time] $message\n")

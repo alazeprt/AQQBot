@@ -6,12 +6,10 @@ import net.kyori.adventure.text.Component
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import org.omg.CORBA.Object
 import taboolib.common.platform.Ghost
 import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.submit
-import taboolib.common5.util.replace
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.AQQBot.config
@@ -29,10 +27,10 @@ object AGameEvent {
     @Ghost
     @SubscribeEvent
     fun onJoin(event: AsyncPlayerPreLoginEvent) {
-        whitelistHandler(event.name) {
+        val handle = whitelistHandler(event.name) {
             event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, it)
         }
-        playerStatusHandler(event.name, true)
+        if (!handle) playerStatusHandler(event.name, true)
     }
 
     @Ghost
@@ -57,10 +55,10 @@ object AGameEvent {
     @Ghost
     @SubscribeEvent
     fun onVCJoin(event: PostLoginEvent) {
-        whitelistHandler(event.player.username) {
+        val handle = whitelistHandler(event.player.username) {
             event.player.disconnect(Component.text(it))
         }
-        playerStatusHandler(event.player.username, true)
+        if (!handle) playerStatusHandler(event.player.username, true)
     }
 
     @Ghost
@@ -89,26 +87,31 @@ object AGameEvent {
         }
     }
     
-    private fun whitelistHandler(playerName: String, kickMethod: Consumer<String>) {
-        if (!config.getBoolean("whitelist.enable") || !config.getBoolean("whitelist.need_bind_to_login")) return
-        if (isFileStorage && playerName !in AQQBot.dataMap.values) {
+    private fun whitelistHandler(playerName: String, kickMethod: Consumer<String>): Boolean {
+        if (!config.getBoolean("whitelist.enable") || !config.getBoolean("whitelist.need_bind_to_login")) return false
+        if (isFileStorage && playerName !in dataMap.values) {
             if (config.getString("whitelist.verify_method")?.uppercase() == "GROUP_NAME") {
                 kickMethod.accept(formatString(get("game.not_bind", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0])))))
+                return true
             } else if (config.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {
                 val verifyCode = if (verifyCodeMap.containsKey(playerName)) verifyCodeMap.get(playerName)!!.first else UUID.randomUUID().toString().substring(0, 6)
                 kickMethod.accept(formatString(get("game.not_verified", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0]), Pair("code", verifyCode)))))
                 if (!verifyCodeMap.containsKey(playerName)) verifyCodeMap.put(playerName, Pair(verifyCode, System.currentTimeMillis()))
+                return true
             }
         }
         if (!isFileStorage && !playerInDatabase(playerName)) {
             if (config.getString("whitelist.verify_method")?.uppercase() == "GROUP_NAME") {
                 kickMethod.accept(formatString(get("game.not_bind", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0])))))
+                return true
             } else if (config.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {
                 val verifyCode = if (verifyCodeMap.containsKey(playerName)) verifyCodeMap.get(playerName)!!.first else UUID.randomUUID().toString().substring(0, 6)
                 kickMethod.accept(formatString(get("game.not_verified", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0]), Pair("code", verifyCode)))))
                 if (!verifyCodeMap.containsKey(playerName)) verifyCodeMap.put(playerName, Pair(verifyCode, System.currentTimeMillis()))
+                return true
             }
         }
+        return false
     }
 
     private fun formatString(input: String): String {
