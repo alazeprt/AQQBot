@@ -11,6 +11,8 @@ import org.bukkit.permissions.PermissionAttachment
 import org.bukkit.permissions.PermissionAttachmentInfo
 import org.bukkit.plugin.Plugin
 import top.alazeprt.aqqbot.AQQBot.config
+import top.alazeprt.aqqbot.command.sender.ASender.Companion.formatter
+import top.alazeprt.aqqbot.util.AFormatter
 import java.util.*
 
 class ABukkitSender : ConsoleCommandSender, ASender {
@@ -131,7 +133,7 @@ class ABukkitSender : ConsoleCommandSender, ASender {
     }
 
     override fun getFormatString(): String {
-        var str = messageList.joinToString("\n").replace(Regex("§([0-9a-fklmnor])"), "")
+        var str = formatter.regexFilter(config.getStringList("command_execution.filter"), AFormatter.chatClear(messageList.joinToString("\n")))
         config.getStringList("command_execution.format_list").forEach {
             if (it != "") {
                 str = str.replace(it, "")

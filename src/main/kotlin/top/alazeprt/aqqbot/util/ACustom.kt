@@ -9,12 +9,6 @@ import top.alazeprt.aqqbot.AQQBot.oneBotClient
 import top.alazeprt.aqqbot.DependencyImpl.Companion.withPAPI
 
 class ACustom(val command: List<String>, val output: List<String>, val unbind_output: List<String>, val format: Boolean) {
-    companion object {
-        private fun formatString(input: String): String {
-            return input.replace(Regex("&([0-9a-fklmnor])"), "")
-        }
-    }
-
     fun handle(input: String, userId: String, groupId: String): Boolean {
         if (!command.contains(input)) return false
         var player: String?
@@ -32,7 +26,7 @@ class ACustom(val command: List<String>, val output: List<String>, val unbind_ou
             outputString = PlaceholderAPI.setPlaceholders(Bukkit.getOfflinePlayer(player), outputString)
         }
         if (format) {
-            outputString = formatString(outputString)
+            outputString = AFormatter.pluginClear(outputString)
         }
         oneBotClient.action(SendGroupMessage(groupId.toLong(), outputString))
         return true

@@ -18,6 +18,7 @@ import top.alazeprt.aqqbot.AQQBot.oneBotClient
 import top.alazeprt.aqqbot.handler.CommandHandler
 import top.alazeprt.aqqbot.handler.InformationHandler
 import top.alazeprt.aqqbot.handler.WhitelistHandler
+import top.alazeprt.aqqbot.util.AFormatter
 import top.alazeprt.aqqbot.util.AI18n.get
 import top.alazeprt.aqqbot.util.DBQuery.qqInDatabase
 import top.alazeprt.aqqbot.util.DBQuery.removePlayer
@@ -55,7 +56,8 @@ class BotListener : Listener {
                 }
             }
             if(canForwardMessage(message) != null && !(handleInfo || handleWl || handleCustom || handleCommand) && isBukkit) {
-                Bukkit.broadcastMessage(formatString(get("game.chat_from_qq", mutableMapOf("groupId" to event.groupId.toString(),
+                Bukkit.broadcastMessage(
+                    AFormatter.pluginToChat(get("game.chat_from_qq", mutableMapOf("groupId" to event.groupId.toString(),
                     "userName" to event.senderNickName,
                     "message" to (canForwardMessage(message)?: return@action)))))
             }
@@ -98,24 +100,22 @@ class BotListener : Listener {
         }
     }
 
-    private fun formatString(input: String): String {
-        return input.replace(Regex("&([0-9a-fklmnor])")) { matchResult ->
-            "§" + matchResult.groupValues[1]
-        }
-    }
-
     private fun canForwardMessage(message: String): String? {
         if (!config.getBoolean("chat.group_to_server.enable")) {
             return null
         }
         if (config.getStringList("chat.group_to_server.prefix").contains("")) {
-            return message
+            return formatter.regexFilter(config.getStringList("chat.group_to_server.filter"), message)
         }
         config.getStringList("chat.group_to_server.prefix").forEach {
             if (message.startsWith(it)) {
-                return message.substring(it.length)
+                return formatter.regexFilter(config.getStringList("chat.group_to_server.filter"), message.substring(it.length))
             }
         }
         return null
+    }
+
+    companion object {
+        val formatter = AFormatter()
     }
 }

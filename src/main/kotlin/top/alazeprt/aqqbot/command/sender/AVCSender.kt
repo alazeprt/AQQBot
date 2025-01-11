@@ -14,6 +14,8 @@ import net.kyori.adventure.util.TriState
 import net.kyori.ansi.ColorLevel
 import taboolib.platform.VelocityPlugin
 import top.alazeprt.aqqbot.AQQBot.config
+import top.alazeprt.aqqbot.command.sender.ASender.Companion.formatter
+import top.alazeprt.aqqbot.util.AFormatter
 import java.util.concurrent.CompletableFuture
 
 class AVCSender : CommandSource, ASender {
@@ -58,7 +60,7 @@ class AVCSender : CommandSource, ASender {
     }
 
     override fun getFormatString(): String {
-        var str = messageList.joinToString("\n").replace(Regex("§([0-9a-fklmnor])"), "")
+        var str = formatter.regexFilter(config.getStringList("command_execution.filter"), AFormatter.chatClear("\n"))
         config.getStringList("command_execution.format_list").forEach {
             if (it != "") {
                 str = str.replace(it, "")

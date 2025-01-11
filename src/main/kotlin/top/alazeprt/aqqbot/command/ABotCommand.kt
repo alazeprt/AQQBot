@@ -10,6 +10,7 @@ import top.alazeprt.aqqbot.util.ACommandTask.forceBind
 import top.alazeprt.aqqbot.util.ACommandTask.forceUnbind
 import top.alazeprt.aqqbot.util.ACommandTask.query
 import top.alazeprt.aqqbot.util.ACommandTask.startReload
+import top.alazeprt.aqqbot.util.AFormatter
 import top.alazeprt.aqqbot.util.AI18n.get
 import top.alazeprt.aqqbot.util.AI18n.getList
 import java.awt.Component
@@ -22,13 +23,13 @@ object ABotCommand {
         if (isBukkit) {
             execute<org.bukkit.command.CommandSender> { sender, _, _ ->
                 submitAsync {
-                    sender.sendMessage(formatString(get("game.reload", mutableMapOf("time" to startReload().toString()))))
+                    sender.sendMessage(AFormatter.pluginToChat(get("game.reload", mutableMapOf("time" to startReload().toString()))))
                 }
             }
         } else {
             execute<com.velocitypowered.api.command.CommandSource> { sender, _, _ ->
                 submitAsync {
-                    sender.sendMessage(net.kyori.adventure.text.Component.text(formatString(get("game.reload", mutableMapOf("time" to startReload().toString())))))
+                    sender.sendMessage(net.kyori.adventure.text.Component.text(AFormatter.pluginToChat(get("game.reload", mutableMapOf("time" to startReload().toString())))))
                 }
             }
         }
@@ -98,18 +99,12 @@ object ABotCommand {
     val help = subCommand {
         if (isBukkit) {
             execute<org.bukkit.command.CommandSender> { sender, _, _ ->
-                sender.sendMessage(formatString(getList("game.help")))
+                sender.sendMessage(AFormatter.pluginToChat(getList("game.help")))
             }
         } else {
             execute<com.velocitypowered.api.command.CommandSource> { sender, _, _ ->
-                sender.sendMessage(net.kyori.adventure.text.Component.text(formatString(getList("game.help"))))
+                sender.sendMessage(net.kyori.adventure.text.Component.text(AFormatter.pluginToChat(getList("game.help"))))
             }
-        }
-    }
-
-    private fun formatString(input: String): String {
-        return input.replace(Regex("&([0-9a-fklmnor])")) { matchResult ->
-            "§" + matchResult.groupValues[1]
         }
     }
 }

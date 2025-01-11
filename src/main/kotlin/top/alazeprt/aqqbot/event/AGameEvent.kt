@@ -16,6 +16,7 @@ import top.alazeprt.aqqbot.AQQBot.config
 import top.alazeprt.aqqbot.AQQBot.dataMap
 import top.alazeprt.aqqbot.AQQBot.isFileStorage
 import top.alazeprt.aqqbot.AQQBot.verifyCodeMap
+import top.alazeprt.aqqbot.util.AFormatter
 import top.alazeprt.aqqbot.util.AI18n.get
 import top.alazeprt.aqqbot.util.DBQuery
 import top.alazeprt.aqqbot.util.DBQuery.playerInDatabase
@@ -23,6 +24,9 @@ import java.util.*
 import java.util.function.Consumer
 
 object AGameEvent {
+
+    val formatter = AFormatter()
+
     // Bukkit
     @Ghost
     @SubscribeEvent
@@ -91,22 +95,22 @@ object AGameEvent {
         if (!config.getBoolean("whitelist.enable") || !config.getBoolean("whitelist.need_bind_to_login")) return false
         if (isFileStorage && playerName !in dataMap.values) {
             if (config.getString("whitelist.verify_method")?.uppercase() == "GROUP_NAME") {
-                kickMethod.accept(formatString(get("game.not_bind", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0])))))
+                kickMethod.accept(AFormatter.pluginToChat(get("game.not_bind", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0])))))
                 return true
             } else if (config.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {
                 val verifyCode = if (verifyCodeMap.containsKey(playerName)) verifyCodeMap.get(playerName)!!.first else UUID.randomUUID().toString().substring(0, 6)
-                kickMethod.accept(formatString(get("game.not_verified", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0]), Pair("code", verifyCode)))))
+                kickMethod.accept(AFormatter.pluginToChat(get("game.not_verified", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0]), Pair("code", verifyCode)))))
                 if (!verifyCodeMap.containsKey(playerName)) verifyCodeMap.put(playerName, Pair(verifyCode, System.currentTimeMillis()))
                 return true
             }
         }
         if (!isFileStorage && !playerInDatabase(playerName)) {
             if (config.getString("whitelist.verify_method")?.uppercase() == "GROUP_NAME") {
-                kickMethod.accept(formatString(get("game.not_bind", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0])))))
+                kickMethod.accept(AFormatter.pluginToChat(get("game.not_bind", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0])))))
                 return true
             } else if (config.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {
                 val verifyCode = if (verifyCodeMap.containsKey(playerName)) verifyCodeMap.get(playerName)!!.first else UUID.randomUUID().toString().substring(0, 6)
-                kickMethod.accept(formatString(get("game.not_verified", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0]), Pair("code", verifyCode)))))
+                kickMethod.accept(AFormatter.pluginToChat(get("game.not_verified", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0]), Pair("code", verifyCode)))))
                 if (!verifyCodeMap.containsKey(playerName)) verifyCodeMap.put(playerName, Pair(verifyCode, System.currentTimeMillis()))
                 return true
             }
@@ -114,24 +118,13 @@ object AGameEvent {
         return false
     }
 
-    private fun formatString(input: String): String {
-        return input.replace(Regex("&([0-9a-fklmnor])")) { matchResult ->
-            "§" + matchResult.groupValues[1]
-        }
-    }
-
     private fun canForwardMessage(message: String): String? {
         if (!config.getBoolean("chat.server_to_group.enable")) {
             return null
         }
-        var formattedMessage = message
-        if (config.getBoolean("chat.server_to_group.format")) {
-            formattedMessage = message.replace(Regex("§([0-9a-fklmnor])"), "")
-        }
-        config.getStringList("command_execution.format_list").forEach {
-            if (it != "") {
-                formattedMessage = formattedMessage.replace(it, "")
-            }
+        var formattedMessage = formatter.regexFilter(config.getStringList("chat.server_to_group.filter"), message)
+        if (config.getBoolean("chat.server_to_group.default_format")) {
+            formattedMessage = AFormatter.chatClear(formattedMessage)
         }
         if (config.getStringList("chat.server_to_group.prefix").contains("")) {
             return formattedMessage

@@ -14,7 +14,9 @@ import top.alazeprt.aqqbot.AQQBot.isFileStorage
 import top.alazeprt.aqqbot.AQQBot.messageConfig
 import top.alazeprt.aqqbot.AQQBot.oneBotClient
 import top.alazeprt.aqqbot.DependencyImpl
-import top.alazeprt.aqqbot.command.ABotCommand
+import top.alazeprt.aqqbot.command.sender.ASender
+import top.alazeprt.aqqbot.debug.ADebug
+import top.alazeprt.aqqbot.event.AGameEvent
 import top.alazeprt.aqqbot.handler.WhitelistAdminHandler.Companion.validateName
 import top.alazeprt.aqqbot.qq.BotListener
 import top.alazeprt.aqqbot.util.AI18n.get
@@ -56,6 +58,15 @@ object ACommandTask {
         botConfig.getStringList("groups").forEach {
             enableGroups.add(it)
         }
+        // Debug Option
+        if (config.getBoolean("debug.enable")) {
+            ADebug.shutdown()
+            ADebug.initialize()
+        }
+        // Formatter
+        ASender.formatter.initialUrl(config.getStringList("command_execution.filter"))
+        BotListener.formatter.initialUrl(config.getStringList("chat.group_to_server.filter"))
+        AGameEvent.formatter.initialUrl(config.getStringList("chat.server_to_group.filter"))
         DependencyImpl.loadSpark()
         if (isBukkit) {
             DependencyImpl.loadPAPI()
@@ -76,7 +87,7 @@ object ACommandTask {
             DBQuery.removePlayerByUserId(userId.toLong())
         }
         if (!validateName(playerName)) {
-            return formatString(get("game.invalid_arguments"))
+            return AFormatter.pluginToChat(get("game.invalid_arguments"))
         }
         if (isFileStorage) {
             var existUserId = ""
@@ -96,45 +107,45 @@ object ACommandTask {
         }
         if (isFileStorage) AQQBot.dataMap[userId] = playerName
         else addPlayer(userId.toLong(), playerName)
-        return formatString(get("game.successfully_bind"))
+        return AFormatter.pluginToChat(get("game.successfully_bind"))
     }
     
     fun forceUnbind(mode: String, data: String): String {
         if (mode.contains("qq")) {
             if (isFileStorage && !AQQBot.dataMap.containsKey(data)) {
-                return formatString(get("game.invalid_arguments"))
+                return AFormatter.pluginToChat(get("game.invalid_arguments"))
             } else if (!isFileStorage && qqInDatabase(data.toLong()) == null) {
-                return formatString(get("game.invalid_arguments"))
+                return AFormatter.pluginToChat(get("game.invalid_arguments"))
             }
             if (isFileStorage) {
                 AQQBot.dataMap.forEach { (k, _) ->
                     if (k == data) {
                         AQQBot.dataMap.remove(k)
-                        return formatString(get("game.successfully_unbind"))
+                        return AFormatter.pluginToChat(get("game.successfully_unbind"))
                     }
                 }
-                return formatString(get("game.invalid_arguments"))
+                return AFormatter.pluginToChat(get("game.invalid_arguments"))
             } else {
                 removePlayerByUserId(data.toLong())
-                return formatString(get("game.successfully_unbind"))
+                return AFormatter.pluginToChat(get("game.successfully_unbind"))
             }
         } else {
             if (isFileStorage && !AQQBot.dataMap.containsValue(data)) {
-                return formatString(get("game.invalid_arguments"))
+                return AFormatter.pluginToChat(get("game.invalid_arguments"))
             } else if (!isFileStorage && !playerInDatabase(data)) {
-                return formatString(get("game.invalid_arguments"))
+                return AFormatter.pluginToChat(get("game.invalid_arguments"))
             }
             if (isFileStorage) {
                 AQQBot.dataMap.forEach { (_, v) ->
                     if (v == data) {
                         AQQBot.dataMap.remove(v)
-                        return formatString(get("game.successfully_unbind"))
+                        return AFormatter.pluginToChat(get("game.successfully_unbind"))
                     }
                 }
-                return formatString(get("game.invalid_arguments"))
+                return AFormatter.pluginToChat(get("game.invalid_arguments"))
             } else {
                 removePlayerByName(data)
-                return formatString(get("game.successfully_unbind"))
+                return AFormatter.pluginToChat(get("game.successfully_unbind"))
             }
         }
     }
@@ -162,12 +173,6 @@ object ACommandTask {
                 userId = if (playerInDatabase(playerName)) getUserIdByName(playerName).toString() else "未知"
             }
         }
-        return formatString(getList("game.query_result", mutableMapOf("userId" to userId, "playerName" to playerName)))
-    }
-
-    private fun formatString(input: String): String {
-        return input.replace(Regex("&([0-9a-fklmnor])")) { matchResult ->
-            "§" + matchResult.groupValues[1]
-        }
+        return AFormatter.pluginToChat(getList("game.query_result", mutableMapOf("userId" to userId, "playerName" to playerName)))
     }
 }

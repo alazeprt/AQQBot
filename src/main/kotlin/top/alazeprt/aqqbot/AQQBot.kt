@@ -11,7 +11,9 @@ import taboolib.module.database.*
 import taboolib.module.metrics.Metrics
 import top.alazeprt.aonebot.BotClient
 import top.alazeprt.aonebot.action.SendGroupMessage
+import top.alazeprt.aqqbot.command.sender.ASender
 import top.alazeprt.aqqbot.debug.ADebug
+import top.alazeprt.aqqbot.event.AGameEvent
 import top.alazeprt.aqqbot.qq.BotListener
 import top.alazeprt.aqqbot.util.ACustom
 import java.io.File
@@ -62,6 +64,7 @@ object AQQBot : Plugin() {
         val configFile = releaseResourceFile("config.yml", replace = false)
         dataFolder = getDataFolder()
         config = Configuration.loadFromFile(configFile)
+        // Data loader
         val dataFile = releaseResourceFile("data.yml", replace = false)
         dataConfig = Configuration.loadFromFile(dataFile)
         if (config.getString("storage.type")!!.lowercase() == "file") isFileStorage = true
@@ -100,6 +103,7 @@ object AQQBot : Plugin() {
             AQQBot.dataSource = dataSource
             table.createTable(dataSource)
         }
+        // Add verify code map future
         if (config.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {
             submit(async = true) {
                 while (true) {
@@ -116,6 +120,7 @@ object AQQBot : Plugin() {
         botConfig = Configuration.loadFromFile(botFile)
         val messageFile = releaseResourceFile("messages.yml", replace = false)
         messageConfig = Configuration.loadFromFile(messageFile)
+        // Add custom commands
         val customFile = releaseResourceFile("custom.yml", replace = false)
         val customConfig = Configuration.loadFromFile(customFile)
         customConfig.getKeys(false).forEach {
@@ -127,13 +132,20 @@ object AQQBot : Plugin() {
                 customCommands.add(ACustom(command, output, unbind_output, format))
             }
         }
+        // Add exists qq data
         dataConfig.getKeys(false).forEach {
             dataMap[it] = (dataConfig.getString(it)?: return@forEach)
         }
+        // Add enable groups
         botConfig.getStringList("groups").forEach {
             enableGroups.add(it)
         }
+        // Debug Option
         if (config.getBoolean("debug.enable")) ADebug.initialize()
+        // Formatter
+        ASender.formatter.initialUrl(config.getStringList("command_execution.filter"))
+        BotListener.formatter.initialUrl(config.getStringList("chat.group_to_server.filter"))
+        AGameEvent.formatter.initialUrl(config.getStringList("chat.server_to_group.filter"))
         info("Loading soft dependency...")
         DependencyImpl.loadSpark()
         if (isBukkit) {
