@@ -17,7 +17,8 @@ taboolib {
             name("alazeprt")
         }
         dependencies {
-            name("spark").optional(true).loadbefore(true)
+            name("spark").optional(true).loadafter(true)
+            name("PlaceholderAPI").with("bukkit").optional(true).loadafter(true)
         }
     }
     relocate("com.google.code.gson", "top.alazeprt.aonebot.lib.google.code.gson")
