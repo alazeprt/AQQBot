@@ -9,9 +9,23 @@ prefix:
   enable: true
 
   # 获取命令
+  # 支持添加自定义参数, 如 ${argName}, argName可改为自定义的参数名
+  # 若是可选参数, 则为 ${argName?:default} default请填写默认值, 如无默认值则请填写 ${argName?}
+  # 该参数可在下面的 execute, unbind_execute, output, unbind_output 中使用 如无默认值且用户未使用参数则为空
   command:
     - "/prefix"
     - "/称号"
+
+  # 以后台身份执行命令 (可选) 支持 PAPI
+  # 若不需要执行命令, 请将其设置为空
+  # 命令不需要以/开头，会自动补全
+  execute:
+    - ""
+
+  # 未绑定账号的用户以后台身份执行命令 (可选)
+  # 同上
+  unbind_execute:
+    - ""
 
   # 输出结果
   output:

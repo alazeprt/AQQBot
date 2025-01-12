@@ -59,7 +59,7 @@ object AQQBot : Plugin() {
         } catch (e: ClassNotFoundException) {
             isBukkit = false
         }
-        val metrics = Metrics(24071, "1.0.13", Platform.CURRENT)
+        val metrics = Metrics(24071, "1.0.14", Platform.CURRENT)
         info("Loading data...")
         val configFile = releaseResourceFile("config.yml", replace = false)
         dataFolder = getDataFolder()
@@ -126,10 +126,12 @@ object AQQBot : Plugin() {
         customConfig.getKeys(false).forEach {
             if (customConfig.getBoolean("$it.enable")) {
                 val command = customConfig.getStringList("$it.command")
+                val execute = customConfig.getStringList("$it.execute")
+                val unbind_execute = customConfig.getStringList("$it.unbind_execute")
                 val output = customConfig.getStringList("$it.output")
                 val unbind_output = customConfig.getStringList("$it.unbind_output")
                 val format = customConfig.getBoolean("$it.format")
-                customCommands.add(ACustom(command, output, unbind_output, format))
+                customCommands.add(ACustom(command, execute, unbind_execute, output, unbind_output, format))
             }
         }
         // Add exists qq data
