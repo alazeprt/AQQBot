@@ -5,6 +5,7 @@ import com.velocitypowered.api.event.player.KickedFromServerEvent
 import net.kyori.adventure.text.Component
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import taboolib.common.platform.Ghost
 import taboolib.common.platform.event.EventPriority
@@ -30,11 +31,11 @@ object AGameEvent {
     // Bukkit
     @Ghost
     @SubscribeEvent
-    fun onJoin(event: AsyncPlayerPreLoginEvent) {
-        val handle = whitelistHandler(event.name) {
-            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, it)
+    fun onJoin(event: PlayerJoinEvent) {
+        val handle = whitelistHandler(event.player.name) {
+            event.player.kickPlayer(it)
         }
-        if (!handle) playerStatusHandler(event.name, true)
+        if (!handle) playerStatusHandler(event.player.name, true)
     }
 
     @Ghost
