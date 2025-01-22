@@ -185,7 +185,7 @@ chat:
     #     代表将所有在test.json内filter的列表里的屏蔽词替换为 " 屏蔽词 "
     filter:
       - ""
-#      - "$url:{https://gh.llkk.cc/https://github.com/alazeprt/AQQBot-Docs/blob/master/fucker/database.json}" # 脏话词库
+#      - "$url:{https://gh.llkk.cc/https://github.com/alazeprt/AQQBot-Docs/raw/refs/heads/master/fucker/database.json}" # 脏话词库
 
 # 有关服务器的通知
 notify:
