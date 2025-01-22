@@ -37,6 +37,9 @@ whitelist:
   # 在验证方法为 VERIFY_CODE 时可用
   verify_code_expire_time: 300
 
+  # 一个QQ号最多可以绑定多少个账户
+  max_bind_count: 1
+
   # 功能指令前缀
   prefix:
     # 绑定指令前缀

@@ -54,7 +54,8 @@ object ACommandTask {
                 val output = customConfig.getStringList("$it.output")
                 val unbind_output = customConfig.getStringList("$it.unbind_output")
                 val format = customConfig.getBoolean("$it.format")
-                customCommands.add(ACustom(command, execute, unbind_execute, output, unbind_output, format))
+                val choose_account = customConfig.getInt("$it.chooseAccount")
+                customCommands.add(ACustom(command, execute, unbind_execute, output, unbind_output, format, choose_account))
             }
         }
         botConfig.getStringList("groups").forEach {
@@ -83,7 +84,7 @@ object ACommandTask {
     }
 
     fun forceBind(userId: String, playerName: String): String {
-        if (isFileStorage && AQQBot.dataMap.containsKey(userId)) {
+        if (isFileStorage && AQQBot.dataMap.containsKey(userId) && AQQBot.dataMap[userId]!!.size >= config.getLong("whitelist.max_bind_count")) {
             AQQBot.dataMap.remove(userId)
         } else if (!isFileStorage && qqInDatabase(userId.toLong()) != null) {
             DBQuery.removePlayerByUserId(userId.toLong())
@@ -94,20 +95,23 @@ object ACommandTask {
         if (isFileStorage) {
             var existUserId = ""
             AQQBot.dataMap.forEach { k, v ->
-                if (v == playerName) {
+                if (v.contains(playerName)) {
                     existUserId = k
                     return@forEach
                 }
             }
-            if (existUserId != "") {
-                AQQBot.dataMap.remove(existUserId)
+            if (!existUserId.isEmpty()) {
+                if (AQQBot.dataMap.get(existUserId)!!.size == 1) AQQBot.dataMap.remove(existUserId)
+                else AQQBot.dataMap[existUserId] = AQQBot.dataMap[existUserId]!!.filter { it != playerName }.toMutableList()
             }
         } else {
             if (playerInDatabase(playerName)) {
                 DBQuery.removePlayerByName(playerName)
             }
         }
-        if (isFileStorage) AQQBot.dataMap[userId] = playerName
+        val newList: MutableList<String> = AQQBot.dataMap.getOrDefault(userId, mutableListOf())
+        newList.add(playerName)
+        if (isFileStorage) AQQBot.dataMap[userId] = newList
         else addPlayer(userId.toLong(), playerName)
         return AFormatter.pluginToChat(get("game.successfully_bind"))
     }
@@ -120,7 +124,7 @@ object ACommandTask {
                 return AFormatter.pluginToChat(get("game.invalid_arguments"))
             }
             if (isFileStorage) {
-                AQQBot.dataMap.forEach { (k, _) ->
+                AQQBot.dataMap.forEach { (k, v) ->
                     if (k == data) {
                         AQQBot.dataMap.remove(k)
                         return AFormatter.pluginToChat(get("game.successfully_unbind"))
@@ -132,15 +136,23 @@ object ACommandTask {
                 return AFormatter.pluginToChat(get("game.successfully_unbind"))
             }
         } else {
-            if (isFileStorage && !AQQBot.dataMap.containsValue(data)) {
-                return AFormatter.pluginToChat(get("game.invalid_arguments"))
+            if (isFileStorage) {
+                var containData = false
+                AQQBot.dataMap.forEach { k, v ->
+                    if (v.contains(data)) {
+                        containData = true
+                        return@forEach
+                    }
+                }
+                if (!containData) return AFormatter.pluginToChat(get("game.invalid_arguments"))
             } else if (!isFileStorage && !playerInDatabase(data)) {
                 return AFormatter.pluginToChat(get("game.invalid_arguments"))
             }
             if (isFileStorage) {
-                AQQBot.dataMap.forEach { (_, v) ->
-                    if (v == data) {
-                        AQQBot.dataMap.remove(v)
+                AQQBot.dataMap.forEach { (k, v) ->
+                    if (v.contains(data)) {
+                        if (v.size == 1) AQQBot.dataMap.remove(k)
+                        else AQQBot.dataMap[k] = v.filter { it != data }.toMutableList()
                         return AFormatter.pluginToChat(get("game.successfully_unbind"))
                     }
                 }
@@ -158,15 +170,15 @@ object ACommandTask {
         if (mode.contains("qq")) {
             userId = data
             if (isFileStorage) {
-                playerName = AQQBot.dataMap[userId] ?: "未知"
+                playerName = (AQQBot.dataMap[userId]?: emptyList()).joinToString(", ")
             } else {
-                playerName = qqInDatabase(userId.toLong()) ?: "未知"
+                playerName = qqInDatabase(userId.toLong()).joinToString(", ")
             }
         } else {
             playerName = data
             if (isFileStorage) {
                 AQQBot.dataMap.forEach { k, v ->
-                    if (v == data) {
+                    if (v.contains(data)) {
                         userId = k
                         return@forEach
                     }

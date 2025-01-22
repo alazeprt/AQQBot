@@ -38,7 +38,7 @@ object AQQBot : Plugin() {
 
     val enableGroups: MutableList<String> = mutableListOf()
 
-    val dataMap: MutableMap<String, String> = mutableMapOf()
+    val dataMap: MutableMap<String, MutableList<String>> = mutableMapOf()
 
     val verifyCodeMap: MutableMap<String, Pair<String, Long>> = mutableMapOf() // <name, <code, time>>
 
@@ -131,12 +131,13 @@ object AQQBot : Plugin() {
                 val output = customConfig.getStringList("$it.output")
                 val unbind_output = customConfig.getStringList("$it.unbind_output")
                 val format = customConfig.getBoolean("$it.format")
-                customCommands.add(ACustom(command, execute, unbind_execute, output, unbind_output, format))
+                val choose_account = customConfig.getInt("$it.chooseAccount")
+                customCommands.add(ACustom(command, execute, unbind_execute, output, unbind_output, format, choose_account))
             }
         }
         // Add exists qq data
         dataConfig.getKeys(false).forEach {
-            dataMap[it] = (dataConfig.getString(it)?: return@forEach)
+            dataMap[it] = dataConfig.getStringList(it).toMutableList()
         }
         // Add enable groups
         botConfig.getStringList("groups").forEach {

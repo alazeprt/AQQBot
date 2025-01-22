@@ -77,7 +77,7 @@ object AGameEvent {
             var qq: Long = -1
             if (isFileStorage) {
                 dataMap.forEach { k, v ->
-                    if (v == playerName) qq = k.toLong()
+                    if (v.contains(playerName)) qq = k.toLong()
                 }
             } else {
                 qq = if (DBQuery.getUserIdByName(playerName) == null) -1 else DBQuery.getUserIdByName(playerName)!!.toLong()
@@ -94,7 +94,11 @@ object AGameEvent {
     
     private fun whitelistHandler(playerName: String, kickMethod: Consumer<String>): Boolean {
         if (!config.getBoolean("whitelist.enable") || !config.getBoolean("whitelist.need_bind_to_login")) return false
-        if (isFileStorage && playerName !in dataMap.values) {
+
+        if (isFileStorage) {
+            dataMap.values.forEach {
+                if (it.contains(playerName)) return false
+            }
             if (config.getString("whitelist.verify_method")?.uppercase() == "GROUP_NAME") {
                 kickMethod.accept(AFormatter.pluginToChat(get("game.not_bind", mutableMapOf(Pair("command", config.getStringList("whitelist.prefix.bind")[0])))))
                 return true

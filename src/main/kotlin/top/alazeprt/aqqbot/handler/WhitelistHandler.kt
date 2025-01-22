@@ -24,11 +24,11 @@ class WhitelistHandler {
     companion object {
         private fun bind(userId: String, groupId: Long, data: String) {
             val playerName: String
-            if (isFileStorage && AQQBot.dataMap.containsKey(userId)) {
+            if (isFileStorage && AQQBot.dataMap.containsKey(userId) && AQQBot.dataMap[userId]!!.size >= config.getLong("whitelist.max_bind_count")) {
                 AQQBot.oneBotClient.action(
                     SendGroupMessage(groupId, get("qq.whitelist.already_bind"), true))
                 return
-            } else if (!isFileStorage && qqInDatabase(userId.toLong()) != null) {
+            } else if (!isFileStorage && qqInDatabase(userId.toLong()).size >= config.getLong("whitelist.max_bind_count")) {
                 AQQBot.oneBotClient.action(
                     SendGroupMessage(groupId, get("qq.whitelist.already_bind"), true))
                 return
@@ -55,7 +55,7 @@ class WhitelistHandler {
             }
             if (isFileStorage) {
                 AQQBot.dataMap.values.forEach {
-                    if (it == playerName) {
+                    if (it.contains(playerName)) {
                         AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.already_exist"), true))
                         return
                     }
@@ -66,7 +66,9 @@ class WhitelistHandler {
                     return
                 }
             }
-            if (isFileStorage) AQQBot.dataMap[userId] = playerName
+            val newList: MutableList<String> = AQQBot.dataMap.getOrDefault(userId, mutableListOf())
+            newList.add(playerName)
+            if (isFileStorage) AQQBot.dataMap[userId] = newList
             else addPlayer(userId.toLong(), playerName)
             AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.bind_successful"), true))
             ALogger.log("$userId bind $userId to account $playerName")
@@ -94,8 +96,9 @@ class WhitelistHandler {
             }
             if (isFileStorage) {
                 AQQBot.dataMap.forEach { (k, v) ->
-                    if (v == playerName && k == userId) {
-                        AQQBot.dataMap.remove(k)
+                    if (v.contains(playerName) && k == userId) {
+                        if (v.size == 1) AQQBot.dataMap.remove(k)
+                        else AQQBot.dataMap[k] = v.filter { it != playerName }.toMutableList()
                         AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.unbind_successful"), true))
                         ALogger.log("$userId unbind $userId to account $playerName")
                         submit {
@@ -115,14 +118,14 @@ class WhitelistHandler {
                         }
                         return
                     } else if (k == userId) {
-                        AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.bind_by_other", mutableMapOf(Pair("name", v))), true))
+                        AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.bind_by_other", mutableMapOf(Pair("name", v.joinToString(", ")))), true))
                         return
                     }
                 }
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.invalid_bind"), true))
             } else {
-                if (qqInDatabase(userId.toLong()) != playerName) {
-                    AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.bind_by_other", mutableMapOf(Pair("name", qqInDatabase(userId.toLong())!!))), true))
+                if (!qqInDatabase(userId.toLong()).contains(playerName)) {
+                    AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.bind_by_other", mutableMapOf(Pair("name", qqInDatabase(userId.toLong()).joinToString(", ")))), true))
                     return
                 }
                 removePlayer(userId.toLong(), playerName)

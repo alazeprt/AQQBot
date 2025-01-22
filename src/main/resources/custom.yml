@@ -27,6 +27,10 @@ prefix:
   unbind_execute:
     - ""
 
+  # 若玩家绑定了多个账号, 要选用第几个作为 PlaceholderAPI 的变量解析玩家
+  # 若玩家绑定账号小于这个个数, 则默认使用第一个
+  choose_account: 1
+
   # 输出结果
   output:
     - "你的称号是: %vault_prefix%"

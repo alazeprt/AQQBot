@@ -12,15 +12,14 @@ import top.alazeprt.aqqbot.AQQBot.oneBotClient
 import top.alazeprt.aqqbot.DependencyImpl.Companion.withPAPI
 import top.alazeprt.aqqbot.command.sender.ABukkitSender
 import top.alazeprt.aqqbot.command.sender.AVCSender
-import java.security.Key
 
 class ACustom(val command: List<String>, val execute: List<String>, val unbind_execute: List<String>,
-              val output: List<String>, val unbind_output: List<String>, val format: Boolean) {
+              val output: List<String>, val unbind_output: List<String>, val format: Boolean, val account: Int) {
     fun handle(input: String, userId: String, groupId: String): Boolean {
         val map = matches(input)?: return false
-        val player: String?
+        val player: List<String>?
         if (isFileStorage) {
-            player = dataMap.getOrDefault(userId, null)
+            player = dataMap.get(userId)
         } else {
             player = DBQuery.qqInDatabase(userId.toLong())
         }
@@ -28,7 +27,7 @@ class ACustom(val command: List<String>, val execute: List<String>, val unbind_e
         if (format) {
             outputString = AFormatter.pluginClear(outputString)
         }
-        if (player == null) {
+        if (player.isNullOrEmpty()) {
             if (unbind_execute.isNotEmpty() && unbind_execute[0].isNotEmpty()) {
                 submit {
                     val sender = if (isBukkit) {
@@ -56,7 +55,7 @@ class ACustom(val command: List<String>, val execute: List<String>, val unbind_e
                 }
             }
             if (withPAPI) {
-                outputString = PlaceholderAPI.setPlaceholders(Bukkit.getOfflinePlayer(player), outputString)
+                outputString = PlaceholderAPI.setPlaceholders(Bukkit.getOfflinePlayer(player.get(if (player.size < account) 0 else account - 1)), outputString)
             }
             oneBotClient.action(SendGroupMessage(groupId.toLong(), outputString))
         }

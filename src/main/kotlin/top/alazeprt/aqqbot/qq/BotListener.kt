@@ -2,6 +2,7 @@ package top.alazeprt.aqqbot.qq
 
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
+import taboolib.common.platform.function.info
 import taboolib.common.platform.function.submit
 import taboolib.platform.VelocityPlugin
 import top.alazeprt.aonebot.action.GetGroupMemberList
@@ -22,6 +23,7 @@ import top.alazeprt.aqqbot.util.AFormatter
 import top.alazeprt.aqqbot.util.AI18n.get
 import top.alazeprt.aqqbot.util.DBQuery.qqInDatabase
 import top.alazeprt.aqqbot.util.DBQuery.removePlayer
+import top.alazeprt.aqqbot.util.DBQuery.removePlayerByUserId
 
 class BotListener : Listener {
     @SubscribeBotEvent
@@ -81,17 +83,17 @@ class BotListener : Listener {
             }
         } else {
             val playerName = qqInDatabase(userId.toLong())!!
-            removePlayer(userId.toLong(), playerName)
+            removePlayerByUserId(userId.toLong())
             submit {
                 if (isBukkit) {
                     for (player in Bukkit.getOnlinePlayers()) {
-                        if (player.name == playerName) {
+                        if (playerName.contains(player.name)) {
                             player.kickPlayer(get("game.kick_when_unbind"))
                         }
                     }
                 } else {
                     for (player in VelocityPlugin.getInstance().server.allPlayers) {
-                        if (player.username == playerName) {
+                        if (playerName.contains(player.username)) {
                             player.disconnect(Component.text(get("game.kick_when_unbind")))
                         }
                     }

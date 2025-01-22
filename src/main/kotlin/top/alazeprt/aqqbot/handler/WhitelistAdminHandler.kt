@@ -8,6 +8,7 @@ import top.alazeprt.aonebot.action.GetGroupMemberList
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aqqbot.AQQBot
+import top.alazeprt.aqqbot.AQQBot.config
 import top.alazeprt.aqqbot.AQQBot.isBukkit
 import top.alazeprt.aqqbot.AQQBot.isFileStorage
 import top.alazeprt.aqqbot.debug.ALogger
@@ -21,9 +22,9 @@ import top.alazeprt.aqqbot.util.DBQuery.removePlayer
 class WhitelistAdminHandler {
     companion object {
         private fun bind(operatorId: String, userId: String, groupId: Long, playerName: String) {
-            if (isFileStorage && AQQBot.dataMap.containsKey(userId)) {
+            if (isFileStorage && AQQBot.dataMap.containsKey(userId) && AQQBot.dataMap[userId]!!.size >= config.getLong("whitelist.max_bind_count")) {
                 AQQBot.dataMap.remove(userId)
-            } else if (!isFileStorage && qqInDatabase(userId.toLong()) != null) {
+            } else if (!isFileStorage && qqInDatabase(userId.toLong()) != null && qqInDatabase(userId.toLong()).size >= config.getLong("whitelist.max_bind_count")) {
                 DBQuery.removePlayerByUserId(userId.toLong())
             }
             if (!validateName(playerName)) {
@@ -33,20 +34,23 @@ class WhitelistAdminHandler {
             if (isFileStorage) {
                 var existUserId = ""
                 AQQBot.dataMap.forEach { k, v ->
-                    if (v == playerName) {
+                    if (v.contains(playerName)) {
                         existUserId = k
                         return@forEach
                     }
                 }
-                if (existUserId != "") {
-                    AQQBot.dataMap.remove(existUserId)
+                if (!existUserId.isEmpty()) {
+                    if (AQQBot.dataMap.get(existUserId)!!.size == 1) AQQBot.dataMap.remove(existUserId)
+                    else AQQBot.dataMap[existUserId] = AQQBot.dataMap[existUserId]!!.filter { it != playerName }.toMutableList()
                 }
             } else {
                 if (playerInDatabase(playerName)) {
                     DBQuery.removePlayerByName(playerName)
                 }
             }
-            if (isFileStorage) AQQBot.dataMap[userId] = playerName
+            val newList: MutableList<String> = AQQBot.dataMap.getOrDefault(userId, mutableListOf())
+            newList.add(playerName)
+            if (isFileStorage) AQQBot.dataMap[userId] = newList
             else addPlayer(userId.toLong(), playerName)
             AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.bind_successful"), true))
             ALogger.log("$operatorId bind $userId to account $playerName")
@@ -62,8 +66,9 @@ class WhitelistAdminHandler {
             }
             if (isFileStorage) {
                 AQQBot.dataMap.forEach { (k, v) ->
-                    if (v == playerName && k == userId) {
-                        AQQBot.dataMap.remove(k)
+                    if (v.contains(playerName) && k == userId) {
+                        if (v.size == 1) AQQBot.dataMap.remove(k)
+                        else AQQBot.dataMap[k] = v.filter { it != playerName }.toMutableList()
                         AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.unbind_successful"), true))
                         ALogger.log("$operatorId unbind $userId to account $playerName")
                         submit {
@@ -83,13 +88,13 @@ class WhitelistAdminHandler {
                         }
                         return
                     } else if (k == userId) {
-                        AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.admin.bind_by_other", mutableMapOf(Pair("name", v))), true))
+                        AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.admin.bind_by_other", mutableMapOf(Pair("name", v.joinToString(", ")))), true))
                         return
                     }
                 }
             } else {
-                if (qqInDatabase(userId.toLong()) != playerName) {
-                    AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.admin.bind_by_other", mutableMapOf(Pair("name", qqInDatabase(userId.toLong())!!))), true))
+                if (!qqInDatabase(userId.toLong()).contains(playerName)) {
+                    AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.admin.bind_by_other", mutableMapOf(Pair("name", qqInDatabase(userId.toLong()).joinToString(", ")))), true))
                 }
                 removePlayer(userId.toLong(), playerName)
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.unbind_successful"), true))
