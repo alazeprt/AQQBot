@@ -131,6 +131,9 @@ object AGameEvent {
         if (config.getBoolean("chat.server_to_group.default_format")) {
             formattedMessage = AFormatter.chatClear(formattedMessage)
         }
+        if (formattedMessage.length > config.getInt("chat.max_forward_length")) {
+            formattedMessage = formattedMessage.substring(0, config.getInt("chat.max_forward_length")) + "..."
+        }
         if (config.getStringList("chat.server_to_group.prefix").contains("")) {
             return formattedMessage
         }

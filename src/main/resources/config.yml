@@ -135,6 +135,9 @@ information:
 # 聊天(群服互联)功能
 # * 该功能仅支持Bukkit类服务端
 chat:
+  # 最大转发字数 (多余的会被替换为...)
+  max_forward_length: 200
+
   # 群->服聊天转发功能 转发结果:
   # [QQ群(${groupId})] ${sender}: ${message}
   group_to_server:

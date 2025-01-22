@@ -106,12 +106,16 @@ class BotListener : Listener {
         if (!config.getBoolean("chat.group_to_server.enable")) {
             return null
         }
+        var newMessage = message;
+        if (message.length > config.getInt("chat.max_forward_length")) {
+            newMessage = newMessage.substring(0, config.getInt("chat.max_forward_length")) + "..."
+        }
         if (config.getStringList("chat.group_to_server.prefix").contains("")) {
-            return formatter.regexFilter(config.getStringList("chat.group_to_server.filter"), message)
+            return formatter.regexFilter(config.getStringList("chat.group_to_server.filter"), newMessage)
         }
         config.getStringList("chat.group_to_server.prefix").forEach {
-            if (message.startsWith(it)) {
-                return formatter.regexFilter(config.getStringList("chat.group_to_server.filter"), message.substring(it.length))
+            if (newMessage.startsWith(it)) {
+                return formatter.regexFilter(config.getStringList("chat.group_to_server.filter"), newMessage.substring(it.length))
             }
         }
         return null
