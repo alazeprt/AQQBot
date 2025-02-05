@@ -45,7 +45,7 @@ object AGameEvent {
     }
 
     @Ghost
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onChat(event: AsyncPlayerChatEvent) {
         if (canForwardMessage(event.message) != null) {
             submit (async = true) {
