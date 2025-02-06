@@ -2,6 +2,7 @@ package top.alazeprt.aqqbot.handler
 
 import me.lucko.spark.api.statistic.StatisticWindow
 import org.bukkit.Bukkit
+import taboolib.platform.VelocityPlugin
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aqqbot.AQQBot
@@ -68,11 +69,12 @@ class InformationHandler {
         }
 
         private fun getPlayerList(groupId: Long) {
-            val playerList = Bukkit.getOnlinePlayers()
+            val playerList = if (isBukkit) Bukkit.getOnlinePlayers().map { it.name }.toList()
+                else VelocityPlugin.getInstance().server.allPlayers.map { it.username }.toList()
             AQQBot.oneBotClient.action(
                 SendGroupMessage(groupId, get("qq.information.player_list.result", mutableMapOf(
                     Pair("count", playerList.size.toString()),
-                    Pair("player_list", playerList.joinToString { it.name })
+                    Pair("player_list", playerList.joinToString { it })
                 )), true))
         }
 
@@ -111,7 +113,7 @@ class InformationHandler {
             }
             AQQBot.config.getStringList("information.list.command").forEach {
                 if (!AQQBot.config.getBoolean("information.list.enable")) return@forEach
-                if (message.lowercase() == it.lowercase() && isBukkit) {
+                if (message.lowercase() == it.lowercase()) {
                     getPlayerList(event.groupId)
                     return true
                 }

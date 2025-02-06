@@ -52,6 +52,8 @@ object AQQBot : Plugin() {
 
     lateinit var dataFolder: File
 
+    var updateConfig = false
+
     override fun onEnable() {
         info("Checking server type...")
         try {
@@ -64,6 +66,10 @@ object AQQBot : Plugin() {
         val configFile = releaseResourceFile("config.yml", replace = false)
         dataFolder = getDataFolder()
         config = Configuration.loadFromFile(configFile)
+        if (config.getInt("version") != 14) {
+            updateConfig = true
+            config.saveToFile(File(getDataFolder(), "config_new.yml"))
+        }
         // Data loader
         val dataFile = releaseResourceFile("data.yml", replace = false)
         dataConfig = Configuration.loadFromFile(dataFile)

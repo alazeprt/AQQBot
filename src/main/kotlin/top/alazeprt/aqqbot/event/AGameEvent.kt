@@ -33,6 +33,10 @@ object AGameEvent {
     @Ghost
     @SubscribeEvent
     fun onJoin(event: PlayerJoinEvent) {
+        if (AQQBot.updateConfig && event.player.isOp) {
+            event.player.sendMessage("§a检测到你正在使用 AQQBot 的低版本配置文件, 这可能会引起一些问题")
+            event.player.sendMessage("§a插件已自动释放新版本配置文件并命名为 config_new.yml, 请根据你的旧版本配置文件 (config.yml) 修改该文件并重命名为 config.yml, 最后执行 /aqqbot reload 应用修改")
+        }
         val handle = whitelistHandler(event.player.name) {
             event.player.kickPlayer(it)
         }

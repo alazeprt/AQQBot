@@ -1,6 +1,9 @@
 # AQQBot 配置文件
 # 可使用 /aqqbot reload 重载
 
+## 配置文件版本, 请勿修改!!!
+version: 14
+
 # 存储相关配置 (重启后生效)
 storage:
   # 存储方式
