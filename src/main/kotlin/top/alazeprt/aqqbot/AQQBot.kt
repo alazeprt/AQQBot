@@ -70,6 +70,7 @@ object AQQBot : Plugin() {
         if (config.getString("storage.type")!!.lowercase() == "file") isFileStorage = true
         else if (config.getString("storage.type")!!.lowercase() == "sqlite") {
             val host = HostSQLite(File(getDataFolder(), config.getString("storage.sqlite.file")?: "aqqbot.db"))
+            host.createDataSource()
             val dataSource by lazy { host.createDataSource() }
             table = Table("account_data", host) {
                 add("userId") {

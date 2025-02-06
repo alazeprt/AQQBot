@@ -8,7 +8,9 @@ object DBQuery {
         return table.select(dataSource) {
             rows("name")
         }.map {
-            getString("name").split(", ").toMutableList().contains(name)
+            if (getString("name").split(", ").toMutableList().isEmpty())
+            getString("name") == name
+            else getString("name").split(", ").toMutableList().contains(name)
         }.any { it }
     }
 
@@ -17,7 +19,8 @@ object DBQuery {
             rows("name")
             where("userId" eq userId)
             limit(1)
-        }.firstOrNull { getString("name").split(", ").toMutableList() }?: mutableListOf()
+        }.firstOrNull { if (getString("name").split(", ").toMutableList().isEmpty())
+            mutableListOf(getString("name")) else getString("name").split(", ").toMutableList() }?: mutableListOf()
     }
 
     fun addPlayer(userId: Long, name: String) {
@@ -27,7 +30,8 @@ object DBQuery {
                 where("userId" eq userId)
                 rows("name")
             }.map {
-                originList = getString("name").split(", ").toMutableList()
+                originList = if (getString("name").split(", ").toMutableList().isEmpty())
+            mutableListOf(getString("name")) else getString("name").split(", ").toMutableList()
             }
         }
         originList.add(name)
@@ -41,8 +45,10 @@ object DBQuery {
             rows("name")
             where("userId" eq userId)
         }.map {
-            if (getString("name").split(", ").toMutableList().contains(name)) {
-                val newList = getString("name").split(", ").toMutableList()
+            if (if (getString("name").split(", ").toMutableList().isEmpty())
+            getString("name") == name else getString("name").split(", ").toMutableList().contains(name)) {
+                val newList = if (getString("name").split(", ").toMutableList().isEmpty())
+            mutableListOf(getString("name")) else getString("name").split(", ").toMutableList()
                 newList.remove(name)
                 table.update(dataSource) {
                     where("userId" eq userId)
@@ -61,10 +67,10 @@ object DBQuery {
 
     fun removePlayerByName(name: String) {
         table.select(dataSource) {
-            rows("name")
-            rows("userId")
+            rows("name", "userId")
         }.map {
-            if (getString("name").split(", ").toMutableList().contains(name)) {
+            if (if (getString("name").split(", ").toMutableList().isEmpty())
+            getString("name") == name else getString("name").split(", ").toMutableList().contains(name)) {
                 table.delete(dataSource) {
                     where(("userId" eq getString("userId")) and ("name" eq getString("name")))
                 }
@@ -76,10 +82,11 @@ object DBQuery {
     fun getUserIdByName(name: String): Long? {
         var userId: Long? = null
         table.select(dataSource) {
-            rows("userId")
-            rows("name")
+            rows("userId", "name")
         }.map {
-            if (getString("name").split(", ").toMutableList().contains(name)) {
+            if (if (getString("name").split(", ").toMutableList().isEmpty())
+            getString("name") == name else getString("name").split(", ").toMutableList().contains(name)) {
+
                 userId = getLong("userId")
                 return@map
             }

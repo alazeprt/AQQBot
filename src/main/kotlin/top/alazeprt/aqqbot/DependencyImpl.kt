@@ -2,11 +2,17 @@ package top.alazeprt.aqqbot
 
 import me.lucko.spark.api.Spark
 import me.lucko.spark.api.SparkProvider
+import taboolib.common.env.RuntimeDependencies
+import taboolib.common.env.RuntimeDependency
 import taboolib.common.platform.function.info
 import taboolib.common.platform.function.submit
 import taboolib.common.platform.function.submitAsync
 import taboolib.common.platform.function.warning
 
+@RuntimeDependencies(
+    RuntimeDependency("!com.mysql:mysql-connector-j:8.4.0"),
+    RuntimeDependency("!org.xerial:sqlite-jdbc:3.46.1.0")
+)
 class DependencyImpl {
     companion object {
 

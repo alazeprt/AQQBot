@@ -10,7 +10,7 @@ plugins {
 taboolib {
     env {
         // 安装模块
-        install(Bukkit, Basic, Velocity, Database, Metrics)
+        install(Bukkit, Basic, Velocity, Metrics, Database)
     }
     description {
         contributors {
@@ -21,7 +21,7 @@ taboolib {
             name("PlaceholderAPI").with("bukkit").optional(true).loadafter(true)
         }
     }
-    relocate("com.google.code.gson", "top.alazeprt.aonebot.lib.google.code.gson")
+    relocate("com.google.code.gson", "top.alazeprt.aqqbot.lib.gson")
 
     version { taboolib = "6.2.1-df22fb1" }
 }
@@ -36,6 +36,8 @@ repositories {
 
 dependencies {
     taboo("com.github.alazeprt:AOneBot:1.0.5-beta")
+    compileOnly("com.mysql:mysql-connector-j:8.4.0")
+    compileOnly("org.xerial:sqlite-jdbc:3.46.1.0")
     compileOnly("me.lucko:spark-api:0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("ink.ptms.core:v12101:12101:mapped")
