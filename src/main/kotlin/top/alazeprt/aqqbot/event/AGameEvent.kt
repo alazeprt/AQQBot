@@ -1,10 +1,11 @@
 package top.alazeprt.aqqbot.event
 
-import com.velocitypowered.api.event.connection.PostLoginEvent
-import com.velocitypowered.api.event.player.KickedFromServerEvent
+import com.velocitypowered.api.event.connection.DisconnectEvent
+import com.velocitypowered.api.event.connection.LoginEvent
+import com.velocitypowered.api.event.player.PlayerChatEvent
 import net.kyori.adventure.text.Component
+import org.bukkit.entity.Player
 import org.bukkit.event.player.AsyncPlayerChatEvent
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import taboolib.common.platform.Ghost
@@ -59,7 +60,7 @@ object AGameEvent {
     // Velocity
     @Ghost
     @SubscribeEvent
-    fun onVCJoin(event: PostLoginEvent) {
+    fun onVCJoin(event: LoginEvent) {
         val handle = whitelistHandler(event.player.username) {
             event.player.disconnect(Component.text(it))
         }
@@ -68,8 +69,20 @@ object AGameEvent {
 
     @Ghost
     @SubscribeEvent
-    fun onVCQuit(event: KickedFromServerEvent) {
+    fun onVCQuit(event: DisconnectEvent) {
         playerStatusHandler(event.player.username, false)
+    }
+
+    @Ghost
+    @SubscribeEvent(ignoreCancelled = true)
+    fun onVCChat(event: PlayerChatEvent) {
+        if (canForwardMessage(event.message) != null) {
+            submit (async = true) {
+                AQQBot.enableGroups.forEach {
+                    AQQBot.oneBotClient.action(SendGroupMessage(it.toLong(), get("qq.chat_from_game", mutableMapOf("player" to event.player.username, "message" to canForwardMessage(event.message)!!)), true))
+                }
+            }
+        }
     }
 
     private fun playerStatusHandler(playerName: String, isJoin: Boolean) {
