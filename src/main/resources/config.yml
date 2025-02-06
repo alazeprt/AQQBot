@@ -136,7 +136,7 @@ information:
       - "/服务器mspt"
 
 # 聊天(群服互联)功能
-# * 该功能仅支持Bukkit类服务端
+# * Velocity类服务端兼容性可能不是很好
 chat:
   # 最大转发字数 (多余的会被替换为...)
   max_forward_length: 200
