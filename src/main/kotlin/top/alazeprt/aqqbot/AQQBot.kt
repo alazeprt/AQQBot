@@ -61,7 +61,7 @@ object AQQBot : Plugin() {
         } catch (e: ClassNotFoundException) {
             isBukkit = false
         }
-        val metrics = Metrics(24071, "1.0.14", Platform.CURRENT)
+        val metrics = Metrics(24071, "1.0.14.1", Platform.CURRENT)
         info("Loading data...")
         val configFile = releaseResourceFile("config.yml", replace = false)
         dataFolder = getDataFolder()
@@ -69,6 +69,9 @@ object AQQBot : Plugin() {
         if (config.getInt("version") != 14) {
             updateConfig = true
             config.saveToFile(File(getDataFolder(), "config_new.yml"))
+            if (config.getInt("chat.max_forward_length") == 0) {
+                config.set("chat.max_forward_length", 200)
+            }
         }
         // Data loader
         val dataFile = releaseResourceFile("data.yml", replace = false)
@@ -138,7 +141,8 @@ object AQQBot : Plugin() {
                 val output = customConfig.getStringList("$it.output")
                 val unbind_output = customConfig.getStringList("$it.unbind_output")
                 val format = customConfig.getBoolean("$it.format")
-                val choose_account = customConfig.getInt("$it.chooseAccount")
+                val choose_account = if (customConfig.getInt("$it.chooseAccount") == 0) 1
+                    else customConfig.getInt("$it.chooseAccount")
                 customCommands.add(ACustom(command, execute, unbind_execute, output, unbind_output, format, choose_account))
             }
         }
