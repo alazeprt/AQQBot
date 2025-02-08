@@ -2,10 +2,8 @@ package top.alazeprt.aqqbot
 
 import taboolib.common.platform.Platform
 import taboolib.common.platform.Plugin
-import taboolib.common.platform.function.getDataFolder
-import taboolib.common.platform.function.info
-import taboolib.common.platform.function.releaseResourceFile
-import taboolib.common.platform.function.submit
+import taboolib.common.platform.function.*
+import taboolib.common.platform.service.PlatformExecutor
 import taboolib.module.configuration.Configuration
 import taboolib.module.database.*
 import taboolib.module.metrics.Metrics
@@ -53,6 +51,8 @@ object AQQBot : Plugin() {
     lateinit var dataFolder: File
 
     var updateConfig = false
+
+    var checkTask: PlatformExecutor.PlatformTask? = null
 
     override fun onEnable() {
         info("Checking server type...")
@@ -182,6 +182,15 @@ object AQQBot : Plugin() {
                 alsoNoticed = true
             }
             oneBotClient.registerEvent(BotListener())
+        }
+        if (botConfig.getLong("check_interval") > 0) {
+            info("Enabling connection checking system...")
+            checkTask = submit(async = true, period = 20 * config.getLong("check_interval")) {
+                if (!oneBotClient.isConnected) {
+                    warning("Bot connection lost, trying to reconnect...")
+                    oneBotClient.connect()
+                }
+            }
         }
     }
 

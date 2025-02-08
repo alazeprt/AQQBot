@@ -10,6 +10,11 @@ ws:
 # 若未配置请留空
 access_token: ""
 
+# 定时检查Websocket连接的间隔时长
+# 单位: 秒
+# ! 若配置为 <0 的数值则不启动定时检查
+check_interval: 60
+
 # 启用插件的群号
 groups:
   - "114514"

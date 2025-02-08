@@ -2,10 +2,13 @@ package top.alazeprt.aqqbot.util
 
 import taboolib.common.platform.function.info
 import taboolib.common.platform.function.releaseResourceFile
+import taboolib.common.platform.function.submit
+import taboolib.common.platform.function.warning
 import taboolib.module.configuration.Configuration
 import top.alazeprt.aonebot.client.websocket.WebsocketBotClient
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.AQQBot.botConfig
+import top.alazeprt.aqqbot.AQQBot.checkTask
 import top.alazeprt.aqqbot.AQQBot.config
 import top.alazeprt.aqqbot.AQQBot.customCommands
 import top.alazeprt.aqqbot.AQQBot.enableGroups
@@ -82,6 +85,16 @@ object ACommandTask {
         }
         oneBotClient.connect()
         oneBotClient.registerEvent(BotListener())
+        checkTask?.cancel()
+        if (botConfig.getLong("check_interval") > 0) {
+            info("Enabling connection checking system...")
+            checkTask = submit(async = true, period = 20 * config.getLong("check_interval")) {
+                if (!oneBotClient.isConnected) {
+                    warning("Bot connection lost, trying to reconnect...")
+                    oneBotClient.connect()
+                }
+            }
+        }
         val time = System.currentTimeMillis() - s
         info("Reloaded AQQBot in $time ms")
         return time
