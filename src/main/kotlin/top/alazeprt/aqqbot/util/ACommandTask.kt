@@ -88,7 +88,7 @@ object ACommandTask {
         checkTask?.cancel()
         if (botConfig.getLong("check_interval") > 0) {
             info("Enabling connection checking system...")
-            checkTask = submit(async = true, period = 20 * config.getLong("check_interval")) {
+            checkTask = submit(async = true, period = 20 * botConfig.getLong("check_interval")) {
                 if (!oneBotClient.isConnected) {
                     warning("Bot connection lost, trying to reconnect...")
                     oneBotClient.connect()
