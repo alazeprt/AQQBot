@@ -62,6 +62,17 @@ class BotListener : Listener {
                     AFormatter.pluginToChat(get("game.chat_from_qq", mutableMapOf("groupId" to event.groupId.toString(),
                     "userName" to event.senderNickName,
                     "message" to (canForwardMessage(message)?: return@action)))))
+            } else if (canForwardMessage(message) != null && !(handleInfo || handleWl || handleCustom || handleCommand) &&
+                config.getBoolean("chat.group_to_server.vc_broadcast") && !isBukkit) {
+                VelocityPlugin.getInstance().server.allServers.forEach {
+                    it.sendMessage(
+                        Component.text(
+                            AFormatter.pluginToChat(get("game.chat_from_qq", mutableMapOf("groupId" to event.groupId.toString(),
+                                "userName" to event.senderNickName,
+                                "message" to (canForwardMessage(message)?: return@action))))
+                        )
+                    )
+                }
             }
         })
     }
