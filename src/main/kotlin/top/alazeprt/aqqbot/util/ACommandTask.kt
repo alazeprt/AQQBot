@@ -3,7 +3,7 @@ package top.alazeprt.aqqbot.util
 import taboolib.common.platform.function.info
 import taboolib.common.platform.function.releaseResourceFile
 import taboolib.module.configuration.Configuration
-import top.alazeprt.aonebot.BotClient
+import top.alazeprt.aonebot.client.websocket.WebsocketBotClient
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.AQQBot.botConfig
 import top.alazeprt.aqqbot.AQQBot.config
@@ -75,7 +75,11 @@ object ACommandTask {
             DependencyImpl.loadPAPI()
         }
         val url = "ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")
-        oneBotClient = BotClient(URI.create(url))
+        oneBotClient = if (botConfig.getString("access_token").isNullOrBlank()) {
+            WebsocketBotClient(URI.create(url))
+        } else {
+            WebsocketBotClient(URI.create(url), botConfig.getString("access_token"))
+        }
         oneBotClient.connect()
         oneBotClient.registerEvent(BotListener())
         val time = System.currentTimeMillis() - s

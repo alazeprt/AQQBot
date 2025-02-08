@@ -6,6 +6,10 @@ ws:
   # 端口
   port: 3001
 
+# 在机器人后端配置的access_token
+# 若未配置请留空
+access_token: ""
+
 # 启用插件的群号
 groups:
   - "114514"

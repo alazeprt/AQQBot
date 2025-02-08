@@ -35,7 +35,7 @@ repositories {
 }
 
 dependencies {
-    taboo("com.github.alazeprt:AOneBot:1.0.5-beta")
+    taboo("com.github.alazeprt:AOneBot:1.0.8-beta")
     compileOnly("com.mysql:mysql-connector-j:8.4.0")
     compileOnly("org.xerial:sqlite-jdbc:3.46.1.0")
     compileOnly("me.lucko:spark-api:0.1-SNAPSHOT")

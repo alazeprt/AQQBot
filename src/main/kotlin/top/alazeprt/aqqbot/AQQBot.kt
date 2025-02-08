@@ -9,8 +9,8 @@ import taboolib.common.platform.function.submit
 import taboolib.module.configuration.Configuration
 import taboolib.module.database.*
 import taboolib.module.metrics.Metrics
-import top.alazeprt.aonebot.BotClient
 import top.alazeprt.aonebot.action.SendGroupMessage
+import top.alazeprt.aonebot.client.websocket.WebsocketBotClient
 import top.alazeprt.aqqbot.command.sender.ASender
 import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.event.AGameEvent
@@ -30,7 +30,7 @@ object AQQBot : Plugin() {
 
     lateinit var messageConfig: Configuration
 
-    lateinit var oneBotClient: BotClient
+    lateinit var oneBotClient: WebsocketBotClient
 
     private var alsoNoticed = false
 
@@ -168,7 +168,11 @@ object AQQBot : Plugin() {
         submit(async = true) {
             info("Enabling bot...")
             val url = "ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")
-            oneBotClient = BotClient(URI.create(url))
+            oneBotClient = if (botConfig.getString("access_token").isNullOrBlank()) {
+                WebsocketBotClient(URI.create(url))
+            } else {
+                WebsocketBotClient(URI.create(url), botConfig.getString("access_token"))
+            }
             oneBotClient.connect()
             if (config.getBoolean("notify.server_status.enable") && !alsoNoticed) {
                 enableGroups.forEach {
