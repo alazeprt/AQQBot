@@ -61,7 +61,7 @@ object AQQBot : Plugin() {
         } catch (e: ClassNotFoundException) {
             isBukkit = false
         }
-        val metrics = Metrics(24071, "1.0.14.1", Platform.CURRENT)
+        val metrics = Metrics(24071, "1.1.0", Platform.CURRENT)
         info("Loading data...")
         val configFile = releaseResourceFile("config.yml", replace = false)
         dataFolder = getDataFolder()
