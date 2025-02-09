@@ -84,7 +84,6 @@ object ACommandTask {
             WebsocketBotClient(URI.create(url), botConfig.getString("access_token"))
         }
         oneBotClient.connect()
-        oneBotClient.registerEvent(BotListener())
         checkTask?.cancel()
         if (botConfig.getLong("check_interval") > 0) {
             info("Enabling connection checking system...")
