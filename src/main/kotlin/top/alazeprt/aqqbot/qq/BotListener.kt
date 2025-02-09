@@ -2,9 +2,9 @@ package top.alazeprt.aqqbot.qq
 
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
-import taboolib.common.platform.function.info
 import taboolib.common.platform.function.submit
 import taboolib.platform.VelocityPlugin
+import top.alazeprt.aonebot.action.GetGroupMemberInfo
 import top.alazeprt.aonebot.action.GetGroupMemberList
 import top.alazeprt.aonebot.event.Listener
 import top.alazeprt.aonebot.event.SubscribeBotEvent
@@ -22,7 +22,6 @@ import top.alazeprt.aqqbot.handler.WhitelistHandler
 import top.alazeprt.aqqbot.util.AFormatter
 import top.alazeprt.aqqbot.util.AI18n.get
 import top.alazeprt.aqqbot.util.DBQuery.qqInDatabase
-import top.alazeprt.aqqbot.util.DBQuery.removePlayer
 import top.alazeprt.aqqbot.util.DBQuery.removePlayerByUserId
 
 class BotListener : Listener {
@@ -57,21 +56,23 @@ class BotListener : Listener {
                     return@forEach
                 }
             }
-            if(canForwardMessage(message) != null && !(handleInfo || handleWl || handleCustom || handleCommand) && isBukkit) {
-                Bukkit.broadcastMessage(
-                    AFormatter.pluginToChat(get("game.chat_from_qq", mutableMapOf("groupId" to event.groupId.toString(),
-                    "userName" to event.senderNickName,
-                    "message" to (canForwardMessage(message)?: return@action)))))
-            } else if (canForwardMessage(message) != null && !(handleInfo || handleWl || handleCustom || handleCommand) &&
-                config.getBoolean("chat.group_to_server.vc_broadcast") && !isBukkit) {
-                VelocityPlugin.getInstance().server.allServers.forEach {
-                    it.sendMessage(
-                        Component.text(
-                            AFormatter.pluginToChat(get("game.chat_from_qq", mutableMapOf("groupId" to event.groupId.toString(),
-                                "userName" to event.senderNickName,
-                                "message" to (canForwardMessage(message)?: return@action))))
+            oneBotClient.action(GetGroupMemberInfo(event.groupId, event.senderId)) { member ->
+                if (canForwardMessage(message) != null && !(handleInfo || handleWl || handleCustom || handleCommand) && isBukkit) {
+                    Bukkit.broadcastMessage(
+                        AFormatter.pluginToChat(get("game.chat_from_qq", mutableMapOf("groupId" to event.groupId.toString(),
+                            "userName" to member.card,
+                            "message" to (canForwardMessage(message)?: return@action)))))
+                } else if (canForwardMessage(message) != null && !(handleInfo || handleWl || handleCustom || handleCommand) &&
+                    config.getBoolean("chat.group_to_server.vc_broadcast") && !isBukkit) {
+                    VelocityPlugin.getInstance().server.allServers.forEach {
+                        it.sendMessage(
+                            Component.text(
+                                AFormatter.pluginToChat(get("game.chat_from_qq", mutableMapOf("groupId" to event.groupId.toString(),
+                                    "userName" to member.card,
+                                    "message" to (canForwardMessage(message)?: return@action))))
+                            )
                         )
-                    )
+                    }
                 }
             }
         })
