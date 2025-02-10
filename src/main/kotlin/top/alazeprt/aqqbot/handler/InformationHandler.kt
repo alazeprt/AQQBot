@@ -12,6 +12,7 @@ import top.alazeprt.aqqbot.util.AI18n.get
 
 class InformationHandler {
     companion object {
+        @Deprecated(message = "This feature was replaced by custom commands")
         private fun getTPS(groupId: Long) {
             if (spark == null) {
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId,
@@ -33,7 +34,8 @@ class InformationHandler {
                 )), true))
             }
         }
-        
+
+        @Deprecated(message = "This feature was replaced by custom commands")
         private fun getMSPT(groupId: Long) {
             if (spark == null) {
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId,
@@ -78,6 +80,7 @@ class InformationHandler {
                 )), true))
         }
 
+        @Deprecated(message = "This feature was replaced by custom commands")
         private fun getCPUInfo(groupId: Long) {
             if (spark == null) {
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId,

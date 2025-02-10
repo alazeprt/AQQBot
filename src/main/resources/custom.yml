@@ -3,8 +3,8 @@
 # 支持掺杂 PlaceholderAPI 所提供的变量
 
 # 例 1
-# 输入 /prefix 或 /称号 时返回玩家的称号 (对应PAPI变量 %vault_prefix%)
-prefix:
+# 返回服务器的 TPS
+tps:
   # 是否开启该命令
   enable: true
 
@@ -14,8 +14,12 @@ prefix:
   # 若是可选参数, 则为 ${argName?:default} default请填写默认值, 如无默认值则请填写 ${argName?}
   # 该参数可在下面的 execute, unbind_execute, output, unbind_output 中使用 如无默认值且用户未使用参数则为空
   command:
-    - "/prefix"
-    - "/称号"
+    - "/tps"
+    - "tps"
+    - "/服务器tps"
+    - "服务器tps"
+    - "TPS"
+    - "/TPS"
 
   # 以后台身份执行命令 (可选) 支持 PAPI
   # 若不需要执行命令, 请将其设置为空
@@ -37,13 +41,36 @@ prefix:
   # 如: - "第一个随机选项" - "xxx" - "$random" - "第二个随机选项" - "$random" - "第三个随机选项"
   # 代表 随机输出 第一个选项(换行)xxx, 第二个选项, 第三个选项 中的其中一个
   output:
-    - "你的称号是: %vault_prefix%"
+    - "服务器TPS: %spark_tps%"
 
-  # 未绑定账号的玩家输出 (不支持 PAPI)
+  # 未绑定账号的玩家输出 (PAPI 变量将会以无身份 (null) 解析)
   # 同上支持随机输出
   unbind_output:
-    - "你还没有绑定账号!"
+    - "服务器TPS: %spark_tps%"
 
   # 是否格式化颜色符号 (如: &7普通&a玩家 -> 普通玩家)
   format: true
 
+# 例 2
+# 返回服务器的 MSPT
+mspt:
+  enable: true
+  command: ["/mspt", "mspt", "/服务器mspt", "服务器mspt", "MSPT", "/MSPT"]
+  execute: [""]
+  unbind_execute: [""]
+  choose_account: 1
+  output: ["服务器MSPT: %spark_tickduration%"]
+  unbind_output: ["服务器MSPT: %spark_tickduration%"]
+  format: true
+
+# 例 3
+# 返回服务器的CPU占用率
+cpu:
+  enable: true
+  command: ["/cpu", "cpu", "/cpu占用", "cpu占用", "/cpu占用率", "cpu占用率", "CPU", "/CPU"]
+  execute: [""]
+  unbind_execute: [""]
+  choose_account: 1
+  output: ["服务器CPU占用率: %spark_cpu_system%"]
+  unbind_output: ["服务器CPU占用率: %spark_cpu_system%"]
+  format: true

@@ -26,6 +26,7 @@ class ACustom(val command: List<String>, val execute: List<String>, val unbind_e
         var outputString = mapFormat(output.joinToString("\n"), map)
         if (format) {
             outputString = AFormatter.pluginClear(outputString)
+            outputString = AFormatter.chatClear(outputString)
         }
         if (player.isNullOrEmpty()) {
             if (unbind_execute.isNotEmpty() && unbind_execute[0].isNotEmpty()) {
@@ -39,6 +40,9 @@ class ACustom(val command: List<String>, val execute: List<String>, val unbind_e
                         sender.execute(mapFormat(it, map))
                     }
                 }
+            }
+            if (withPAPI) {
+                outputString = PlaceholderAPI.setPlaceholders(null, outputString)
             }
             if (outputString.contains("\$random\n")) {
                 val optionsOutput: List<String> = outputString.split("\$random\n")
