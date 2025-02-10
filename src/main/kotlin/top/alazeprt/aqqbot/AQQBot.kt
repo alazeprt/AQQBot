@@ -68,7 +68,7 @@ object AQQBot : Plugin() {
         } catch (e: ClassNotFoundException) {
             isBukkit = false
         }
-        val metrics = Metrics(24071, "1.1.1", Platform.CURRENT)
+        val metrics = Metrics(24071, "1.1.2", Platform.CURRENT)
         info("Loading data...")
         val configFile = releaseResourceFile("config.yml", replace = false)
         dataFolder = getDataFolder()
@@ -95,7 +95,7 @@ object AQQBot : Plugin() {
                     }
                 }
                 add("name") {
-                    type(ColumnTypeSQLite.TEXT) {
+                    type(ColumnTypeSQLite.TEXT, 512) {
                         options(ColumnOptionSQLite.NOTNULL)
                     }
                 }
@@ -112,7 +112,7 @@ object AQQBot : Plugin() {
                     }
                 }
                 add("name") {
-                    type(ColumnTypeSQL.VARCHAR) {
+                    type(ColumnTypeSQL.VARCHAR, 1024) {
                         options(ColumnOptionSQL.NOTNULL)
                     }
                 }

@@ -25,7 +25,7 @@ object DBQuery {
 
     fun addPlayer(userId: Long, name: String) {
         var originList: MutableList<String> = mutableListOf();
-        if (playerInDatabase(name)) {
+        if (!qqInDatabase(userId).isEmpty()) {
             table.select(dataSource) {
                 where("userId" eq userId)
                 rows("name")
@@ -35,8 +35,15 @@ object DBQuery {
             }
         }
         originList.add(name)
-        table.insert(dataSource, "userId", "name") {
-            value(userId, originList.joinToString(", "))
+        if (originList.size == 1) {
+            table.insert(dataSource, "userId", "name") {
+                value(userId, originList.joinToString(", "))
+            }
+        } else {
+            table.update(dataSource) {
+                where("userId" eq userId)
+                set("name", originList.joinToString(", "))
+            }
         }
     }
 
@@ -50,9 +57,15 @@ object DBQuery {
                 val newList = if (getString("name").split(", ").toMutableList().isEmpty())
             mutableListOf(getString("name")) else getString("name").split(", ").toMutableList()
                 newList.remove(name)
-                table.update(dataSource) {
-                    where("userId" eq userId)
-                    updateString("name", newList.joinToString(", "))
+                if (newList.isEmpty()) {
+                    table.delete(dataSource) {
+                        where("userId" eq userId)
+                    }
+                } else {
+                    table.update(dataSource) {
+                        set("name", newList.joinToString(", "))
+                        where("userId" eq userId)
+                    }
                 }
                 return@map
             }
@@ -71,8 +84,15 @@ object DBQuery {
         }.map {
             if (if (getString("name").split(", ").toMutableList().isEmpty())
             getString("name") == name else getString("name").split(", ").toMutableList().contains(name)) {
-                table.delete(dataSource) {
-                    where(("userId" eq getString("userId")) and ("name" eq getString("name")))
+                if (getString("name").split(", ").toMutableList().size == 1) {
+                    table.delete(dataSource) {
+                        where(("userId" eq getString("userId")) and ("name" eq getString("name")))
+                    }
+                } else {
+                    table.update(dataSource) {
+                        where("userId" eq getString("userId"))
+                        set("name", getString("name").split(", ").toMutableList().filter { it != name })
+                    }
                 }
                 return@map
             }
