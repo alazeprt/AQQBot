@@ -40,7 +40,13 @@ class ACustom(val command: List<String>, val execute: List<String>, val unbind_e
                     }
                 }
             }
-            oneBotClient.action(SendGroupMessage(groupId.toLong(), unbind_output.joinToString("\n")))
+            if (outputString.contains("\$random\n")) {
+                val optionsOutput: List<String> = outputString.split("\$random\n")
+                val outputList = optionsOutput.random()
+                oneBotClient.action(SendGroupMessage(groupId.toLong(), outputList))
+            } else {
+                oneBotClient.action(SendGroupMessage(groupId.toLong(), outputString))
+            }
         } else {
             if (execute.isNotEmpty() && execute[0].isNotEmpty()) {
                 submit {
@@ -57,7 +63,13 @@ class ACustom(val command: List<String>, val execute: List<String>, val unbind_e
             if (withPAPI) {
                 outputString = PlaceholderAPI.setPlaceholders(Bukkit.getOfflinePlayer(player.get(if (player.size < account) 0 else account - 1)), outputString)
             }
-            oneBotClient.action(SendGroupMessage(groupId.toLong(), outputString))
+            if (outputString.contains("\$random\n")) {
+                val optionsOutput: List<String> = outputString.split("\$random\n")
+                val outputList = optionsOutput.random()
+                oneBotClient.action(SendGroupMessage(groupId.toLong(), outputList))
+            } else {
+                oneBotClient.action(SendGroupMessage(groupId.toLong(), outputString))
+            }
         }
         return true
     }
