@@ -4,15 +4,20 @@ import taboolib.common.platform.Platform
 import taboolib.common.platform.Plugin
 import taboolib.common.platform.function.*
 import taboolib.common.platform.service.PlatformExecutor
+import taboolib.common.reflect.hasAnnotation
 import taboolib.module.configuration.Configuration
 import taboolib.module.database.*
 import taboolib.module.metrics.Metrics
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aonebot.client.websocket.WebsocketBotClient
+import top.alazeprt.aqqbot.api.events.AQBEvent
+import top.alazeprt.aqqbot.api.events.AQBEventInterface
+import top.alazeprt.aqqbot.api.events.AQBListener
 import top.alazeprt.aqqbot.command.sender.ASender
 import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.event.AGameEvent
 import top.alazeprt.aqqbot.qq.BotListener
+import top.alazeprt.aqqbot.util.ACommandTask
 import top.alazeprt.aqqbot.util.ACustom
 import java.io.File
 import java.net.URI
@@ -53,6 +58,8 @@ object AQQBot : Plugin() {
     var updateConfig = false
 
     var checkTask: PlatformExecutor.PlatformTask? = null
+
+    private val eventList = mutableListOf<AQBListener>()
 
     override fun onEnable() {
         info("Checking server type...")
@@ -214,5 +221,30 @@ object AQQBot : Plugin() {
             oneBotClient.disconnect()
         }
         if (!isFileStorage) dataSource.connection.close()
+    }
+
+    fun registerEvent(event: AQBListener) {
+        eventList.add(event)
+    }
+
+    fun postEvent(event: AQBEventInterface) {
+        synchronized(eventList) {
+            eventList.forEach {
+                it.javaClass.declaredMethods.forEach { method ->
+                    if (method.hasAnnotation(AQBEvent::class.java) && method.parameters.size == 1
+                        && method.parameters[0].parameterizedType.typeName == event.javaClass.typeName) {
+                        method.invoke(it, event)
+                    }
+                }
+            }
+        }
+    }
+
+    fun searchQQByName(name: String): String {
+        return ACommandTask.query("name", name)
+    }
+
+    fun searchNameByQQ(qq: String): String {
+        return ACommandTask.query("qq", qq)
     }
 }

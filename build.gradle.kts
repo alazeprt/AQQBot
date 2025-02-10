@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
+    id("maven-publish")
     id("io.izzel.taboolib") version "2.0.22"
     id("org.jetbrains.kotlin.jvm") version "1.8.22"
 }
@@ -61,4 +62,12 @@ tasks.withType<KotlinCompile> {
 configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
+    }
 }

@@ -18,6 +18,7 @@ import top.alazeprt.aqqbot.AQQBot.config
 import top.alazeprt.aqqbot.AQQBot.dataMap
 import top.alazeprt.aqqbot.AQQBot.isFileStorage
 import top.alazeprt.aqqbot.AQQBot.verifyCodeMap
+import top.alazeprt.aqqbot.api.events.ServerToGroupEvent
 import top.alazeprt.aqqbot.util.AFormatter
 import top.alazeprt.aqqbot.util.AI18n.get
 import top.alazeprt.aqqbot.util.DBQuery
@@ -54,9 +55,10 @@ object AGameEvent {
     fun onChat(event: AsyncPlayerChatEvent) {
         if (canForwardMessage(event.message) != null) {
             submit (async = true) {
-                AQQBot.enableGroups.forEach {
-                    AQQBot.oneBotClient.action(SendGroupMessage(it.toLong(), get("qq.chat_from_game", mutableMapOf("player" to event.player.name, "message" to canForwardMessage(event.message)!!)), true))
-                }
+                val message = canForwardMessage(event.message)!!
+                val internalEvent = ServerToGroupEvent(event.player.name, message)
+                AQQBot.postEvent(internalEvent)
+                internalEvent.handle()
             }
         }
     }
@@ -82,9 +84,10 @@ object AGameEvent {
     fun onVCChat(event: PlayerChatEvent) {
         if (canForwardMessage(event.message) != null) {
             submit (async = true) {
-                AQQBot.enableGroups.forEach {
-                    AQQBot.oneBotClient.action(SendGroupMessage(it.toLong(), get("qq.chat_from_game", mutableMapOf("player" to event.player.username, "message" to canForwardMessage(event.message)!!)), true))
-                }
+                val message = canForwardMessage(event.message)!!
+                val internalEvent = ServerToGroupEvent(event.player.username, message)
+                AQQBot.postEvent(internalEvent)
+                internalEvent.handle()
             }
         }
     }

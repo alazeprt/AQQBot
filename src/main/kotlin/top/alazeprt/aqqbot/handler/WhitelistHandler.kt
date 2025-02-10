@@ -13,6 +13,8 @@ import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.AQQBot.config
 import top.alazeprt.aqqbot.AQQBot.isBukkit
 import top.alazeprt.aqqbot.AQQBot.isFileStorage
+import top.alazeprt.aqqbot.api.events.BindEvent
+import top.alazeprt.aqqbot.api.events.UnbindEvent
 import top.alazeprt.aqqbot.debug.ALogger
 import top.alazeprt.aqqbot.util.AI18n.get
 import top.alazeprt.aqqbot.util.DBQuery.addPlayer
@@ -22,16 +24,16 @@ import top.alazeprt.aqqbot.util.DBQuery.removePlayer
 
 class WhitelistHandler {
     companion object {
-        private fun bind(userId: String, groupId: Long, data: String) {
+        private fun bind(userId: String, groupId: Long, data: String): Boolean {
             val playerName: String
             if (isFileStorage && AQQBot.dataMap.containsKey(userId) && AQQBot.dataMap[userId]!!.size >= config.getLong("whitelist.max_bind_count")) {
                 AQQBot.oneBotClient.action(
                     SendGroupMessage(groupId, get("qq.whitelist.already_bind"), true))
-                return
+                return false
             } else if (!isFileStorage && qqInDatabase(userId.toLong()).size >= config.getLong("whitelist.max_bind_count")) {
                 AQQBot.oneBotClient.action(
                     SendGroupMessage(groupId, get("qq.whitelist.already_bind"), true))
-                return
+                return false
             }
             if (config.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {
                 var name: String? = null
@@ -43,27 +45,27 @@ class WhitelistHandler {
                 }
                 if (name == null) {
                     AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.verify_code_not_exist"), true))
-                    return
+                    return false
                 }
                 playerName = name!!
             } else {
                 playerName = data
                 if (!validateName(playerName)) {
                     AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.invalid_name"), true))
-                    return
+                    return false
                 }
             }
             if (isFileStorage) {
                 AQQBot.dataMap.values.forEach {
                     if (it.contains(playerName)) {
                         AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.already_exist"), true))
-                        return
+                        return false
                     }
                 }
             } else {
                 if (playerInDatabase(playerName)) {
                     AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.already_exist"), true))
-                    return
+                    return false
                 }
             }
             val newList: MutableList<String> = AQQBot.dataMap.getOrDefault(userId, mutableListOf())
@@ -84,15 +86,16 @@ class WhitelistHandler {
                     AQQBot.oneBotClient.action(SetGroupCard(groupId, userId.toLong(), newName))
                 }
             }
+            return true
         }
         
-        private fun unbind(userId: String, groupId: Long, playerName: String) {
+        private fun unbind(userId: String, groupId: Long, playerName: String): Boolean {
             if (isFileStorage && !AQQBot.dataMap.containsKey(userId)) {
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.not_bind"), true))
-                return
+                return false
             } else if (!isFileStorage && qqInDatabase(userId.toLong()) == null) {
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.not_bind"), true))
-                return
+                return false
             }
             if (isFileStorage) {
                 AQQBot.dataMap.forEach { (k, v) ->
@@ -116,17 +119,18 @@ class WhitelistHandler {
                                 }
                             }
                         }
-                        return
+                        return true
                     } else if (k == userId) {
                         AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.bind_by_other", mutableMapOf(Pair("name", v.joinToString(", ")))), true))
-                        return
+                        return false
                     }
                 }
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.invalid_bind"), true))
+                return false
             } else {
                 if (!qqInDatabase(userId.toLong()).contains(playerName)) {
                     AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.bind_by_other", mutableMapOf(Pair("name", qqInDatabase(userId.toLong()).joinToString(", ")))), true))
-                    return
+                    return false
                 }
                 removePlayer(userId.toLong(), playerName)
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.unbind_successful"), true))
@@ -146,6 +150,7 @@ class WhitelistHandler {
                         }
                     }
                 }
+                return true
             }
         }
 
@@ -166,7 +171,8 @@ class WhitelistHandler {
                         if (message.split(" ").size == 3 && (sender.role == GroupRole.ADMIN || sender.role == GroupRole.OWNER)) {
                             WhitelistAdminHandler.handle(message, event, "bind")
                         } else {
-                            bind(event.senderId.toString(), event.groupId, playerName)
+                            AQQBot.postEvent(BindEvent(event.senderId, event.senderId, event.groupId, playerName,
+                                bind(event.senderId.toString(), event.groupId, playerName)))
                         }
                     }
                     return true
@@ -179,7 +185,9 @@ class WhitelistHandler {
                         if (message.split(" ").size == 3 && (sender.role == GroupRole.ADMIN || sender.role == GroupRole.OWNER)) {
                             WhitelistAdminHandler.handle(message, event, "unbind")
                         } else {
-                            unbind(event.senderId.toString(), event.groupId, playerName)
+                            AQQBot.postEvent(UnbindEvent(event.senderId, event.senderId, event.groupId, playerName,
+                                unbind(event.senderId.toString(), event.groupId, playerName))
+                            )
                         }
                     }
                     return true

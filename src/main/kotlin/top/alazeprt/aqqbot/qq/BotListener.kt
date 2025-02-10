@@ -16,6 +16,7 @@ import top.alazeprt.aqqbot.AQQBot.customCommands
 import top.alazeprt.aqqbot.AQQBot.isBukkit
 import top.alazeprt.aqqbot.AQQBot.isFileStorage
 import top.alazeprt.aqqbot.AQQBot.oneBotClient
+import top.alazeprt.aqqbot.api.events.GroupToServerEvent
 import top.alazeprt.aqqbot.handler.CommandHandler
 import top.alazeprt.aqqbot.handler.InformationHandler
 import top.alazeprt.aqqbot.handler.WhitelistHandler
@@ -31,51 +32,43 @@ class BotListener : Listener {
             return
         }
         var message = ""
-        oneBotClient.action(GetGroupMemberList(event.groupId), { memberList ->
-            event.jsonMessage.forEach {
-                val jsonObject = it.asJsonObject?: return@forEach
-                if (jsonObject.get("type").asString == "text") {
-                    message += jsonObject.get("data").asJsonObject.get("text").asString
-                } else if (jsonObject.get("type").asString == "image") {
-                    message += "[图片]"
-                } else if (jsonObject.get("type").asString == "at") {
-                    memberList.forEach { member ->
-                        if (member.member.userId == jsonObject.get("data").asJsonObject.get("qq").asLong) {
-                            message += "@${member.member.nickname}"
+        synchronized(oneBotClient) {
+            oneBotClient.action(GetGroupMemberList(event.groupId), { memberList ->
+                event.jsonMessage.forEach {
+                    val jsonObject = it.asJsonObject?: return@forEach
+                    if (jsonObject.get("type").asString == "text") {
+                        message += jsonObject.get("data").asJsonObject.get("text").asString
+                    } else if (jsonObject.get("type").asString == "image") {
+                        message += "[图片]"
+                    } else if (jsonObject.get("type").asString == "at") {
+                        memberList.forEach { member ->
+                            if (member.member.userId == jsonObject.get("data").asJsonObject.get("qq").asLong) {
+                                message += "@${member.member.nickname}"
+                            }
                         }
                     }
                 }
-            }
-            val handleInfo = InformationHandler.handle(message, event)
-            val handleWl = WhitelistHandler.handle(message, event)
-            val handleCommand = CommandHandler.handle(message, event)
-            var handleCustom = false
-            customCommands.forEach {
-                if (it.handle(message, event.senderId.toString(), event.groupId.toString())) {
-                    handleCustom = true
-                    return@forEach
-                }
-            }
-            oneBotClient.action(GetGroupMemberInfo(event.groupId, event.senderId)) { member ->
-                if (canForwardMessage(message) != null && !(handleInfo || handleWl || handleCustom || handleCommand) && isBukkit) {
-                    Bukkit.broadcastMessage(
-                        AFormatter.pluginToChat(get("game.chat_from_qq", mutableMapOf("groupId" to event.groupId.toString(),
-                            "userName" to member.card,
-                            "message" to (canForwardMessage(message)?: return@action)))))
-                } else if (canForwardMessage(message) != null && !(handleInfo || handleWl || handleCustom || handleCommand) &&
-                    config.getBoolean("chat.group_to_server.vc_broadcast") && !isBukkit) {
-                    VelocityPlugin.getInstance().server.allServers.forEach {
-                        it.sendMessage(
-                            Component.text(
-                                AFormatter.pluginToChat(get("game.chat_from_qq", mutableMapOf("groupId" to event.groupId.toString(),
-                                    "userName" to member.card,
-                                    "message" to (canForwardMessage(message)?: return@action))))
-                            )
-                        )
+                val handleInfo = InformationHandler.handle(message, event)
+                val handleWl = WhitelistHandler.handle(message, event)
+                val handleCommand = CommandHandler.handle(message, event)
+                var handleCustom = false
+                customCommands.forEach {
+                    if (it.handle(message, event.senderId.toString(), event.groupId.toString())) {
+                        handleCustom = true
+                        return@forEach
                     }
                 }
-            }
-        })
+                oneBotClient.action(GetGroupMemberInfo(event.groupId, event.senderId)) sendAction@ { member ->
+                    if (!(canForwardMessage(message) != null && !(handleInfo || handleWl || handleCustom))) {
+                        return@sendAction
+                    }
+                    val newMessage: String = canForwardMessage(message)?: return@sendAction
+                    var internalEvent = GroupToServerEvent(event.groupId, event.senderId, member.card, newMessage)
+                    AQQBot.postEvent(internalEvent)
+                    internalEvent.handle()
+                }
+            })
+        }
     }
 
     @SubscribeBotEvent

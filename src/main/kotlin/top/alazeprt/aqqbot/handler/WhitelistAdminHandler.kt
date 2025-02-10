@@ -11,6 +11,8 @@ import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.AQQBot.config
 import top.alazeprt.aqqbot.AQQBot.isBukkit
 import top.alazeprt.aqqbot.AQQBot.isFileStorage
+import top.alazeprt.aqqbot.api.events.BindEvent
+import top.alazeprt.aqqbot.api.events.UnbindEvent
 import top.alazeprt.aqqbot.debug.ALogger
 import top.alazeprt.aqqbot.util.AI18n.get
 import top.alazeprt.aqqbot.util.DBQuery
@@ -21,7 +23,7 @@ import top.alazeprt.aqqbot.util.DBQuery.removePlayer
 
 class WhitelistAdminHandler {
     companion object {
-        private fun bind(operatorId: String, userId: String, groupId: Long, playerName: String) {
+        private fun bind(operatorId: String, userId: String, groupId: Long, playerName: String): Boolean {
             if (isFileStorage && AQQBot.dataMap.containsKey(userId) && AQQBot.dataMap[userId]!!.size >= config.getLong("whitelist.max_bind_count")) {
                 AQQBot.dataMap.remove(userId)
             } else if (!isFileStorage && qqInDatabase(userId.toLong()) != null && qqInDatabase(userId.toLong()).size >= config.getLong("whitelist.max_bind_count")) {
@@ -29,7 +31,7 @@ class WhitelistAdminHandler {
             }
             if (!validateName(playerName)) {
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.invalid_name"), true))
-                return
+                return false
             }
             if (isFileStorage) {
                 var existUserId = ""
@@ -54,15 +56,16 @@ class WhitelistAdminHandler {
             else addPlayer(userId.toLong(), playerName)
             AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.bind_successful"), true))
             ALogger.log("$operatorId bind $userId to account $playerName")
+            return true
         }
 
-        private fun unbind(operatorId: String, userId: String, groupId: Long, playerName: String) {
+        private fun unbind(operatorId: String, userId: String, groupId: Long, playerName: String): Boolean {
             if (isFileStorage && !AQQBot.dataMap.containsKey(userId)) {
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.admin.not_bind", mutableMapOf(Pair("userId", userId))), true))
-                return
+                return false
             } else if (!isFileStorage && qqInDatabase(userId.toLong()) == null) {
                 AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.admin.not_bind", mutableMapOf(Pair("userId", userId))), true))
-                return
+                return false
             }
             if (isFileStorage) {
                 AQQBot.dataMap.forEach { (k, v) ->
@@ -86,10 +89,10 @@ class WhitelistAdminHandler {
                                 }
                             }
                         }
-                        return
+                        return true
                     } else if (k == userId) {
                         AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.admin.bind_by_other", mutableMapOf(Pair("name", v.joinToString(", ")))), true))
-                        return
+                        return false
                     }
                 }
             } else {
@@ -114,8 +117,10 @@ class WhitelistAdminHandler {
                         }
                     }
                 }
+                return true
             }
             AQQBot.oneBotClient.action(SendGroupMessage(groupId, get("qq.whitelist.admin.invalid_bind", mutableMapOf(Pair("userId", userId))), true))
+            return false
         }
 
         fun validateName(name: String): Boolean {
@@ -146,9 +151,12 @@ class WhitelistAdminHandler {
                     return@action
                 } else {
                     if (action == "bind") {
-                        bind(event.senderId.toString(), userId.toString(), event.groupId, playerName)
+                        AQQBot.postEvent(BindEvent(userId, event.senderId, event.groupId, playerName,
+                            bind(event.senderId.toString(), userId.toString(), event.groupId, playerName)))
                     } else if (action == "unbind") {
-                        unbind(event.senderId.toString(), userId.toString(), event.groupId, playerName)
+                        AQQBot.postEvent(UnbindEvent(userId, event.senderId, event.groupId, playerName,
+                            unbind(event.senderId.toString(), userId.toString(), event.groupId, playerName))
+                        )
                     }
                 }
             }
