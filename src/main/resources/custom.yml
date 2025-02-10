@@ -9,6 +9,7 @@ prefix:
   enable: true
 
   # 获取命令
+  # 支持 正则表达式 使用 $regex:{你的正则表达式} (可作为参数匹配使用)
   # 支持添加自定义参数, 如 ${argName}, argName可改为自定义的参数名
   # 若是可选参数, 则为 ${argName?:default} default请填写默认值, 如无默认值则请填写 ${argName?}
   # 该参数可在下面的 execute, unbind_execute, output, unbind_output 中使用 如无默认值且用户未使用参数则为空

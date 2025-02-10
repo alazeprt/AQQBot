@@ -182,13 +182,13 @@ object AQQBot : Plugin() {
                 alsoNoticed = true
             }
             oneBotClient.registerEvent(BotListener())
-        }
-        if (botConfig.getLong("check_interval") > 0) {
-            info("Enabling connection checking system...")
-            checkTask = submit(async = true, period = 20 * botConfig.getLong("check_interval")) {
-                if (!oneBotClient.isConnected) {
-                    warning("Bot connection lost, trying to reconnect...")
-                    oneBotClient.connect()
+            if (botConfig.getLong("check_interval") > 0) {
+                info("Enabling connection checking system...")
+                checkTask = submit(async = true, period = 20 * botConfig.getLong("check_interval")) {
+                    if (!oneBotClient.isConnected) {
+                        warning("Bot connection lost, trying to reconnect...")
+                        oneBotClient.connect()
+                    }
                 }
             }
         }

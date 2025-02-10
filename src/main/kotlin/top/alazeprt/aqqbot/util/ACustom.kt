@@ -65,7 +65,6 @@ class ACustom(val command: List<String>, val execute: List<String>, val unbind_e
     private fun mapFormat(input: String, map: Map<String, String>): String {
         return input.replace(Regex("\\$\\{([^}]+)}")) { match ->
             val key = match.groupValues[1]
-            info(key)
             map[key] ?: ""
         }
     }
@@ -82,6 +81,13 @@ class ACustom(val command: List<String>, val execute: List<String>, val unbind_e
                     args.put(it.substring(2, it.length - 1), string.split(" ")
                         .getOrElse(argsIndex) { _ -> "" })
                 } else if (string.split(" ").getOrElse(argsIndex) { _ -> null } != null) {
+                    args.put(it.substring(2, it.length - 1), string.split(" ")[argsIndex])
+                } else {
+                    return null
+                }
+            } else if (it.startsWith("\$regex:")) {
+                val regex = it.substring(8, it.length - 1)
+                if (string.split(" ").getOrElse(argsIndex) { _ -> null } != null && string.split(" ")[argsIndex].matches(Regex(regex))) {
                     args.put(it.substring(2, it.length - 1), string.split(" ")[argsIndex])
                 } else {
                     return null
