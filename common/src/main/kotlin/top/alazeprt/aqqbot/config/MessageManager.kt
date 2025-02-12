@@ -3,7 +3,7 @@ package top.alazeprt.aqqbot.config
 import top.alazeprt.aqqbot.AQQBot
 
 class MessageManager(plugin: AQQBot) {
-    private val messageConfig = plugin.getMessageConfig()
+    private val messageConfig = plugin.messageConfig
 
     fun get(key: String): String {
         return messageConfig.getString(key)?: ""

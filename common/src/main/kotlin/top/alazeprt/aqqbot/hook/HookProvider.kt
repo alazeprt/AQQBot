@@ -4,13 +4,12 @@ import top.alazeprt.aqqbot.util.LogLevel
 import me.lucko.spark.api.Spark
 import me.lucko.spark.api.SparkProvider
 import top.alazeprt.aqqbot.AQQBot
-import top.alazeprt.aqqbot.hook.bukkit.PAPIHook
 
 interface HookProvider {
 
     var spark: Spark?
 
-    var loadCount: Int // default = 0
+    var loadCount: Int
 
     fun loadSpark(plugin: AQQBot) {
         try {

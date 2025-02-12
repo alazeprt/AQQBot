@@ -10,7 +10,7 @@ open class DebugLogger(val plugin: AQQBot) {
 
     private lateinit var loggerFile: File
 
-    private val config = plugin.getGeneralConfig()
+    private val config = plugin.generalConfig
 
     private var initialized = false
 

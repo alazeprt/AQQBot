@@ -1,0 +1,62 @@
+# 语言文件
+# 以${开头, }结尾 (如${name}) 的是占位符, 在实际中会被替换
+# 可使用 /aqqbot reload 重载
+
+# 此部分为发送到Q群的消息
+qq:
+  whitelist:
+    already_bind: "你已经绑定过了"
+    invalid_name: "名称不合法! (名称只能由字母、数字、下划线组成)"
+    already_exist: "该名称已被他人占用!"
+    verify_code_not_exist: "验证码不存在或已过期!"
+    bind_successful: "绑定成功!"
+    not_bind: "你还没有绑定过!"
+    unbind_successful: "解绑成功!"
+    bind_by_other: "该名称不是你绑定的! 你绑定的名称是: ${name}"
+    invalid_bind: "该名称尚未绑定过/不是你绑定的!"
+    admin:
+      already_bind: "他(${userId})已经绑定过了!"
+      not_bind: "他(${userId})还没有绑定过!"
+      bind_by_other: "该名称不是他绑定的! 他绑定的名称是: ${name}"
+      invalid_bind: "该名称尚未绑定过/不是他(${userId})绑定的!"
+      invalid_user_id: "请输入正确的QQ号!"
+      user_not_in_group: "该用户不在本群!"
+
+  information:
+    tps:
+      not_installed_dependency: "服务器尚未安装spark插件, 无法获取TPS! 请联系服务器管理员!"
+      result: "服务器TPS: ${tps_5_seconds}, ${tps_10_seconds}, ${tps_1_minute}, ${tps_5_minutes}, ${tps_15_minutes}"
+    mspt:
+      not_installed_dependency: "服务器尚未安装spark插件, 无法获取MSPT! 请联系服务器管理员!"
+      result: "服务器MSPT: ${mspt_10_seconds}, ${mspt_1_minute}, ${mspt_5_minutes}"
+    cpu:
+      not_installed_dependency: "服务器尚未安装spark插件, 无法获取CPU占用情况信息! 请联系服务器管理员!"
+      result: "服务器CPU占用率: ${cpu_10_seconds}%, ${cpu_1_minute}%, ${cpu_15_minutes}%"
+    player_list:
+      result: "服务器在线玩家(${count}): ${player_list}"
+
+  chat_from_game: "[服务器] ${player}: ${message}"
+  executing_command: "正在执行命令..."
+  no_permission: "你没有权限使用这项功能!"
+  execution_finished: "指令执行完成, 无返回值"
+
+# 此部分为发送到游戏/在游戏内提示的消息 (使用&代表颜色符号)
+game:
+  not_bind: "[AQQBot] 你的账号还没有绑定QQ!\n请通过在QQ群发送${command} <游戏名称> 来绑定!" # 在GROUP_NAME模式下使用, ${command}为你设置的第一个绑定命令, 如: /bind
+  not_verified: "[AQQBot] 你的账号还没有绑定QQ!\n请通过在QQ群发送${command} ${code} 来绑定!" # 在VERIFY_CODE模式下可用, ${code}为验证码
+  kick_when_unbind: "[AQQBot] 你的账号已被解绑!\n请重新绑定!"
+  chat_from_qq: "&8[&aQQ群(${groupId})&8] &b${userName}: &f${message}"
+  reload: "&a[AQQBot] 重载完成! 耗时 &e${time} ms"
+  invalid_arguments: "&c[AQQBot] 参数不合法或过多或过少!"
+  successfully_bind: "&b[AQQBot] 绑定成功!"
+  successfully_unbind: "&b[AQQBot] 解绑成功!"
+  query_result:
+    - "&a[AQQBot] 查询结果: "
+    - "&bQQ号: ${userId}"
+    - "&d游戏名: ${playerName}"
+  help:
+    - "&a[AQQBot] 帮助页面"
+    - "&b/aqqbot forcebind <QQ号> <游戏名>   &e强制绑定(会清除之前已有的绑定)"
+    - "&b/aqqbot forceunbind <qq|player> <数据>   &e强制解除绑定(qq: QQ号, player: 游戏名, 根据数据选择其一)"
+    - "&b/aqqbot query <qq|player> <数据>   &e根据QQ号或游戏名查询对应的游戏名或QQ号"
+    - "&b/aqqbot help   &e查看此帮助页面"

@@ -79,27 +79,27 @@ class AQBListener(val plugin: AQQBot) : Listener {
         plugin.submit {
             plugin.adapter!!.getPlayerList().forEach {
                 if (nameList.contains(it.getName())) {
-                    it.kick(Component.text(plugin.getMessageManager().get("game.kick_when_unbind")))
+                    it.kick(plugin.getMessageManager().get("game.kick_when_unbind"))
                 }
             }
         }
     }
 
     private fun canForwardMessage(message: String): String? {
-        if (!plugin.getGeneralConfig().getBoolean("chat.group_to_server.enable")) {
+        if (!plugin.generalConfig.getBoolean("chat.group_to_server.enable")) {
             return null
         }
         val formatter = AFormatter(plugin)
         var newMessage = message;
-        if (message.length > plugin.getGeneralConfig().getInt("chat.max_forward_length")) {
-            newMessage = newMessage.substring(0, plugin.getGeneralConfig().getInt("chat.max_forward_length")) + "..."
+        if (message.length > plugin.generalConfig.getInt("chat.max_forward_length")) {
+            newMessage = newMessage.substring(0, plugin.generalConfig.getInt("chat.max_forward_length")) + "..."
         }
-        if (plugin.getGeneralConfig().getStringList("chat.group_to_server.prefix").contains("")) {
-            return formatter.regexFilter(plugin.getGeneralConfig().getStringList("chat.group_to_server.filter"), newMessage)
+        if (plugin.generalConfig.getStringList("chat.group_to_server.prefix").contains("")) {
+            return formatter.regexFilter(plugin.generalConfig.getStringList("chat.group_to_server.filter"), newMessage)
         }
-        plugin.getGeneralConfig().getStringList("chat.group_to_server.prefix").forEach {
+        plugin.generalConfig.getStringList("chat.group_to_server.prefix").forEach {
             if (newMessage.startsWith(it)) {
-                return formatter.regexFilter(plugin.getGeneralConfig().getStringList("chat.group_to_server.filter"), newMessage.substring(it.length))
+                return formatter.regexFilter(plugin.generalConfig.getStringList("chat.group_to_server.filter"), newMessage.substring(it.length))
             }
         }
         return null

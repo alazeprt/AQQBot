@@ -2,7 +2,7 @@ package top.alazeprt.aqqbot.profile
 
 import java.util.*
 
-interface AOfflinePlayer: ASender {
+interface AOfflinePlayer {
     fun getName(): String
 
     fun getUUID(): UUID

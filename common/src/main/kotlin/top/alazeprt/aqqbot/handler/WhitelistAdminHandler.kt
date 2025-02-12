@@ -48,7 +48,7 @@ class WhitelistAdminHandler(val plugin: AQQBot) {
     }
 
     fun handle(message: String, event: GroupMessageEvent, action: String) {
-        if (!plugin.getGeneralConfig().getBoolean("whitelist.admin")) {
+        if (!plugin.generalConfig.getBoolean("whitelist.admin")) {
             return
         }
         val userId = message.split(" ")[1].toLongOrNull()

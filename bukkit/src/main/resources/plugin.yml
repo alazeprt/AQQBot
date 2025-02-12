@@ -1,0 +1,8 @@
+name: AQQBot
+main: top.alazeprt.aqqbot.AQQBotBukkit
+version: 1.2
+api-version: 1.13
+author: alazeprt
+commands:
+  aqqbot:
+    description: AQQBot commands

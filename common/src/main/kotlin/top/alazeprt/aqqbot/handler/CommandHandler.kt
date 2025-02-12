@@ -9,7 +9,7 @@ import top.alazeprt.aqqbot.bot.BotProvider
 
 class CommandHandler(val plugin: AQQBot) {
     
-    private val config = plugin.getGeneralConfig()
+    private val config = plugin.generalConfig
     
     fun handle(message: String, event: GroupMessageEvent): Boolean {
         if (!config.getBoolean("command_execution.enable")) {
@@ -46,14 +46,12 @@ class CommandHandler(val plugin: AQQBot) {
                         val command = commandList.joinToString(" ")
                         BotProvider.getBot()?.action(SendGroupMessage(event.groupId, plugin.getMessageManager().get("qq.executing_command")))
                         plugin.submitCommand(command).thenAccept {
-                            plugin.submitLaterAsync(config.getInt("command_execution.delay")*20L) {
-                                if (config.getBoolean("command_execution.format")) {
-                                    BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
-                                        it.getFormattedString().ifEmpty { plugin.getMessageManager().get("qq.execution_finished") }))
-                                } else {
-                                    BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
-                                        it.getRawString().ifEmpty { plugin.getMessageManager().get("qq.execution_finished") }))
-                                }
+                            if (config.getBoolean("command_execution.format")) {
+                                BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
+                                    it.getFormattedString().ifEmpty { plugin.getMessageManager().get("qq.execution_finished") }))
+                            } else {
+                                BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
+                                    it.getRawString().ifEmpty { plugin.getMessageManager().get("qq.execution_finished") }))
                             }
                         }
                     }

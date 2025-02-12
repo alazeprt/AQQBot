@@ -1,17 +1,17 @@
 package top.alazeprt.aqqbot
 
-import top.alazeprt.aqqbot.util.LogLevel
 import top.alazeprt.aqqbot.adapter.AQQBotAdapter
 import top.alazeprt.aqqbot.bot.BotProvider.loadBot
 import top.alazeprt.aqqbot.bot.BotProvider.unloadBot
 import top.alazeprt.aqqbot.command.CommandProvider
 import top.alazeprt.aqqbot.config.ConfigProvider
 import top.alazeprt.aqqbot.config.MessageManager
-import top.alazeprt.aqqbot.data.DataProvider
-import top.alazeprt.aqqbot.data.DataStorageType
+import top.alazeprt.aqqbot.data.*
 import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.hook.HookProvider
+import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.task.TaskProvider
+import top.alazeprt.aqqbot.util.LogLevel
 import java.net.URI
 
 interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, TaskProvider {
@@ -22,22 +22,24 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
 
     val verifyCodeMap: MutableMap<String, Pair<String, Long>>  // <name, <code, time>>
 
+    var dataProvider: DataProvider
+
     fun enable() {
         loadConfig()
-        loadData(DataStorageType.valueOf(getGeneralConfig().getString("storage.type")))
+        loadData(DataStorageType.valueOf(generalConfig.getString("storage.type")))
         loadDebug()
         loadCommands(this)
         adapter = loadAdapter()
         loadBot(
             this,
-            URI.create("ws://" + getBotConfig().getString("ws.host") + ":" + getBotConfig().getInt("ws.port"))
+            URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port"))
         )
         loadHook(this)
     }
 
     fun disable() {
         unloadBot()
-        saveData(DataStorageType.valueOf(getGeneralConfig().getString("storage.type")))
+        saveData(DataStorageType.valueOf(generalConfig.getString("storage.type")))
         unloadDebug()
     }
 
@@ -66,5 +68,53 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
 
     fun getMessageManager(): MessageManager {
         return MessageManager(this)
+    }
+
+    override fun loadData(type: DataStorageType) {
+        dataProvider = when (type) {
+            DataStorageType.SQLITE -> SQLiteProvider(this)
+            DataStorageType.MYSQL -> MySQLProvider(this)
+            DataStorageType.FILE -> FileDataProvider(this)
+        }
+    }
+
+    override fun getStorageType(): DataStorageType {
+        return dataProvider.getStorageType()
+    }
+
+    override fun saveData(type: DataStorageType) {
+        return dataProvider.saveData(type)
+    }
+
+    override fun hasPlayer(player: AOfflinePlayer): Boolean {
+        return dataProvider.hasPlayer(player)
+    }
+
+    override fun hasQQ(qq: Long): Boolean {
+        return dataProvider.hasQQ(qq)
+    }
+
+    override fun addPlayer(qq: Long, player: AOfflinePlayer) {
+        return dataProvider.addPlayer(qq, player)
+    }
+
+    override fun removePlayer(player: AOfflinePlayer) {
+        return dataProvider.removePlayer(player)
+    }
+
+    override fun removePlayer(qq: Long) {
+        return dataProvider.removePlayer(qq)
+    }
+
+    override fun removePlayer(qq: Long, player: AOfflinePlayer) {
+        return dataProvider.removePlayer(qq, player)
+    }
+
+    override fun getQQByPlayer(player: AOfflinePlayer): Long? {
+        return dataProvider.getQQByPlayer(player)
+    }
+
+    override fun getPlayerByQQ(qq: Long): List<AOfflinePlayer> {
+        return dataProvider.getPlayerByQQ(qq)
     }
 }

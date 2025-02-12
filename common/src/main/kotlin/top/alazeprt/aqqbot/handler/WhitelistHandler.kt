@@ -11,7 +11,7 @@ import top.alazeprt.aqqbot.util.AFormatter.Companion.validateName
 
 class WhitelistHandler(val plugin: AQQBot) {
     
-    private val config = plugin.getGeneralConfig()
+    private val config = plugin.generalConfig
     
     private fun bind(userId: String, groupId: Long, data: String): Boolean {
         val playerName: String
