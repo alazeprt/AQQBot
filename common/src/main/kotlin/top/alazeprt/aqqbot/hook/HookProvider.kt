@@ -16,7 +16,7 @@ interface HookProvider {
             Class.forName("me.lucko.spark.api.SparkProvider")
             spark = SparkProvider.get()
             if (loadCount > 0) {
-                plugin.log(LogLevel.WARN, "Spark has been loaded successfully!")
+                plugin.log(LogLevel.INFO, "Spark has been loaded successfully!")
             }
             loadCount = 0
         } catch (e: ClassNotFoundException) {

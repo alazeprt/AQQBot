@@ -3,7 +3,6 @@ package top.alazeprt.aqqbot.event
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.event.AEventUtil.playerStatusHandler
 import top.alazeprt.aqqbot.event.AEventUtil.whitelistHandler
-import top.alazeprt.aqqbot.event.sub.AEvent
 import top.alazeprt.aqqbot.profile.APlayer
 
 class AJoinEvent(val plugin: AQQBot, private val player: APlayer) : AEvent {

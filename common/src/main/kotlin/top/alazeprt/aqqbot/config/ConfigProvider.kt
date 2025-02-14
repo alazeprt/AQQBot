@@ -2,8 +2,11 @@ package top.alazeprt.aqqbot.config
 
 import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aconfiguration.file.YamlConfiguration
+import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.util.ACustom
+import top.alazeprt.aqqbot.util.LogLevel
 import java.io.File
+import kotlin.math.log
 
 interface ConfigProvider {
 
@@ -13,16 +16,21 @@ interface ConfigProvider {
     var generalConfig: FileConfiguration
     var messageConfig: FileConfiguration
     var botConfig: FileConfiguration
+    var customConfig: FileConfiguration
 
-    fun loadConfig() {
+    fun loadConfig(plugin: AQQBot) {
         loadGeneralConfig()
+        println(generalConfig.toString())
+        plugin.log(LogLevel.INFO, generalConfig.toString())
         loadBotConfig()
         loadMessageConfig()
         loadCustomConfig()
         setEnableGroups()
+        plugin.log(LogLevel.INFO, generalConfig.toString())
     }
 
     fun setEnableGroups() {
+        enableGroups = mutableListOf()
         botConfig.getStringList("groups")?.forEach {
             enableGroups.add(it)
         }
@@ -56,8 +64,6 @@ interface ConfigProvider {
     }
 
     fun loadCustomConfig()
-
-    fun getCustomConfig(): FileConfiguration
 
     fun getDataFolder(): File
 

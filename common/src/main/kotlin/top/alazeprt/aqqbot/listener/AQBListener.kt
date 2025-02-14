@@ -13,6 +13,7 @@ import top.alazeprt.aqqbot.handler.CommandHandler
 import top.alazeprt.aqqbot.handler.InformationHandler
 import top.alazeprt.aqqbot.handler.WhitelistHandler
 import top.alazeprt.aqqbot.util.AFormatter
+import top.alazeprt.aqqbot.util.LogLevel
 
 class AQBListener(val plugin: AQQBot) : Listener {
     @SubscribeBotEvent
@@ -49,19 +50,19 @@ class AQBListener(val plugin: AQQBot) : Listener {
                     }
                 }
                 oneBotClient.action(GetGroupMemberInfo(event.groupId, event.senderId)) sendAction@ { member ->
+                    plugin.log(LogLevel.INFO, "$handleInfo $handleWl $handleCommand $handleCustom")
                     if (!(canForwardMessage(message) != null && !(handleInfo || handleWl || handleCommand || handleCustom))) {
                         return@sendAction
                     }
                     val newMessage: String = canForwardMessage(message)?: return@sendAction
                     plugin.adapter!!.broadcastMessage(
-                        Component.text(
                         AFormatter.pluginToChat(
                             plugin.getMessageManager().get("game.chat_from_qq", mutableMapOf(
                                 "groupId" to event.groupId.toString(),
                                 "userName" to member.card,
                                 "message" to newMessage))
                         )
-                    ))
+                    )
                 }
             })
         }

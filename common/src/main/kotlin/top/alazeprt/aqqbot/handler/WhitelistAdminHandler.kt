@@ -31,7 +31,8 @@ class WhitelistAdminHandler(val plugin: AQQBot) {
             return false
         }
         if ((plugin.getQQByPlayer(plugin.adapter!!.getOfflinePlayer(playerName))?: -1L) != userId.toLong()) {
-            BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.admin.bind_by_other", mutableMapOf(Pair("name", plugin.getPlayerByQQ(userId.toLong()).joinToString(", ")))), true))
+            BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.admin.bind_by_other", mutableMapOf(Pair("name",
+                plugin.getPlayerByQQ(userId.toLong()).joinToString(", ") { it.getName() }))), true))
         }
         plugin.removePlayer(userId.toLong(), plugin.adapter!!.getOfflinePlayer(playerName))
         BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.unbind_successful"), true))

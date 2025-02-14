@@ -11,10 +11,6 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
         val map = matches(input)?: return false
         val player: List<String> = plugin.getPlayerByQQ(userId.toLong()).map { it.getName() }
         var outputString = mapFormat(output.joinToString("\n"), map)
-        if (format) {
-            outputString = AFormatter.pluginClear(outputString)
-            outputString = AFormatter.chatClear(outputString)
-        }
         if (player.isEmpty()) {
             if (unbind_execute.isNotEmpty() && unbind_execute[0].isNotEmpty()) {
                 plugin.submit {
@@ -24,6 +20,10 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
                 }
             }
             outputString = setPlaceholders(null, outputString)
+            if (format) {
+                outputString = AFormatter.pluginClear(outputString)
+                outputString = AFormatter.chatClear(outputString)
+            }
             if (outputString.contains("\$random\n")) {
                 val optionsOutput: List<String> = outputString.split("\$random\n")
                 val outputList = optionsOutput.random()
@@ -40,7 +40,11 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
                 }
             }
             val playerName = player[if (player.size < account) 0 else account - 1]
-            outputString = setPlaceholders(plugin.adapter!!.getOnlinePlayer(playerName)!!, outputString)
+            outputString = setPlaceholders(plugin.adapter!!.getOnlinePlayer(playerName), outputString)
+            if (format) {
+                outputString = AFormatter.pluginClear(outputString)
+                outputString = AFormatter.chatClear(outputString)
+            }
             if (outputString.contains("\$random\n")) {
                 val optionsOutput: List<String> = outputString.split("\$random\n")
                 val outputList = optionsOutput.random()

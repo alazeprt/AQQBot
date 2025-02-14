@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "top.alazeprt.aqqbot"
-version = "1.1.2"
+version = "1.2.0"
 
 repositories {
     maven("https://jitpack.io")
@@ -13,10 +13,10 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.alazeprt:AOneBot:1.0.8-beta")
+    implementation("com.github.alazeprt:AOneBot:1.0.10-beta.2")
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("net.kyori:adventure-api:4.18.0")
-    implementation("com.github.alazeprt:AConfiguration:1.0")
+    implementation("com.github.alazeprt:AConfiguration:1.2")
     implementation("com.github.alazeprt:taboolib-database:1.0.4")
     compileOnly("me.lucko:spark-api:0.1-SNAPSHOT")
 }

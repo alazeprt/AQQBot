@@ -1,10 +1,7 @@
 package top.alazeprt.aqqbot.command
 
 import top.alazeprt.aqqbot.AQQBot
-import top.alazeprt.aqqbot.command.sub.SubForceBind
-import top.alazeprt.aqqbot.command.sub.SubForceUnbind
-import top.alazeprt.aqqbot.command.sub.SubHelp
-import top.alazeprt.aqqbot.command.sub.SubQuery
+import top.alazeprt.aqqbot.command.sub.*
 import top.alazeprt.aqqbot.profile.ASender
 
 class AParentCommand(val plugin: AQQBot) : ACommand {
@@ -15,6 +12,7 @@ class AParentCommand(val plugin: AQQBot) : ACommand {
             "forcebind" -> SubForceBind(plugin).onCommand(command, sender, args)
             "forceunbind" -> SubForceUnbind(plugin).onCommand(command, sender, args)
             "query" -> SubQuery(plugin).onCommand(command, sender, args)
+            "reload" -> SubReload(plugin).onCommand(command, sender, args)
             else -> SubHelp(plugin).onCommand(command, sender, args)
         }
     }

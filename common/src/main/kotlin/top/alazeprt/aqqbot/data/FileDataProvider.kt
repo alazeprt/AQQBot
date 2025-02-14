@@ -8,7 +8,7 @@ import java.io.File
 
 class FileDataProvider(val plugin: AQQBot) : DataProvider {
 
-    private val file = File(plugin.getDataFolder(), "data.json")
+    private val file = File(plugin.getDataFolder(), "data.yml")
     private lateinit var dataConfig: FileConfiguration
     val dataMap: MutableMap<String, MutableList<String>> = mutableMapOf()
 

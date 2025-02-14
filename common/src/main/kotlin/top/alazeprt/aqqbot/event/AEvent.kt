@@ -1,4 +1,4 @@
-package top.alazeprt.aqqbot.event.sub
+package top.alazeprt.aqqbot.event
 
 interface AEvent {
     fun handle()

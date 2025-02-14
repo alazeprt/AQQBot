@@ -4,7 +4,6 @@ import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.bot.BotProvider
 import top.alazeprt.aqqbot.event.AEventUtil.canForwardMessage
-import top.alazeprt.aqqbot.event.sub.AEvent
 import top.alazeprt.aqqbot.profile.APlayer
 
 class AChatEvent(val plugin: AQQBot, private val player: APlayer, private val message: String): AEvent {

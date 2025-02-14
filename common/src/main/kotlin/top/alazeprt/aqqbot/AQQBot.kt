@@ -1,6 +1,9 @@
 package top.alazeprt.aqqbot
 
+import top.alazeprt.aconfiguration.file.FileConfiguration
+import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.adapter.AQQBotAdapter
+import top.alazeprt.aqqbot.bot.BotProvider
 import top.alazeprt.aqqbot.bot.BotProvider.loadBot
 import top.alazeprt.aqqbot.bot.BotProvider.unloadBot
 import top.alazeprt.aqqbot.command.CommandProvider
@@ -8,6 +11,7 @@ import top.alazeprt.aqqbot.config.ConfigProvider
 import top.alazeprt.aqqbot.config.MessageManager
 import top.alazeprt.aqqbot.data.*
 import top.alazeprt.aqqbot.debug.ADebug
+import top.alazeprt.aqqbot.event.AEvent
 import top.alazeprt.aqqbot.hook.HookProvider
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.task.TaskProvider
@@ -24,27 +28,64 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
 
     var dataProvider: DataProvider
 
+    override var generalConfig: FileConfiguration
+    override var messageConfig: FileConfiguration
+    override var botConfig: FileConfiguration
+
     fun enable() {
-        loadConfig()
-        loadData(DataStorageType.valueOf(generalConfig.getString("storage.type")))
+        loadConfig(this)
+        loadData(DataStorageType.valueOf(generalConfig.getString("storage.type").uppercase()))
         loadDebug()
         loadCommands(this)
         adapter = loadAdapter()
-        loadBot(
-            this,
-            URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port"))
-        )
+        if (botConfig.getString("access_token").isNullOrBlank()) {
+            loadBot(
+                this,
+                URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port"))
+            )
+        } else {
+            loadBot(
+                this,
+                URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")),
+                botConfig.getString("access_token")
+            )
+        }
         loadHook(this)
+        if (generalConfig.getBoolean("notify.server_status.enable")) {
+            enableGroups.forEach {
+                BotProvider.getBot()!!.action(SendGroupMessage(it.toLong(),
+                    generalConfig.getString("notify.server_status.start")?: "[AQQBot] 服务器已启动!"))
+            }
+        }
     }
 
     fun disable() {
+        if (generalConfig.getBoolean("notify.server_status.enable")) {
+            enableGroups.forEach {
+                BotProvider.getBot()!!.action(SendGroupMessage(it.toLong(),
+                    generalConfig.getString("notify.server_status.stop")?: "[AQQBot] 服务器已关闭!"))
+            }
+        }
         unloadBot()
-        saveData(DataStorageType.valueOf(generalConfig.getString("storage.type")))
+        saveData(DataStorageType.valueOf(generalConfig.getString("storage.type").uppercase()))
         unloadDebug()
     }
 
     fun reload() {
-        loadConfig()
+        loadConfig(this)
+        unloadBot()
+        if (botConfig.getString("access_token").isNullOrBlank()) {
+            loadBot(
+                this,
+                URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port"))
+            )
+        } else {
+            loadBot(
+                this,
+                URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")),
+                botConfig.getString("access_token")
+            )
+        }
         reloadDebug()
     }
 
@@ -76,6 +117,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
             DataStorageType.MYSQL -> MySQLProvider(this)
             DataStorageType.FILE -> FileDataProvider(this)
         }
+        dataProvider.loadData(type)
     }
 
     override fun getStorageType(): DataStorageType {
