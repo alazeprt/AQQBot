@@ -39,7 +39,7 @@ interface ConfigProvider {
             saveResource("config.yml", false)
         }
         generalConfig = YamlConfiguration.loadConfiguration(file)
-        if (generalConfig.getInt("chat.max_forward_length") == 0) {
+        if (generalConfig.getInt("chat.max_forward_length") <= 0) {
             generalConfig.set("chat.max_forward_length", 200)
         }
     }
