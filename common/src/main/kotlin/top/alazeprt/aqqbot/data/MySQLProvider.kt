@@ -2,10 +2,8 @@ package top.alazeprt.aqqbot.data
 
 import me.regadpole.config.DatabaseSource
 import taboolib.module.database.*
-import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aconfiguration.file.YamlConfiguration
 import top.alazeprt.aqqbot.AQQBot
-import top.alazeprt.aqqbot.util.LogLevel
 import java.io.File
 import javax.sql.DataSource
 

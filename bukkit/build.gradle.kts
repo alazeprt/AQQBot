@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "top.alazeprt.aqqbot"
-version = "1.2.0"
+version = properties["version"] as String
 
 repositories {
     maven("https://jitpack.io")
@@ -21,4 +21,12 @@ dependencies {
     compileOnly("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("me.lucko:spark-api:0.1-SNAPSHOT")
+}
+
+tasks.jar {
+    archiveFileName.set("AQQBot-${archiveFileName.get()}")
+}
+
+tasks.shadowJar {
+    archiveFileName.set("AQQBot-${archiveFileName.get()}")
 }

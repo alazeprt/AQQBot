@@ -29,7 +29,7 @@ abstract class DatabaseDataProvider(val plugin: AQQBot): DataProvider {
             rows("name")
             where("userId" eq qq)
             limit(1)
-        }.firstOrNull { getString("name") } == null
+        }.firstOrNull { getString("name") } != null
     }
 
     override fun addPlayer(qq: Long, player: AOfflinePlayer) {
@@ -63,20 +63,28 @@ abstract class DatabaseDataProvider(val plugin: AQQBot): DataProvider {
     }
 
     override fun removePlayer(player: AOfflinePlayer) {
+        val userId = ""
+        val list = mutableListOf<String>()
         table.select(dataSource) {
-            rows("name", "userId")
+            rows("userId", "name")
         }.map {
             if (if (getString("name").split(", ").toMutableList().isEmpty())
-                    getString("name") == player.getName() else getString("name").split(", ").toMutableList().contains(player.getName())) {
-                table.delete(dataSource) {
-                    where(("userId" eq getString("userId")) and ("name" eq getString("name")))
-                }
-                return@map
+                    getString("name") == player.getName()
+                else getString("name").split(", ").toMutableList().contains(player.getName())) {
+                val newList = if (getString("name").split(", ").toMutableList().isEmpty())
+                    mutableListOf(getString("name")) else getString("name").split(", ").toMutableList()
+                newList.remove(player.getName())
+                list.addAll(newList)
             }
+        }
+        table.update(dataSource) {
+            set("name", list.joinToString(", "))
+            where("userId" eq userId)
         }
     }
 
     override fun removePlayer(qq: Long, player: AOfflinePlayer) {
+        val list = mutableListOf<String>()
         table.select(dataSource) {
             rows("name")
             where("userId" eq qq)
@@ -87,12 +95,12 @@ abstract class DatabaseDataProvider(val plugin: AQQBot): DataProvider {
                 val newList = if (getString("name").split(", ").toMutableList().isEmpty())
                     mutableListOf(getString("name")) else getString("name").split(", ").toMutableList()
                 newList.remove(player.getName())
-                table.update(dataSource) {
-                    where("userId" eq qq)
-                    updateString("name", newList.joinToString(", "))
-                }
-                return@map
+                list.addAll(newList)
             }
+        }
+        table.update(dataSource) {
+            set("name", list.joinToString(", "))
+            where("userId" eq qq)
         }
     }
 

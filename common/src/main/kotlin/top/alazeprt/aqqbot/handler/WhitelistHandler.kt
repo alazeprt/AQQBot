@@ -93,26 +93,14 @@ class WhitelistHandler(val plugin: AQQBot) {
         config.getStringList("whitelist.prefix.bind").forEach {
             if (message.lowercase().startsWith(it.lowercase())) {
                 val playerName = message.split(" ")[1]
-                BotProvider.getBot()?.action(GetGroupMemberInfo(event.groupId, event.senderId)) { sender ->
-                    if (message.split(" ").size == 3 && (sender.role == GroupRole.ADMIN || sender.role == GroupRole.OWNER)) {
-                        WhitelistAdminHandler(plugin).handle(message, event, "bind")
-                    } else {
-                        bind(event.senderId.toString(), event.groupId, playerName)
-                    }
-                }
+                bind(event.senderId.toString(), event.groupId, playerName)
                 return true
             }
         }
         config.getStringList("whitelist.prefix.unbind").forEach {
             if (message.lowercase().startsWith(it.lowercase())) {
                 val playerName = message.substring(it.length + 1)
-                BotProvider.getBot()?.action(GetGroupMemberInfo(event.groupId, event.senderId)) { sender ->
-                    if (message.split(" ").size == 3 && (sender.role == GroupRole.ADMIN || sender.role == GroupRole.OWNER)) {
-                        WhitelistAdminHandler(plugin).handle(message, event, "unbind")
-                    } else {
-                        unbind(event.senderId.toString(), event.groupId, playerName)
-                    }
-                }
+                unbind(event.senderId.toString(), event.groupId, playerName)
                 return true
             }
         }

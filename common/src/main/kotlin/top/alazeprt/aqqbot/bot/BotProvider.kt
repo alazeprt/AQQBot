@@ -40,7 +40,7 @@ object BotProvider {
     }
 
     fun unloadBot() {
-        if (botClient!= null) {
+        if (botClient != null && botClient!!.isConnected) {
             botClient!!.disconnect()
             botClient = null
         }

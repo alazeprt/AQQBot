@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "top.alazeprt.aqqbot"
-version = "1.2.0"
+version = properties["version"] as String
 
 repositories {
     maven("https://jitpack.io")

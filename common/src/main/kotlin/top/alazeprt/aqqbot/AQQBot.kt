@@ -61,7 +61,8 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
     }
 
     fun disable() {
-        if (generalConfig.getBoolean("notify.server_status.enable")) {
+        if (generalConfig.getBoolean("notify.server_status.enable") && BotProvider.getBot() != null &&
+            BotProvider.getBot()!!.isConnected) {
             enableGroups.forEach {
                 BotProvider.getBot()!!.action(SendGroupMessage(it.toLong(),
                     generalConfig.getString("notify.server_status.stop")?: "[AQQBot] 服务器已关闭!"))
