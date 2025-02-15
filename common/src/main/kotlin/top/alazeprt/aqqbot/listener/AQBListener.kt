@@ -11,6 +11,7 @@ import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.bot.BotProvider
 import top.alazeprt.aqqbot.handler.CommandHandler
 import top.alazeprt.aqqbot.handler.InformationHandler
+import top.alazeprt.aqqbot.handler.WhitelistAdminHandler
 import top.alazeprt.aqqbot.handler.WhitelistHandler
 import top.alazeprt.aqqbot.util.AFormatter
 import top.alazeprt.aqqbot.util.LogLevel
@@ -41,6 +42,7 @@ class AQBListener(val plugin: AQQBot) : Listener {
                 }
                 val handleInfo = InformationHandler(plugin).handle(message, event)
                 val handleWl = WhitelistHandler(plugin).handle(message, event)
+                val handleWlAdmin = WhitelistAdminHandler(plugin).handle(message, event, memberList)
                 val handleCommand = CommandHandler(plugin).handle(message, event)
                 var handleCustom = false
                 plugin.customCommands.forEach {
@@ -50,7 +52,7 @@ class AQBListener(val plugin: AQQBot) : Listener {
                     }
                 }
                 oneBotClient.action(GetGroupMemberInfo(event.groupId, event.senderId)) sendAction@ { member ->
-                    if (!(canForwardMessage(message) != null && !(handleInfo || handleWl || handleCommand || handleCustom))) {
+                    if (!(canForwardMessage(message) != null && !(handleInfo || handleWlAdmin || handleWl || handleCommand || handleCustom))) {
                         return@sendAction
                     }
                     val newMessage: String = canForwardMessage(message)?: return@sendAction

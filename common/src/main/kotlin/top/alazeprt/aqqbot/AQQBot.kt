@@ -51,6 +51,19 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
             )
         }
         loadHook(this)
+        if (generalConfig.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {
+            submitAsync {
+                while (true) {
+                    verifyCodeMap.forEach {
+                        if (System.currentTimeMillis() - it.value.second >
+                               generalConfig.getLong("whitelist.verify_code_expire_time") * 1000L) {
+                            verifyCodeMap.remove(it.key)
+                        }
+                    }
+                    Thread.sleep(5000)
+                }
+            }
+        }
         if (generalConfig.getBoolean("notify.server_status.enable") && BotProvider.getBot() != null &&
                 BotProvider.getBot()!!.isConnected()) {
             enableGroups.forEach {

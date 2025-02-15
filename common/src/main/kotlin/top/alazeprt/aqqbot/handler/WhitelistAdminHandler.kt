@@ -3,11 +3,16 @@ package top.alazeprt.aqqbot.handler
 import top.alazeprt.aonebot.action.GetGroupMemberList
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
+import top.alazeprt.aonebot.result.GroupMemberList
+import top.alazeprt.aonebot.util.GroupRole
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.bot.BotProvider
 import top.alazeprt.aqqbot.util.AFormatter.Companion.validateName
 
 class WhitelistAdminHandler(val plugin: AQQBot) {
+
+    private val config = plugin.generalConfig
+
     private fun bind(operatorId: String, userId: String, groupId: Long, playerName: String): Boolean {
         if (plugin.hasQQ(userId.toLong())) {
             plugin.removePlayer(userId.toLong())
@@ -26,13 +31,14 @@ class WhitelistAdminHandler(val plugin: AQQBot) {
     }
 
     private fun unbind(operatorId: String, userId: String, groupId: Long, playerName: String): Boolean {
-        if (plugin.hasQQ(userId.toLong())) {
+        if (!plugin.hasQQ(userId.toLong())) {
             BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.admin.not_bind", mutableMapOf(Pair("userId", userId))), true))
             return false
         }
         if ((plugin.getQQByPlayer(plugin.adapter!!.getOfflinePlayer(playerName))?: -1L) != userId.toLong()) {
             BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.admin.bind_by_other", mutableMapOf(Pair("name",
                 plugin.getPlayerByQQ(userId.toLong()).joinToString(", ") { it.getName() }))), true))
+            return false
         }
         plugin.removePlayer(userId.toLong(), plugin.adapter!!.getOfflinePlayer(playerName))
         BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.unbind_successful"), true))
@@ -48,34 +54,54 @@ class WhitelistAdminHandler(val plugin: AQQBot) {
 
     }
 
-    fun handle(message: String, event: GroupMessageEvent, action: String) {
-        if (!plugin.generalConfig.getBoolean("whitelist.admin")) {
-            return
+    fun handle(message: String, event: GroupMessageEvent, memberList: GroupMemberList): Boolean {
+        if (!plugin.generalConfig.getBoolean("whitelist.admin.enable")) {
+            return false
         }
-        val userId = message.split(" ")[1].toLongOrNull()
-        if (userId == null) {
+        if (message.split(" ").size != 3) return false
+        val targetUserId = message.split(" ")[1].toLongOrNull()
+        if (targetUserId == null) {
             BotProvider.getBot()?.action(SendGroupMessage(event.groupId, plugin.getMessageManager().get("qq.whitelist.admin.invalid_user_id"), true))
-            return
+            return true
         }
         val playerName = message.split(" ")[2]
-        BotProvider.getBot()?.action(GetGroupMemberList(event.groupId)) {
-            var has = false;
-            for (member in it) {
-                if (member.member.userId == userId) {
-                    has = true
-                    break
-                }
+        var has = false
+        var hasPermission = false
+        for (member in memberList) {
+            if (member.member.userId == targetUserId) {
+                has = true
             }
-            if (!has) {
-                BotProvider.getBot()?.action(SendGroupMessage(event.groupId, plugin.getMessageManager().get("qq.whitelist.admin.user_not_in_group"), true))
-                return@action
-            } else {
-                if (action == "bind") {
-                    bind(event.senderId.toString(), userId.toString(), event.groupId, playerName)
-                } else if (action == "unbind") {
-                    unbind(event.senderId.toString(), userId.toString(), event.groupId, playerName)
-                }
+            if (member.member.userId == event.senderId &&
+                (member.role == GroupRole.ADMIN || member.role == GroupRole.OWNER)) {
+                hasPermission = true
             }
         }
+        if (!has) {
+            BotProvider.getBot()?.action(
+                SendGroupMessage(
+                    event.groupId,
+                    plugin.getMessageManager().get("qq.whitelist.admin.user_not_in_group"),
+                    true
+                )
+            )
+            return true
+        }
+        if (!hasPermission) {
+            return false
+        }
+        config.getStringList("whitelist.admin.bind").forEach {
+            if (message.lowercase().startsWith(it.lowercase())) {
+                bind(event.senderId.toString(), targetUserId.toString(), event.groupId, playerName)
+                return true
+            }
+        }
+        config.getStringList("whitelist.admin.unbind").forEach {
+            if (message.lowercase().startsWith(it.lowercase())) {
+                unbind(event.senderId.toString(), targetUserId.toString(), event.groupId, playerName)
+                return true
+            }
+        }
+        return false
     }
+
 }

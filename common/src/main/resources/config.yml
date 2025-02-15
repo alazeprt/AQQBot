@@ -71,10 +71,24 @@ whitelist:
     # 可用变量: ${playerName} -> 游戏名, ${qq} -> QQ号, ${nickName} -> 当前用户群昵称
     format: "[${nickName}] ${playerName}"
 
-  # 是否启用管理员管理
-  # 管理员可通过/$command $userId $name 进行绑定/解绑
-  # ! 验证方法不影响该功能的使用
-  admin: true
+  # 管理员管理
+  admin:
+    # 是否启用该功能
+    enable: true
+
+    # 绑定指令前缀
+    # 用户需要发送的消息: $command $userId $name
+    # ! 如果验证方法为 VERIFY_CODE, 则用户需要发送的消息为: $command $code
+    bind:
+      - "/管理绑定"
+      - "/abind"
+
+    # 解绑指令前缀
+    # 用户需要发送的消息: $command $userId $name
+    unbind:
+      - "/管理解绑"
+      - "/aunbind"
+
 
 # 查询服务器基本信息
 information:

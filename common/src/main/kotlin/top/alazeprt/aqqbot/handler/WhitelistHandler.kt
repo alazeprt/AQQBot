@@ -89,7 +89,7 @@ class WhitelistHandler(val plugin: AQQBot) {
         if (!config.getBoolean("whitelist.enable")) {
             return false
         }
-        if (message.split(" ").size < 2) return false
+        if (message.split(" ").size != 2) return false
         config.getStringList("whitelist.prefix.bind").forEach {
             if (message.lowercase().startsWith(it.lowercase())) {
                 val playerName = message.split(" ")[1]

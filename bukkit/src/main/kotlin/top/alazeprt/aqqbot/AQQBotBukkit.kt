@@ -10,7 +10,6 @@ import top.alazeprt.aqqbot.adapter.*
 import top.alazeprt.aqqbot.command.ACommand
 import top.alazeprt.aqqbot.data.DataProvider
 import top.alazeprt.aqqbot.debug.ADebug
-import top.alazeprt.aqqbot.event.AEvent
 import top.alazeprt.aqqbot.event.BukkitEventHandler
 import top.alazeprt.aqqbot.util.ACustom
 import top.alazeprt.aqqbot.util.AExecution
