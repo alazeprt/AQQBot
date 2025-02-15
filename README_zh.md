@@ -1,5 +1,5 @@
 # AQQBot
-
+[ENGLISH](https://github.com/alazeprt/AQQBot/blob/master/README.md) | 简体中文
 ## 介绍
 
 AQQBot是一个基于Onebot v11协议开发的QQ群与服务器互联的插件，可以让用户通过QQ群进行许多操作（例如绑定游戏账号、查询服务器状态）
