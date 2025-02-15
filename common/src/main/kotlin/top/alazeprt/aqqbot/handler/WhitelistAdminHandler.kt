@@ -55,6 +55,19 @@ class WhitelistAdminHandler(val plugin: AQQBot) {
     }
 
     fun handle(message: String, event: GroupMessageEvent, memberList: GroupMemberList): Boolean {
+        var bind = false
+        var unbind = false
+        config.getStringList("whitelist.admin.bind").forEach {
+            if (message.lowercase().startsWith(it.lowercase())) {
+                bind = true
+            }
+        }
+        config.getStringList("whitelist.admin.unbind").forEach {
+            if (message.lowercase().startsWith(it.lowercase())) {
+                unbind = true
+            }
+        }
+        if (!bind && !unbind) return false
         if (!plugin.generalConfig.getBoolean("whitelist.admin.enable")) {
             return false
         }
@@ -89,17 +102,12 @@ class WhitelistAdminHandler(val plugin: AQQBot) {
         if (!hasPermission) {
             return false
         }
-        config.getStringList("whitelist.admin.bind").forEach {
-            if (message.lowercase().startsWith(it.lowercase())) {
-                bind(event.senderId.toString(), targetUserId.toString(), event.groupId, playerName)
-                return true
-            }
-        }
-        config.getStringList("whitelist.admin.unbind").forEach {
-            if (message.lowercase().startsWith(it.lowercase())) {
-                unbind(event.senderId.toString(), targetUserId.toString(), event.groupId, playerName)
-                return true
-            }
+        if (bind) {
+            bind(event.senderId.toString(), targetUserId.toString(), event.groupId, playerName)
+            return true
+        } else if (unbind) {
+            unbind(event.senderId.toString(), targetUserId.toString(), event.groupId, playerName)
+            return true
         }
         return false
     }

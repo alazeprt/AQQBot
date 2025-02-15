@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm")
 }
@@ -13,10 +15,26 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.alazeprt:AOneBot:1.0.10-beta.2")
-    implementation("com.google.code.gson:gson:2.11.0")
-    implementation("net.kyori:adventure-api:4.18.0")
-    implementation("com.github.alazeprt:AConfiguration:1.2")
-    implementation("com.github.alazeprt:taboolib-database:1.0.4")
+    compileOnly("com.github.alazeprt:AOneBot:1.0.10-beta.2")
+    compileOnly("com.google.code.gson:gson:2.11.0")
+    compileOnly("net.kyori:adventure-api:4.18.0")
+    compileOnly("com.github.alazeprt:AConfiguration:1.2")
+    compileOnly("com.github.alazeprt:taboolib-database:1.0.4")
     compileOnly("me.lucko:spark-api:0.1-SNAPSHOT")
+}
+
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+}
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs = listOf("-Xjvm-default=all")
+    }
+}
+
+configure<JavaPluginConvention> {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }

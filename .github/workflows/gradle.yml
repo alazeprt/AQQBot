@@ -3,8 +3,11 @@
 # certain platforms or Java versions, and provides a first line of defence
 # against bad commits.
 
-name: AQQBot Gradle Build
-on: push
+name: AQQBot Gradle Build (Refactor Branch)
+on:
+  push:
+    branches:
+      - refactor
 
 jobs:
   build:

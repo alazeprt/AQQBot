@@ -33,6 +33,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
     override var botConfig: FileConfiguration
 
     fun enable() {
+        loadDependencies()
         loadConfig(this)
         loadData(DataStorageType.valueOf(generalConfig.getString("storage.type").uppercase()))
         loadDebug()
@@ -72,6 +73,8 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
             }
         }
     }
+
+    fun loadDependencies()
 
     fun disable() {
         if (generalConfig.getBoolean("notify.server_status.enable") && BotProvider.getBot() != null &&

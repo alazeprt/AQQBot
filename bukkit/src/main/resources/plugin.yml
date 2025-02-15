@@ -1,6 +1,6 @@
 name: AQQBot
 main: top.alazeprt.aqqbot.AQQBotBukkit
-version: 2.0-alpha.1
+version: 2.0-beta.3
 api-version: 1.13
 author: alazeprt
 commands:
