@@ -115,8 +115,10 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
 
     override fun submitCommand(command: String): CompletableFuture<AExecution> {
         val sender = BukkitConsoleSender(this)
-        sender.execute(command)
-        return CompletableFuture.supplyAsync() {
+        submit {
+            sender.execute(command)
+        }
+        return CompletableFuture.supplyAsync {
             Thread.sleep(1000L * generalConfig.getInt("command_execution.delay"))
             sender
         }

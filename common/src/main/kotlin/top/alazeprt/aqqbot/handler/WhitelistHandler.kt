@@ -63,13 +63,11 @@ class WhitelistHandler(val plugin: AQQBot) {
     }
     
     private fun unbind(userId: String, groupId: Long, playerName: String): Boolean {
-        println(222)
         if (!plugin.hasQQ(userId.toLong())) {
             BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.not_bind"), true))
             return false
         }
         if (!plugin.getPlayerByQQ(userId.toLong()).map { it.getName() }.toList().contains(playerName)) {
-            println("playerName not match")
             BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.bind_by_other", mutableMapOf(Pair("name",
                 plugin.getPlayerByQQ(userId.toLong()).joinToString(", ") { it.getName() }))), true))
             return false
@@ -112,7 +110,6 @@ class WhitelistHandler(val plugin: AQQBot) {
                     if (message.split(" ").size == 3 && (sender.role == GroupRole.ADMIN || sender.role == GroupRole.OWNER)) {
                         WhitelistAdminHandler(plugin).handle(message, event, "unbind")
                     } else {
-                        println(111)
                         unbind(event.senderId.toString(), event.groupId, playerName)
                     }
                 }

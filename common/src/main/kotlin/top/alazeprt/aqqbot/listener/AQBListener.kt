@@ -50,7 +50,6 @@ class AQBListener(val plugin: AQQBot) : Listener {
                     }
                 }
                 oneBotClient.action(GetGroupMemberInfo(event.groupId, event.senderId)) sendAction@ { member ->
-                    plugin.log(LogLevel.INFO, "$handleInfo $handleWl $handleCommand $handleCustom")
                     if (!(canForwardMessage(message) != null && !(handleInfo || handleWl || handleCommand || handleCustom))) {
                         return@sendAction
                     }

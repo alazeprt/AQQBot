@@ -42,9 +42,7 @@ class MySQLProvider(plugin: AQQBot) : DatabaseDataProvider(plugin) {
         }
         this.host = host
         this.dataSource = dataSource
-        plugin.log(LogLevel.INFO, dataSource.toString())
         table.createTable(dataSource)
-        plugin.log(LogLevel.INFO, "Loaded MySQL data provider")
     }
 
     override fun getStorageType(): DataStorageType {
@@ -52,8 +50,6 @@ class MySQLProvider(plugin: AQQBot) : DatabaseDataProvider(plugin) {
     }
 
     override fun saveData(type: DataStorageType) {
-        plugin.log(LogLevel.INFO, type.toString())
-        plugin.log(LogLevel.INFO, dataSource.toString())
         dataSource.connection.close()
     }
 }

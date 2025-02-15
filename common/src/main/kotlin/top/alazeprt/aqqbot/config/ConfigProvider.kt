@@ -20,13 +20,10 @@ interface ConfigProvider {
 
     fun loadConfig(plugin: AQQBot) {
         loadGeneralConfig()
-        println(generalConfig.toString())
-        plugin.log(LogLevel.INFO, generalConfig.toString())
         loadBotConfig()
         loadMessageConfig()
         loadCustomConfig()
         setEnableGroups()
-        plugin.log(LogLevel.INFO, generalConfig.toString())
     }
 
     fun setEnableGroups() {

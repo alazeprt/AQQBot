@@ -51,7 +51,8 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
             )
         }
         loadHook(this)
-        if (generalConfig.getBoolean("notify.server_status.enable")) {
+        if (generalConfig.getBoolean("notify.server_status.enable") && BotProvider.getBot() != null &&
+                BotProvider.getBot()!!.isConnected()) {
             enableGroups.forEach {
                 BotProvider.getBot()!!.action(SendGroupMessage(it.toLong(),
                     generalConfig.getString("notify.server_status.start")?: "[AQQBot] 服务器已启动!"))
