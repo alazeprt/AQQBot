@@ -2,7 +2,7 @@
 # 可使用 /aqqbot reload 重载
 
 ## 配置文件版本, 请勿修改!!!
-version: 15
+version: 16
 
 # 存储相关配置 (重启后生效)
 storage:

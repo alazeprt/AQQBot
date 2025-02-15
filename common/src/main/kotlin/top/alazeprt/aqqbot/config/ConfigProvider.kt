@@ -66,11 +66,12 @@ interface ConfigProvider {
 
     fun configNeedUpdate(): Boolean {
         if (generalConfig.getInt("version") != 16) {
-            saveResource("config.yml", true)
+            val file = File(getDataFolder(), "config_new.yml")
+            this.javaClass.getResource("/config.yml")?.let { file.writeText(it.readText()) }
             return true
         }
         return false
     }
-    
+
     fun saveResource(name: String, replace: Boolean)
 }
