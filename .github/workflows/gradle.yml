@@ -30,9 +30,15 @@ jobs:
         run: chmod +x ./gradlew
       - name: Build
         run: ./gradlew build
-      - name: capture build artifacts
+      - name: capture build artifacts (spigot)
         uses: actions/upload-artifact@v4.6.0
         with:
-          name: Artifacts
+          name: AQQBot for Spigot
           path: |
-            build/libs/
+            bukkit/build/libs/
+      - name: capture build artifacts (velocity)
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          name: AQQBot for Velocity
+          path: |
+            velocity/build/libs/
