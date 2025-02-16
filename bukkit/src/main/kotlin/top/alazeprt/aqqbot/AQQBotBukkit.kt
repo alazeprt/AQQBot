@@ -2,8 +2,10 @@ package top.alazeprt.aqqbot
 
 import com.alessiodp.libby.BukkitLibraryManager
 import com.alessiodp.libby.Library
+import com.alessiodp.libby.LibraryManager
 import me.lucko.spark.api.Spark
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
+import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import top.alazeprt.aconfiguration.file.FileConfiguration
@@ -32,11 +34,15 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
 
     override lateinit var enableGroups: MutableList<String>
 
+    override lateinit var libraryManager: LibraryManager
+
     override lateinit var customCommands: MutableList<ACustom>
     override lateinit var generalConfig: FileConfiguration
     override lateinit var messageConfig: FileConfiguration
     override lateinit var botConfig: FileConfiguration
     override lateinit var customConfig: FileConfiguration
+
+    private val pluginId = 24071
 
     override var spark: Spark? = null
 
@@ -47,6 +53,7 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     }
 
     override fun onEnable() {
+        libraryManager = BukkitLibraryManager(this)
         this.enable()
         try {
             Class.forName("me.clip.placeholderapi.PlaceholderAPI")
@@ -55,6 +62,7 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
         }
         audience = BukkitAudiences.create(this);
         server.pluginManager.registerEvents(BukkitEventHandler(this), this)
+        val metrics = Metrics(this, pluginId)
     }
 
     override fun onDisable() {
@@ -149,79 +157,5 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
                 customCommands.add(ABukkitCustom(this, command, execute, unbind_execute, output, unbind_output, format, choose_account))
             }
         }
-    }
-
-    override fun loadDependencies() {
-        val libraryManager = BukkitLibraryManager(this)
-        val adventureBukkitLib = Library.builder()
-            .groupId("net{}kyori")
-            .artifactId("adventure-platform-bukkit")
-            .version("4.3.4")
-            .relocate("net{}kyori", "top{}alazeprt{}aqqbot{}lib")
-            .resolveTransitiveDependencies(true)
-            .build()
-        val databaseLib = Library.builder()
-            .groupId("com{}github{}alazeprt")
-            .artifactId("taboolib-database")
-            .version("1.0.4")
-            .relocate("taboolib", "top{}alazeprt{}aqqbot{}lib{}taboolib")
-            .relocate("com{}zaxxer", "top{}alazeprt{}aqqbot{}lib{}com{}zaxxer")
-            .relocate("com{}google{}common", "top{}alazeprt{}aqqbot{}lib{}com{}google{}common")
-            .relocate("org{}sqlite", "top{}alazeprt{}aqqbot{}lib{}org{}sqlite")
-            .relocate("com{}mysql", "top{}alazeprt{}aqqbot{}lib{}com{}mysql")
-            .build()
-        val hikaricpLib = Library.builder()
-            .groupId("com{}zaxxer")
-            .artifactId("HikariCP")
-            .version("4.0.3")
-            .relocate("com{}zaxxer", "top{}alazeprt{}aqqbot{}lib{}com{}zaxxer")
-            .resolveTransitiveDependencies(true)
-            .build()
-        val guavaLib = Library.builder()
-            .groupId("com{}google{}guava")
-            .artifactId("guava")
-            .version("21.0")
-            .relocate("com{}google{}common", "top{}alazeprt{}aqqbot{}lib{}com{}google{}common")
-            .resolveTransitiveDependencies(true)
-            .build()
-        val sqliteLib = Library.builder()
-            .groupId("org{}xerial")
-            .artifactId("sqlite-jdbc")
-            .version("3.49.0.0")
-            .relocate("org{}sqlite", "top{}alazeprt{}aqqbot{}lib{}org{}sqlite")
-            .resolveTransitiveDependencies(true)
-            .build()
-        val aconfigurationLib = Library.builder()
-            .groupId("com{}github{}alazeprt")
-            .artifactId("AConfiguration")
-            .version("1.2")
-            .relocate("com{}github{}alazeprt", "top{}alazeprt{}aqqbot{}lib{}aconfiguration")
-            .build()
-        val mysqlLib = Library.builder()
-            .groupId("com{}mysql")
-            .artifactId("mysql-connector-j")
-            .version("8.3.0")
-            .relocate("com{}mysql", "top{}alazeprt{}aqqbot{}lib{}com{}mysql")
-            .resolveTransitiveDependencies(true)
-            .build()
-        val aonebotLib = Library.builder()
-            .groupId("com{}github{}alazeprt")
-            .artifactId("AOneBot")
-            .version("1.0.10-beta.2")
-            .relocate("org{}java_websocket", "top{}alazeprt{}aonebot{}lib{}java_websocket")
-            .relocate("com{}google{}code{}gson", "top{}alazeprt{}aonebot{}lib{}com{}google")
-            .resolveTransitiveDependencies(true)
-            .build()
-        libraryManager.addRepository("https://maven.aliyun.com/repository/public")
-        libraryManager.addMavenCentral()
-        libraryManager.addJitPack()
-        libraryManager.loadLibrary(adventureBukkitLib)
-        libraryManager.loadLibrary(guavaLib)
-        libraryManager.loadLibrary(hikaricpLib)
-        libraryManager.loadLibrary(sqliteLib)
-        libraryManager.loadLibrary(mysqlLib)
-        libraryManager.loadLibrary(aconfigurationLib)
-        libraryManager.loadLibrary(databaseLib)
-        libraryManager.loadLibrary(aonebotLib)
     }
 }

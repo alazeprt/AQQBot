@@ -11,10 +11,12 @@ repositories {
     maven("https://jitpack.io")
     maven("https://repo.extendedclip.com/releases/")
     maven("https://oss.sonatype.org/content/repositories/snapshots")
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
     mavenCentral()
 }
 
 dependencies {
+    implementation("com.alessiodp.libby:libby-core:2.0.0-SNAPSHOT")
     compileOnly("com.github.alazeprt:AOneBot:1.0.10-beta.2")
     compileOnly("com.google.code.gson:gson:2.11.0")
     compileOnly("net.kyori:adventure-api:4.18.0")
