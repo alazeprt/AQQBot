@@ -35,6 +35,7 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     override lateinit var enableGroups: MutableList<String>
 
     override lateinit var libraryManager: LibraryManager
+    override var libraryList: MutableList<Library> = mutableListOf()
 
     override lateinit var customCommands: MutableList<ACustom>
     override lateinit var generalConfig: FileConfiguration
@@ -53,6 +54,14 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     }
 
     override fun onEnable() {
+        val adventureBukkitLib = Library.builder()
+            .groupId("net{}kyori")
+            .artifactId("adventure-platform-bukkit")
+            .version("4.3.4")
+            .relocate("net{}kyori", "top{}alazeprt{}aqqbot{}lib")
+            .resolveTransitiveDependencies(true)
+            .build()
+        libraryList.add(adventureBukkitLib)
         libraryManager = BukkitLibraryManager(this)
         this.enable()
         try {

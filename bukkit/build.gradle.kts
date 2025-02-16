@@ -34,6 +34,8 @@ tasks.jar {
 
 tasks.shadowJar {
     archiveFileName.set("AQQBot-${archiveFileName.get()}")
+    relocate("net.kyori.adventure", "top.alazeprt.aqqbot.lib.adventure")
+    relocate("org.bstats", "top.alazeprt.aqqbot.lib.bstats")
 }
 
 tasks.withType<JavaCompile> {
@@ -50,9 +52,4 @@ tasks.withType<KotlinCompile> {
 configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
-}
-
-tasks.shadowJar {
-    relocate("net.kyori.adventure", "top.alazeprt.aqqbot.lib.adventure")
-    relocate("org.bstats", "top.alazeprt.aqqbot.lib.bstats")
 }

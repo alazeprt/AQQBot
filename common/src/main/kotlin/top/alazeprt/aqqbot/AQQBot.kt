@@ -32,6 +32,8 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
 
     var libraryManager: LibraryManager
 
+    var libraryList: MutableList<Library>
+
     override var generalConfig: FileConfiguration
     override var messageConfig: FileConfiguration
     override var botConfig: FileConfiguration
@@ -79,13 +81,6 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
     }
 
     fun loadDependencies() {
-        val adventureBukkitLib = Library.builder()
-            .groupId("net{}kyori")
-            .artifactId("adventure-platform-bukkit")
-            .version("4.3.4")
-            .relocate("net{}kyori", "top{}alazeprt{}aqqbot{}lib")
-            .resolveTransitiveDependencies(true)
-            .build()
         val databaseLib = Library.builder()
             .groupId("com{}github{}alazeprt")
             .artifactId("taboolib-database")
@@ -138,17 +133,17 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
             .relocate("com{}google{}code{}gson", "top{}alazeprt{}aonebot{}lib{}com{}google")
             .resolveTransitiveDependencies(true)
             .build()
+        libraryList.add(guavaLib)
+        libraryList.add(hikaricpLib)
+        libraryList.add(sqliteLib)
+        libraryList.add(mysqlLib)
+        libraryList.add(aconfigurationLib)
+        libraryList.add(databaseLib)
+        libraryList.add(aonebotLib)
         libraryManager.addRepository("https://maven.aliyun.com/repository/public")
         libraryManager.addMavenCentral()
         libraryManager.addJitPack()
-        libraryManager.loadLibrary(adventureBukkitLib)
-        libraryManager.loadLibrary(guavaLib)
-        libraryManager.loadLibrary(hikaricpLib)
-        libraryManager.loadLibrary(sqliteLib)
-        libraryManager.loadLibrary(mysqlLib)
-        libraryManager.loadLibrary(aconfigurationLib)
-        libraryManager.loadLibrary(databaseLib)
-        libraryManager.loadLibrary(aonebotLib)
+        libraryManager.loadLibraries(*libraryList.toTypedArray())
     }
 
     fun disable() {

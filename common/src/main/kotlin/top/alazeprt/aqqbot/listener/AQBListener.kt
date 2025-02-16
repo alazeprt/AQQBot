@@ -43,7 +43,7 @@ class AQBListener(val plugin: AQQBot) : Listener {
                 val handleInfo = InformationHandler(plugin).handle(message, event)
                 val handleWl = WhitelistHandler(plugin).handle(message, event)
                 val handleWlAdmin = WhitelistAdminHandler(plugin).handle(message, event, memberList)
-                val handleCommand = CommandHandler(plugin).handle(message, event)
+                val handleCommand = CommandHandler(plugin).handle(message, event, memberList)
                 var handleCustom = false
                 plugin.customCommands.forEach {
                     if (it.handle(message, event.senderId.toString(), event.groupId.toString())) {

@@ -1,0 +1,8 @@
+{
+  "id": "aqqbot",
+  "name": "AQQBot",
+  "main": "top.alazeprt.aqqbot.AQQBotVelocity",
+  "version": "2.0-beta.4",
+  "authors": ["alazeprt"],
+  "url": "https://aqqbot.alazeprt.top"
+}
