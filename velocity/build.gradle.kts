@@ -33,6 +33,7 @@ tasks.jar {
 
 tasks.shadowJar {
     archiveFileName.set("AQQBot-${archiveFileName.get()}")
+    relocate("org.bstats", "top.alazeprt.aqqbot.lib.bstats")
 }
 
 tasks.withType<JavaCompile> {
@@ -49,8 +50,4 @@ tasks.withType<KotlinCompile> {
 configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
-}
-
-tasks.shadowJar {
-    relocate("org.bstats", "top.alazeprt.aqqbot.lib.bstats")
 }

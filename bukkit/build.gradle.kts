@@ -34,7 +34,6 @@ tasks.jar {
 
 tasks.shadowJar {
     archiveFileName.set("AQQBot-${archiveFileName.get()}")
-    relocate("net.kyori.adventure", "top.alazeprt.aqqbot.lib.adventure")
     relocate("org.bstats", "top.alazeprt.aqqbot.lib.bstats")
 }
 

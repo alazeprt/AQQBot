@@ -37,7 +37,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
 
-@Plugin(id = "aqqbot", name = "AQQBot", version = "2.0-beta.4", url = "https://aqqbot.alazeprt.top", authors = ["alazeprt"])
+@Plugin(id = "aqqbot", name = "AQQBot", version = "2.0-beta.5", url = "https://aqqbot.alazeprt.top", authors = ["alazeprt"])
 class AQQBotVelocity : AQQBot {
     override var debugModule: ADebug? = null
 
@@ -50,7 +50,6 @@ class AQQBotVelocity : AQQBot {
     override lateinit var enableGroups: MutableList<String>
 
     override lateinit var libraryManager: LibraryManager
-    override var libraryList: MutableList<Library> = mutableListOf()
 
     override lateinit var customCommands: MutableList<ACustom>
     override lateinit var generalConfig: FileConfiguration
@@ -218,5 +217,56 @@ class AQQBotVelocity : AQQBot {
     @Subscribe
     fun onChat(event: PlayerChatEvent) {
         AChatEvent(this, VelocityPlayer(event.player), event.message).handle()
+    }
+
+    override fun loadDependencies() {
+        val databaseLib = Library.builder()
+            .groupId("com{}github{}alazeprt")
+            .artifactId("taboolib-database")
+            .version("1.0.4")
+            .relocate("com{}google{}common", "top{}alazeprt{}aqqbot{}lib{}com{}google{}common")
+            .build()
+        val hikaricpLib = Library.builder()
+            .groupId("com{}zaxxer")
+            .artifactId("HikariCP")
+            .version("4.0.3")
+            .resolveTransitiveDependencies(true)
+            .build()
+        val guavaLib = Library.builder()
+            .groupId("com{}google{}guava")
+            .artifactId("guava")
+            .version("21.0")
+            .relocate("com{}google{}common", "top{}alazeprt{}aqqbot{}lib{}com{}google{}common")
+            .resolveTransitiveDependencies(true)
+            .build()
+        val sqliteLib = Library.builder()
+            .groupId("org{}xerial")
+            .artifactId("sqlite-jdbc")
+            .version("3.49.0.0")
+            .resolveTransitiveDependencies(true)
+            .build()
+        val aconfigurationLib = Library.builder()
+            .groupId("com{}github{}alazeprt")
+            .artifactId("AConfiguration")
+            .version("1.2")
+            .build()
+        val mysqlLib = Library.builder()
+            .groupId("com{}mysql")
+            .artifactId("mysql-connector-j")
+            .version("8.3.0")
+            .resolveTransitiveDependencies(true)
+            .build()
+        val aonebotLib = Library.builder()
+            .groupId("com{}github{}alazeprt")
+            .artifactId("AOneBot")
+            .version("1.0.10-beta.2")
+            .relocate("com{}google{}code{}gson", "top{}alazeprt{}aonebot{}lib{}com{}google")
+            .resolveTransitiveDependencies(true)
+            .build()
+
+        libraryManager.addRepository("https://maven.aliyun.com/repository/public")
+        libraryManager.addMavenCentral()
+        libraryManager.addJitPack()
+        libraryManager.loadLibraries(guavaLib, hikaricpLib, sqliteLib, mysqlLib, aconfigurationLib, databaseLib, aonebotLib)
     }
 }

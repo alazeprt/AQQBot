@@ -35,7 +35,6 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     override lateinit var enableGroups: MutableList<String>
 
     override lateinit var libraryManager: LibraryManager
-    override var libraryList: MutableList<Library> = mutableListOf()
 
     override lateinit var customCommands: MutableList<ACustom>
     override lateinit var generalConfig: FileConfiguration
@@ -54,14 +53,6 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     }
 
     override fun onEnable() {
-        val adventureBukkitLib = Library.builder()
-            .groupId("net{}kyori")
-            .artifactId("adventure-platform-bukkit")
-            .version("4.3.4")
-            .relocate("net{}kyori", "top{}alazeprt{}aqqbot{}lib")
-            .resolveTransitiveDependencies(true)
-            .build()
-        libraryList.add(adventureBukkitLib)
         libraryManager = BukkitLibraryManager(this)
         this.enable()
         try {
@@ -166,5 +157,62 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
                 customCommands.add(ABukkitCustom(this, command, execute, unbind_execute, output, unbind_output, format, choose_account))
             }
         }
+    }
+
+    override fun loadDependencies() {
+        val adventureBukkitLib = Library.builder()
+            .groupId("net{}kyori")
+            .artifactId("adventure-platform-bukkit")
+            .version("4.3.4")
+            .resolveTransitiveDependencies(true)
+            .build()
+        val databaseLib = Library.builder()
+            .groupId("com{}github{}alazeprt")
+            .artifactId("taboolib-database")
+            .version("1.0.4")
+            .relocate("com{}google{}common", "top{}alazeprt{}aqqbot{}lib{}com{}google{}common")
+            .build()
+        val hikaricpLib = Library.builder()
+            .groupId("com{}zaxxer")
+            .artifactId("HikariCP")
+            .version("4.0.3")
+            .resolveTransitiveDependencies(true)
+            .build()
+        val guavaLib = Library.builder()
+            .groupId("com{}google{}guava")
+            .artifactId("guava")
+            .version("21.0")
+            .relocate("com{}google{}common", "top{}alazeprt{}aqqbot{}lib{}com{}google{}common")
+            .resolveTransitiveDependencies(true)
+            .build()
+        val sqliteLib = Library.builder()
+            .groupId("org{}xerial")
+            .artifactId("sqlite-jdbc")
+            .version("3.49.0.0")
+            .resolveTransitiveDependencies(true)
+            .build()
+        val aconfigurationLib = Library.builder()
+            .groupId("com{}github{}alazeprt")
+            .artifactId("AConfiguration")
+            .version("1.2")
+            .build()
+        val mysqlLib = Library.builder()
+            .groupId("com{}mysql")
+            .artifactId("mysql-connector-j")
+            .version("8.3.0")
+            .resolveTransitiveDependencies(true)
+            .build()
+        val aonebotLib = Library.builder()
+            .groupId("com{}github{}alazeprt")
+            .artifactId("AOneBot")
+            .version("1.0.10-beta.2")
+            .relocate("com{}google{}code{}gson", "top{}alazeprt{}aonebot{}lib{}com{}google")
+            .resolveTransitiveDependencies(true)
+            .build()
+
+        libraryManager.addRepository("https://maven.aliyun.com/repository/public")
+        libraryManager.addMavenCentral()
+        libraryManager.addJitPack()
+        libraryManager.loadLibraries(adventureBukkitLib, guavaLib, hikaricpLib, sqliteLib, mysqlLib, aconfigurationLib, databaseLib, aonebotLib)
     }
 }

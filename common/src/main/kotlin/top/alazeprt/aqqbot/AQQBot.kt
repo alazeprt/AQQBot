@@ -32,8 +32,6 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
 
     var libraryManager: LibraryManager
 
-    var libraryList: MutableList<Library>
-
     override var generalConfig: FileConfiguration
     override var messageConfig: FileConfiguration
     override var botConfig: FileConfiguration
@@ -80,71 +78,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         }
     }
 
-    fun loadDependencies() {
-        val databaseLib = Library.builder()
-            .groupId("com{}github{}alazeprt")
-            .artifactId("taboolib-database")
-            .version("1.0.4")
-            .relocate("taboolib", "top{}alazeprt{}aqqbot{}lib{}taboolib")
-            .relocate("com{}zaxxer", "top{}alazeprt{}aqqbot{}lib{}com{}zaxxer")
-            .relocate("com{}google{}common", "top{}alazeprt{}aqqbot{}lib{}com{}google{}common")
-            .relocate("org{}sqlite", "top{}alazeprt{}aqqbot{}lib{}org{}sqlite")
-            .relocate("com{}mysql", "top{}alazeprt{}aqqbot{}lib{}com{}mysql")
-            .build()
-        val hikaricpLib = Library.builder()
-            .groupId("com{}zaxxer")
-            .artifactId("HikariCP")
-            .version("4.0.3")
-            .relocate("com{}zaxxer", "top{}alazeprt{}aqqbot{}lib{}com{}zaxxer")
-            .resolveTransitiveDependencies(true)
-            .build()
-        val guavaLib = Library.builder()
-            .groupId("com{}google{}guava")
-            .artifactId("guava")
-            .version("21.0")
-            .relocate("com{}google{}common", "top{}alazeprt{}aqqbot{}lib{}com{}google{}common")
-            .resolveTransitiveDependencies(true)
-            .build()
-        val sqliteLib = Library.builder()
-            .groupId("org{}xerial")
-            .artifactId("sqlite-jdbc")
-            .version("3.49.0.0")
-            .relocate("org{}sqlite", "top{}alazeprt{}aqqbot{}lib{}org{}sqlite")
-            .resolveTransitiveDependencies(true)
-            .build()
-        val aconfigurationLib = Library.builder()
-            .groupId("com{}github{}alazeprt")
-            .artifactId("AConfiguration")
-            .version("1.2")
-            .relocate("com{}github{}alazeprt", "top{}alazeprt{}aqqbot{}lib{}aconfiguration")
-            .build()
-        val mysqlLib = Library.builder()
-            .groupId("com{}mysql")
-            .artifactId("mysql-connector-j")
-            .version("8.3.0")
-            .relocate("com{}mysql", "top{}alazeprt{}aqqbot{}lib{}com{}mysql")
-            .resolveTransitiveDependencies(true)
-            .build()
-        val aonebotLib = Library.builder()
-            .groupId("com{}github{}alazeprt")
-            .artifactId("AOneBot")
-            .version("1.0.10-beta.2")
-            .relocate("org{}java_websocket", "top{}alazeprt{}aonebot{}lib{}java_websocket")
-            .relocate("com{}google{}code{}gson", "top{}alazeprt{}aonebot{}lib{}com{}google")
-            .resolveTransitiveDependencies(true)
-            .build()
-        libraryList.add(guavaLib)
-        libraryList.add(hikaricpLib)
-        libraryList.add(sqliteLib)
-        libraryList.add(mysqlLib)
-        libraryList.add(aconfigurationLib)
-        libraryList.add(databaseLib)
-        libraryList.add(aonebotLib)
-        libraryManager.addRepository("https://maven.aliyun.com/repository/public")
-        libraryManager.addMavenCentral()
-        libraryManager.addJitPack()
-        libraryManager.loadLibraries(*libraryList.toTypedArray())
-    }
+    fun loadDependencies()
 
     fun disable() {
         if (generalConfig.getBoolean("notify.server_status.enable") && BotProvider.getBot() != null &&
