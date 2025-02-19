@@ -1,12 +1,11 @@
 package top.alazeprt.aqqbot.listener
 
-import net.kyori.adventure.text.Component
-import top.alazeprt.aonebot.action.GetGroupMemberInfo
 import top.alazeprt.aonebot.action.GetGroupMemberList
 import top.alazeprt.aonebot.event.Listener
 import top.alazeprt.aonebot.event.SubscribeBotEvent
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aonebot.event.notice.GroupMemberDecreaseEvent
+import top.alazeprt.aonebot.result.GroupMember
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.bot.BotProvider
 import top.alazeprt.aqqbot.handler.CommandHandler
@@ -14,7 +13,6 @@ import top.alazeprt.aqqbot.handler.InformationHandler
 import top.alazeprt.aqqbot.handler.WhitelistAdminHandler
 import top.alazeprt.aqqbot.handler.WhitelistHandler
 import top.alazeprt.aqqbot.util.AFormatter
-import top.alazeprt.aqqbot.util.LogLevel
 
 class AQBListener(val plugin: AQQBot) : Listener {
     @SubscribeBotEvent
@@ -25,9 +23,9 @@ class AQBListener(val plugin: AQQBot) : Listener {
         var message = ""
         val oneBotClient = BotProvider.getBot()
         synchronized(oneBotClient!!) {
-            oneBotClient.action(GetGroupMemberList(event.groupId), { memberList ->
+            oneBotClient.action(GetGroupMemberList(event.groupId)) { memberList ->
                 event.jsonMessage.forEach {
-                    val jsonObject = it.asJsonObject?: return@forEach
+                    val jsonObject = it.asJsonObject ?: return@forEach
                     if (jsonObject.get("type").asString == "text") {
                         message += jsonObject.get("data").asJsonObject.get("text").asString
                     } else if (jsonObject.get("type").asString == "image") {
@@ -51,21 +49,29 @@ class AQBListener(val plugin: AQQBot) : Listener {
                         return@forEach
                     }
                 }
-                oneBotClient.action(GetGroupMemberInfo(event.groupId, event.senderId)) sendAction@ { member ->
-                    if (!(canForwardMessage(message) != null && !(handleInfo || handleWlAdmin || handleWl || handleCommand || handleCustom))) {
-                        return@sendAction
+                var member: GroupMember? = null
+                memberList.forEach { groupMember ->
+                    if (groupMember.member.userId == event.senderId) {
+                        member = groupMember
                     }
-                    val newMessage: String = canForwardMessage(message)?: return@sendAction
-                    plugin.adapter!!.broadcastMessage(
-                        AFormatter.pluginToChat(
-                            plugin.getMessageManager().get("game.chat_from_qq", mutableMapOf(
+                }
+                if (member == null) return@action
+                if (!(canForwardMessage(message) != null && !(handleInfo || handleWlAdmin || handleWl || handleCommand || handleCustom))) {
+                    return@action
+                }
+                val newMessage: String = canForwardMessage(message) ?: return@action
+                plugin.adapter!!.broadcastMessage(
+                    AFormatter.pluginToChat(
+                        plugin.getMessageManager().get(
+                            "game.chat_from_qq", mutableMapOf(
                                 "groupId" to event.groupId.toString(),
-                                "userName" to member.card,
-                                "message" to newMessage))
+                                "userName" to if (member!!.card.isNullOrBlank()) member!!.member.nickname else member!!.card,
+                                "message" to newMessage
+                            )
                         )
                     )
-                }
-            })
+                )
+            }
         }
     }
 
