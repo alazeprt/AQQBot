@@ -17,7 +17,7 @@ repositories {
 
 dependencies {
     implementation("com.alessiodp.libby:libby-core:2.0.0-SNAPSHOT")
-    compileOnly("com.github.alazeprt:AOneBot:1.0.10-beta.2")
+    compileOnly("com.github.alazeprt:AOneBot:1.0.11-beta")
     compileOnly("com.google.code.gson:gson:2.11.0")
     compileOnly("net.kyori:adventure-api:4.18.0")
     compileOnly("com.github.alazeprt:AConfiguration:1.2")

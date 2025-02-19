@@ -205,7 +205,7 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
         val aonebotLib = Library.builder()
             .groupId("com{}github{}alazeprt")
             .artifactId("AOneBot")
-            .version("1.0.10-beta.2")
+            .version("1.0.11-beta")
             .relocate("com{}google{}code{}gson", "top{}alazeprt{}aonebot{}lib{}com{}google")
             .resolveTransitiveDependencies(true)
             .build()
