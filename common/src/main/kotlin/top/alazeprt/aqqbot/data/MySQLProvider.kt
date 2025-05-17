@@ -34,7 +34,7 @@ class MySQLProvider(plugin: AQQBot) : DatabaseDataProvider(plugin) {
                 }
             }
             add("name") {
-                type(ColumnTypeSQL.VARCHAR) {
+                type(ColumnTypeSQL.VARCHAR, 128) {
                     options(ColumnOptionSQL.NOTNULL)
                 }
             }
