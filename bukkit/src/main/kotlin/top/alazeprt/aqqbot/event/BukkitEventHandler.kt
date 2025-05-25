@@ -3,7 +3,7 @@ package top.alazeprt.aqqbot.event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
-import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import top.alazeprt.aqqbot.AQQBotBukkit
 import top.alazeprt.aqqbot.adapter.BukkitPlayer
@@ -15,7 +15,7 @@ class BukkitEventHandler(val plugin: AQQBotBukkit) : Listener {
     }
 
     @EventHandler
-    fun onJoin(event: PlayerJoinEvent) {
+    fun onJoin(event: PlayerLoginEvent) {
         AJoinEvent(plugin, BukkitPlayer(event.player)).handle()
     }
 

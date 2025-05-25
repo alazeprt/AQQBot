@@ -16,4 +16,16 @@ class AParentCommand(val plugin: AQQBot) : ACommand {
             else -> SubHelp(plugin).onCommand(command, sender, args)
         }
     }
+
+    override fun onComplete(args: List<String>): List<String> {
+        return when (args.size) {
+            1 -> listOf("forcebind", "forceunbind", "query", "reload")
+            2 -> return when (args[0]) {
+                "forceunbind" -> listOf("qq", "player")
+                "query" -> listOf("qq", "player")
+                else -> emptyList()
+            }
+            else -> emptyList()
+        }
+    }
 }

@@ -61,8 +61,7 @@ class AFormatter(val plugin: AQQBot) {
                         jsonObject = jsonObject.getAsJsonObject(path.split(".")[i])
                     }
                     jsonObject.getAsJsonArray(path.split(".").last()).forEach {
-                        println(it.toString())
-                        filters.add(it.toString())
+                        filters.add(it.asString)
                     }
                     remoteFilter["$urlString.$path"] = filters
                 } catch (e: Exception) {
@@ -85,7 +84,6 @@ class AFormatter(val plugin: AQQBot) {
         val url = keyValueMap["url"]
         val path = keyValueMap["path"] ?: "words"
         val replaceTo = keyValueMap["replaceTo"] ?: ""
-        val cancel = keyValueMap["cancel"] ?: "false"
         if (regex != null) {
             return string.replace(Regex(regex), replaceTo)
         } else if (filter != null) {

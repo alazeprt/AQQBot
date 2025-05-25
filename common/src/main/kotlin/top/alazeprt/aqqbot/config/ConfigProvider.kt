@@ -72,7 +72,7 @@ interface ConfigProvider {
     fun getDataFolder(): File
 
     fun configNeedUpdate(): Boolean {
-        if (generalConfig.getInt("version") != 16) {
+        if (generalConfig.getInt("version") != 17) {
             val file = File(getDataFolder(), "config_new.yml")
             this.javaClass.getResource("/config.yml")?.let { file.writeText(it.readText()) }
             return true

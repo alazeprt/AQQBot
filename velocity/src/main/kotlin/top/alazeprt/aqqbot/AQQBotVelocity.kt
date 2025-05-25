@@ -165,6 +165,11 @@ class AQQBotVelocity : AQQBot {
                 val args = invocation.arguments()
                 handler.onCommand(command, VelocitySender(source), args.toList())
             }
+
+            override fun suggest(invocation: SimpleCommand.Invocation?): MutableList<String> {
+                val args = invocation?.arguments() ?: emptyArray<String>()
+                return handler.onComplete(args.toList()).toMutableList()
+            }
         })
     }
 

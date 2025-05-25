@@ -113,6 +113,9 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
             handler.onCommand(s, BukkitSender(commandSender), strings.toList())
             false
         }
+        getCommand(command)?.setTabCompleter { _, _, _, strings ->
+            handler.onComplete(strings.toList())
+        }
     }
 
     override fun submit(task: Runnable): Future<*> {
