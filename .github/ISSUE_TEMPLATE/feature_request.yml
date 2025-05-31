@@ -1,0 +1,43 @@
+
+name: '🎉 功能建议'
+title: "[Feature]"
+description: 提交建议帮助我们改进。
+labels: [ "enhancement" ]
+assignees: alazeprt
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您抽出时间提出新功能建议，请准确解释您的想法。
+
+  - type: textarea
+    attributes:
+      label: 描述
+      description: 简短描述您的功能建议。
+
+  - type: textarea
+    attributes:
+      label: 使用场景
+      description: 你想要发生什么？
+      placeholder: >
+        一个清晰且具体的描述这个功能的使用场景。
+
+  - type: checkboxes
+    attributes:
+      label: 你愿意提交PR吗?
+      description: >
+        这不是必须的，但我们欢迎您的贡献。
+      options:
+        - label: 是的, 我愿意提交PR!
+
+  - type: checkboxes
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: >
+            我已阅读并同意遵守该项目的 [行为准则](https://docs.github.com/zh/site-policy/github-terms/github-community-code-of-conduct)。
+          required: true
+
+  - type: markdown
+    attributes:
+      value: "感谢您填写我们的表单！"
