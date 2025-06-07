@@ -45,7 +45,7 @@ class ACommandImpl(val plugin: AQQBot) {
         var playerName = "未知"
         if (mode.contains("qq")) {
             userId = data
-            playerName = plugin.getPlayerByQQ(data.toLong()).joinToString(", ")
+            playerName = plugin.getPlayerByQQ(data.toLong()).joinToString(", ") { it.getName() }
         } else {
             playerName = data
             userId = plugin.getQQByPlayer(plugin.adapter!!.getOfflinePlayer(data)).toString()
