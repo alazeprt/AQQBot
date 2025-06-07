@@ -14,7 +14,7 @@ class AQQBotExpansion(val plugin: AQQBot): PlaceholderExpansion() {
     }
 
     override fun getVersion(): String {
-        return "2.0-beta.9"
+        return "2.0-alpha.10"
     }
 
     override fun onRequest(player: OfflinePlayer?, params: String): String? {

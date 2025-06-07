@@ -77,6 +77,12 @@ abstract class DatabaseDataProvider(val plugin: AQQBot): DataProvider {
                 list.addAll(newList)
             }
         }
+        if (list.joinToString(", ").isBlank()) {
+            table.delete(dataSource) {
+                where("userId" eq userId)
+            }
+            return
+        }
         table.update(dataSource) {
             set("name", list.joinToString(", "))
             where("userId" eq userId)
@@ -97,6 +103,12 @@ abstract class DatabaseDataProvider(val plugin: AQQBot): DataProvider {
                 newList.remove(player.getName())
                 list.addAll(newList)
             }
+        }
+        if (list.joinToString(", ").isBlank()) {
+            table.delete(dataSource) {
+                where("userId" eq qq)
+            }
+            return
         }
         table.update(dataSource) {
             set("name", list.joinToString(", "))

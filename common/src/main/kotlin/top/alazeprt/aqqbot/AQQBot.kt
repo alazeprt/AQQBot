@@ -42,16 +42,23 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
     override var botConfig: FileConfiguration
 
     fun enable() {
+        log(LogLevel.INFO, "Loading libraries...")
         loadDependencies()
+        log(LogLevel.INFO, "Loading config...")
         loadConfig(this)
+        log(LogLevel.INFO, "Loading data...")
         loadData(DataStorageType.valueOf(generalConfig.getString("storage.type").uppercase()))
+        log(LogLevel.INFO, "Loading debug system...")
         loadDebug()
+        log(LogLevel.INFO, "Registering commands...")
         loadCommands(this)
+        log(LogLevel.INFO, "Loading formatters...")
         toGroupFormatter = AFormatter(this)
         toGameFormatter = AFormatter(this)
         toGroupFormatter.initialUrl(generalConfig.getStringList("chat.server_to_group.filter"))
         toGameFormatter.initialUrl(generalConfig.getStringList("chat.group_to_server.filter"))
         adapter = loadAdapter()
+        log(LogLevel.INFO, "Connecting to the bot...")
         if (botConfig.getString("access_token").isNullOrBlank()) {
             loadBot(
                 this,
@@ -64,56 +71,48 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
                 botConfig.getString("access_token")
             )
         }
-        submitAsync {
-            while (true) {
-                if (getBot()?.isConnected != true) {
-                    if (botConfig.getString("access_token").isNullOrBlank()) {
-                        loadBot(
-                            this,
-                            URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port"))
-                        )
-                    } else {
-                        loadBot(
-                            this,
-                            URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")),
-                            botConfig.getString("access_token")
-                        )
-                    }
+        submitTimerAsync(0L, botConfig.getLong("check_interval") * 20) {
+            if (getBot()?.isConnected != true) {
+                if (botConfig.getString("access_token").isNullOrBlank()) {
+                    loadBot(
+                        this,
+                        URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port"))
+                    )
+                } else {
+                    loadBot(
+                        this,
+                        URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")),
+                        botConfig.getString("access_token")
+                    )
                 }
-                Thread.sleep(botConfig.getLong("check_interval") * 1000)
             }
         }
+        log(LogLevel.INFO, "Loading hooks...")
         loadHook(this)
         if (generalConfig.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {
-            submitAsync {
-                while (true) {
-                    verifyCodeMap.forEach {
-                        if (System.currentTimeMillis() - it.value.second >
-                               generalConfig.getLong("whitelist.verify_code_expire_time") * 1000L) {
-                            verifyCodeMap.remove(it.key)
-                        }
+            submitTimerAsync(0L, 5 * 20L) {
+                verifyCodeMap.forEach {
+                    if (System.currentTimeMillis() - it.value.second >
+                           generalConfig.getLong("whitelist.verify_code_expire_time") * 1000L) {
+                        verifyCodeMap.remove(it.key)
                     }
-                    Thread.sleep(5000)
                 }
             }
         }
-        submitAsync {
-            while (true) {
-                for ((k, v) in bindCooldownMap) {
-                    if (v <= 0) {
-                        bindCooldownMap.remove(k)
-                    } else {
-                        bindCooldownMap[k] = v - 1;
-                    }
+        submitTimerAsync(0L, 1 * 20L) {
+            for ((k, v) in bindCooldownMap) {
+                if (v <= 0) {
+                    bindCooldownMap.remove(k)
+                } else {
+                    bindCooldownMap[k] = v - 1;
                 }
-                for ((k, v) in unbindCooldownMap) {
-                    if (v <= 0) {
-                        unbindCooldownMap.remove(k)
-                    } else {
-                        unbindCooldownMap[k] = v - 1;
-                    }
+            }
+            for ((k, v) in unbindCooldownMap) {
+                if (v <= 0) {
+                    unbindCooldownMap.remove(k)
+                } else {
+                    unbindCooldownMap[k] = v - 1;
                 }
-                Thread.sleep(1000)
             }
         }
         if (generalConfig.getBoolean("notify.server_status.enable") && getBot() != null &&

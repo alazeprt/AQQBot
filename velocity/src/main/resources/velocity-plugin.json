@@ -2,7 +2,7 @@
   "id": "aqqbot",
   "name": "AQQBot",
   "main": "top.alazeprt.aqqbot.AQQBotVelocity",
-  "version": "2.0-beta.9",
+  "version": "2.0-alpha.10",
   "authors": ["alazeprt"],
   "url": "https://aqqbot.alazeprt.top"
 }
