@@ -24,6 +24,7 @@ dependencies {
     compileOnly("com.github.alazeprt:AConfiguration:1.2")
     implementation("com.alessiodp.libby:libby-bukkit:2.0.0-SNAPSHOT")
     implementation("org.bstats:bstats-bukkit:3.0.2")
+    implementation("org.glavo:rcon-java:3.0")
     compileOnly("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("me.lucko:spark-api:0.1-SNAPSHOT")

@@ -81,7 +81,11 @@ class VelocityConsoleSender(val plugin: AQQBotVelocity) : CommandSource, AExecut
         return str
     }
 
-    fun execute(command: String) {
+    override fun execute(command: String): CompletableFuture<AExecution> {
         future = plugin.server.commandManager.executeImmediatelyAsync(this, command)
+        return CompletableFuture.supplyAsync {
+            Thread.sleep(1000L * plugin.generalConfig.getInt("command_execution.delay"))
+            this
+        }
     }
 }

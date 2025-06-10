@@ -14,6 +14,7 @@ import top.alazeprt.aqqbot.AQQBotBukkit
 import top.alazeprt.aqqbot.util.AExecution
 import top.alazeprt.aqqbot.util.AFormatter
 import java.util.*
+import java.util.concurrent.CompletableFuture
 
 class BukkitConsoleSender(val plugin: AQQBotBukkit) : ConsoleCommandSender, AExecution {
     private val messageList = mutableListOf<String>()
@@ -133,28 +134,20 @@ class BukkitConsoleSender(val plugin: AQQBotBukkit) : ConsoleCommandSender, AExe
     }
 
     override fun getFormattedString(): String {
-        var str = AFormatter(plugin).regexFilter(plugin.generalConfig.getStringList("command_execution.filter"),
+        return AFormatter(plugin).regexFilter(plugin.generalConfig.getStringList("command_execution.filter"),
             AFormatter.chatClear(messageList.joinToString("\n"))
         )
-        plugin.generalConfig.getStringList("command_execution.format_list").forEach {
-            if (it != "") {
-                str = str.replace(it, "")
-            }
-        }
-        return str
     }
 
     override fun getRawString(): String {
-        var str = messageList.joinToString("\n")
-        plugin.generalConfig.getStringList("command_execution.format_list").forEach {
-            if (it != "") {
-                str = str.replace(it, "")
-            }
-        }
-        return str
+        return messageList.joinToString("\n")
     }
 
-    fun execute(command: String) {
+    override fun execute(command: String): CompletableFuture<AExecution> {
         Bukkit.dispatchCommand(this, command)
+        return CompletableFuture.supplyAsync {
+            Thread.sleep(plugin.generalConfig.getLong("command_execution.delay") * 1000L)
+            this
+        }
     }
 }

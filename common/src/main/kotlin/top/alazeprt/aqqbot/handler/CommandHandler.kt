@@ -53,13 +53,15 @@ class CommandHandler(val plugin: AQQBot) {
                     commandList.removeAt(0)
                     val command = commandList.joinToString(" ")
                     BotProvider.getBot()?.action(SendGroupMessage(event.groupId, plugin.getMessageManager().get("qq.executing_command")))
-                    plugin.submitCommand(command).thenAccept {
-                        if (config.getBoolean("command_execution.format")) {
-                            BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
-                                it.getFormattedString().ifEmpty { plugin.getMessageManager().get("qq.execution_finished") }))
-                        } else {
-                            BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
-                                it.getRawString().ifEmpty { plugin.getMessageManager().get("qq.execution_finished") }))
+                    plugin.submit {
+                        plugin.submitCommand(command).thenAccept {
+                            if (config.getBoolean("command_execution.format")) {
+                                BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
+                                    it.getFormattedString().ifEmpty { plugin.getMessageManager().get("qq.execution_finished") }))
+                            } else {
+                                BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
+                                    it.getRawString().ifEmpty { plugin.getMessageManager().get("qq.execution_finished") }))
+                            }
                         }
                     }
                 }

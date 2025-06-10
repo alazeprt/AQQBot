@@ -26,10 +26,7 @@ import top.alazeprt.aqqbot.event.AChatEvent
 import top.alazeprt.aqqbot.event.AJoinEvent
 import top.alazeprt.aqqbot.event.AQuitEvent
 import top.alazeprt.aqqbot.profile.APlayer
-import top.alazeprt.aqqbot.util.ACustom
-import top.alazeprt.aqqbot.util.AExecution
-import top.alazeprt.aqqbot.util.AFormatter
-import top.alazeprt.aqqbot.util.LogLevel
+import top.alazeprt.aqqbot.util.*
 import java.io.File
 import java.nio.file.Path
 import java.time.Duration
@@ -54,6 +51,7 @@ class AQQBotVelocity : AQQBot {
     override val unbindCooldownMap: MutableMap<String, Long> = mutableMapOf()
 
     override lateinit var toGameFormatter: AFormatter
+    override lateinit var sender: Class<out AExecution>
     override lateinit var toGroupFormatter: AFormatter
 
     override lateinit var libraryManager: LibraryManager
@@ -173,52 +171,45 @@ class AQQBotVelocity : AQQBot {
         })
     }
 
-    override fun submit(task: Runnable): Future<*> {
-        task.run()
-        return CompletableFuture.completedFuture<Any>(null)
+    override fun submit(task: Runnable): Cancelable {
+        val future = server.scheduler.buildTask(this, task).delay(Duration.ofMillis(0)).schedule()
+        return VelocityTaskCancelable(future)
     }
 
-    override fun submitAsync(task: Runnable): Future<*> {
-        executor.submit(task)
-        return CompletableFuture.completedFuture<Any>(null)
+    override fun submitAsync(task: Runnable): Cancelable {
+        val future = executor.submit(task)
+        return RunnableTaskCancelable(future)
     }
 
-    override fun submitLater(delay: Long, task: Runnable): Future<*> {
-        server.scheduler.buildTask(this, task).delay(Duration.ofMillis(delay * 50L)).schedule()
-        return CompletableFuture.completedFuture<Any>(null)
+    override fun submitLater(delay: Long, task: Runnable): Cancelable {
+        val future = server.scheduler.buildTask(this, task).delay(Duration.ofMillis(delay * 50L)).schedule()
+        return VelocityTaskCancelable(future)
     }
 
-    override fun submitLaterAsync(delay: Long, task: Runnable): Future<*> {
-        server.scheduler.buildTask(this, Runnable { executor.submit(task) })
+    override fun submitLaterAsync(delay: Long, task: Runnable): Cancelable {
+        val future = server.scheduler.buildTask(this, Runnable { executor.submit(task) })
             .delay(Duration.ofMillis(delay * 50L)).schedule()
-        return CompletableFuture.completedFuture<Any>(null)
+        return VelocityTaskCancelable(future)
     }
 
-    override fun submitTimer(delay: Long, period: Long, task: Runnable): Future<*> {
-        server.scheduler.buildTask(this, task)
+    override fun submitTimer(delay: Long, period: Long, task: Runnable): Cancelable {
+        val future = server.scheduler.buildTask(this, task)
             .delay(Duration.ofMillis(delay * 50L))
             .repeat(Duration.ofMillis(period * 50L))
             .schedule()
-        return CompletableFuture.completedFuture<Any>(null)
+        return VelocityTaskCancelable(future)
     }
 
-    override fun submitTimerAsync(delay: Long, period: Long, task: Runnable): Future<*> {
-        server.scheduler.buildTask(this, Runnable { executor.submit(task) })
+    override fun submitTimerAsync(delay: Long, period: Long, task: Runnable): Cancelable {
+        val future = server.scheduler.buildTask(this, Runnable { executor.submit(task) })
             .delay(Duration.ofMillis(delay * 50L))
             .repeat(Duration.ofMillis(period * 50L))
             .schedule()
-        return CompletableFuture.completedFuture<Any>(null)
+        return VelocityTaskCancelable(future)
     }
 
-    override fun submitCommand(command: String): CompletableFuture<AExecution> {
-        val sender = VelocityConsoleSender(this)
-        submit {
-            sender.execute(command)
-        }
-        return CompletableFuture.supplyAsync {
-            Thread.sleep(1000L * generalConfig.getInt("command_execution.delay"))
-            sender
-        }
+    override fun setSender() {
+        this.sender = VelocityConsoleSender::class.java
     }
 
     @Subscribe

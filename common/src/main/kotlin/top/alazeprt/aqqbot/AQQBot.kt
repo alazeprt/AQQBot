@@ -15,9 +15,11 @@ import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.hook.HookProvider
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.task.TaskProvider
+import top.alazeprt.aqqbot.util.AExecution
 import top.alazeprt.aqqbot.util.AFormatter
 import top.alazeprt.aqqbot.util.LogLevel
 import java.net.URI
+import java.util.concurrent.CompletableFuture
 
 interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, TaskProvider {
 
@@ -34,6 +36,8 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
 
     var toGroupFormatter: AFormatter
     var toGameFormatter: AFormatter
+
+    var sender: Class<out AExecution>
 
     var libraryManager: LibraryManager
 
@@ -52,6 +56,9 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         loadDebug()
         log(LogLevel.INFO, "Registering commands...")
         loadCommands(this)
+        log(LogLevel.INFO, "Loading command execution system ...")
+        setSender()
+        log(LogLevel.INFO, "Command Execution System: ${sender.name}")
         log(LogLevel.INFO, "Loading formatters...")
         toGroupFormatter = AFormatter(this)
         toGameFormatter = AFormatter(this)
@@ -129,6 +136,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
     fun loadDependencies()
 
     fun disable() {
+        log(LogLevel.INFO, "Disconnecting bot...")
         if (generalConfig.getBoolean("notify.server_status.enable") && getBot() != null &&
             getBot()!!.isConnected) {
             enableGroups.forEach {
@@ -139,7 +147,9 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
             }
         }
         unloadBot()
+        log(LogLevel.INFO, "Saving data...")
         saveData(DataStorageType.valueOf(generalConfig.getString("storage.type").uppercase()))
+        log(LogLevel.INFO, "Unloading debug system...")
         unloadDebug()
     }
 
@@ -182,6 +192,8 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
     fun getMessageManager(): MessageManager {
         return MessageManager(this)
     }
+
+    fun setSender()
 
     override fun loadData(type: DataStorageType) {
         dataProvider = when (type) {
@@ -230,5 +242,13 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
 
     override fun getPlayerByQQ(qq: Long): List<AOfflinePlayer> {
         return dataProvider.getPlayerByQQ(qq)
+    }
+
+    override fun submitCommand(command: String): CompletableFuture<AExecution> {
+        val senderInstance: AExecution = sender.constructors[0].newInstance(this) as AExecution
+        if (senderInstance.javaClass.methods.map { it.name }.contains("check")) {
+            senderInstance.javaClass.getMethod("check").invoke(senderInstance)
+        }
+        return senderInstance.execute(command)
     }
 }

@@ -20,7 +20,9 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
                         if (plugin.getPlayerByQQ(userId.toLong()).isNotEmpty()) {
                             str = it.replace("\$player", plugin.getPlayerByQQ(userId.toLong())[0].getName())
                         }
-                        plugin.submitCommand(mapFormat(str, map))
+                        plugin.submit {
+                            plugin.submitCommand(mapFormat(str, map))
+                        }
                     }
                 }
             }

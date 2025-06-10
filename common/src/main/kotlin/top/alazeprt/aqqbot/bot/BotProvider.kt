@@ -13,18 +13,12 @@ object BotProvider {
 
     fun loadBot(plugin: AQQBot, uri: URI) {
         try {
-            println(1)
             val client = WebsocketBotClient(uri)
-            println(2)
             client.connect()
-            println(3)
             botClient = client
-            println(4)
             if (!hasLoaded) {
-                println(5)
                 botClient!!.registerEvent(AQBListener(plugin))
             }
-            println(6)
             hasLoaded = true
         } catch (e: Exception) {
             throw RuntimeException("Failed to connect to OneBot's websocket server!", e)

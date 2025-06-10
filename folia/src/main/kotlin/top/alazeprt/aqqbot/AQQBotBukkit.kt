@@ -3,7 +3,6 @@ package top.alazeprt.aqqbot
 import com.alessiodp.libby.BukkitLibraryManager
 import com.alessiodp.libby.Library
 import com.alessiodp.libby.LibraryManager
-import io.papermc.paper.threadedregions.scheduler.AsyncScheduler
 import me.clip.placeholderapi.PlaceholderAPI
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bstats.bukkit.Metrics
@@ -17,10 +16,7 @@ import top.alazeprt.aqqbot.data.DataProvider
 import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.event.BukkitEventHandler
 import top.alazeprt.aqqbot.profile.APlayer
-import top.alazeprt.aqqbot.util.ACustom
-import top.alazeprt.aqqbot.util.AExecution
-import top.alazeprt.aqqbot.util.AFormatter
-import top.alazeprt.aqqbot.util.LogLevel
+import top.alazeprt.aqqbot.util.*
 import java.io.File
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Future
@@ -45,6 +41,8 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     override lateinit var toGameFormatter: AFormatter
     override lateinit var toGroupFormatter: AFormatter
 
+    override lateinit var sender: Class<out AExecution>
+
     override lateinit var libraryManager: LibraryManager
 
     override lateinit var customCommands: MutableList<ACustom>
@@ -60,6 +58,8 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
 
     override var loadSparkCount: Int = 0
     override var loadFloodgateCount: Int = 0
+
+    val taskList: MutableList<BukkitTaskCancelable> = mutableListOf()
 
     companion object {
         lateinit var audience: BukkitAudiences
@@ -79,6 +79,11 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     }
 
     override fun onDisable() {
+        log(LogLevel.INFO , "Canceling task")
+        taskList.forEach {
+            it.cancel(true)
+        }
+        this.disable()
         this.disable()
         audience.close()
     }
@@ -118,46 +123,46 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
         }
     }
 
-    override fun submit(task: Runnable): Future<*> {
-        Bukkit.getGlobalRegionScheduler().run(this) { task.run() }
-        return CompletableFuture.completedFuture<Void>(null)
+    override fun submit(task: Runnable): Cancelable {
+        val newTask = Bukkit.getScheduler().runTask(this, task)
+        val cancelable = BukkitTaskCancelable(newTask)
+        taskList.add(cancelable)
+        return cancelable
     }
 
-    override fun submitAsync(task: Runnable): Future<*> {
-        Bukkit.getAsyncScheduler().runNow(this) { task.run() }
-        return CompletableFuture.completedFuture<Void>(null)
+    override fun submitAsync(task: Runnable): Cancelable {
+        val newTask = Bukkit.getScheduler().runTaskAsynchronously(this, task)
+        val cancelable = BukkitTaskCancelable(newTask)
+        taskList.add(cancelable)
+        return cancelable
     }
 
-    override fun submitLater(delay: Long, task: Runnable): Future<*> {
-        Bukkit.getGlobalRegionScheduler().runDelayed(this, { task.run() }, delay)
-        return CompletableFuture.completedFuture<Void>(null)
+    override fun submitLater(delay: Long, task: Runnable): Cancelable {
+        val newTask = Bukkit.getScheduler().runTaskLater(this, task, delay)
+        val cancelable = BukkitTaskCancelable(newTask)
+        taskList.add(cancelable)
+        return cancelable
     }
 
-    override fun submitLaterAsync(delay: Long, task: Runnable): Future<*> {
-        Bukkit.getAsyncScheduler().runDelayed(this, { task.run() }, delay * 50, TimeUnit.MILLISECONDS)
-        return CompletableFuture.completedFuture<Void>(null)
+    override fun submitLaterAsync(delay: Long, task: Runnable): Cancelable {
+        val newTask = Bukkit.getScheduler().runTaskLaterAsynchronously(this, task, delay)
+        val cancelable = BukkitTaskCancelable(newTask)
+        taskList.add(cancelable)
+        return cancelable
     }
 
-    override fun submitTimer(delay: Long, period: Long, task: Runnable): Future<*> {
-        Bukkit.getGlobalRegionScheduler().runAtFixedRate(this, { task.run() }, delay, period)
-        return CompletableFuture.completedFuture<Void>(null)
+    override fun submitTimer(delay: Long, period: Long, task: Runnable): Cancelable {
+        val newTask = Bukkit.getScheduler().runTaskTimer(this, task, delay, period)
+        val cancelable = BukkitTaskCancelable(newTask)
+        taskList.add(cancelable)
+        return cancelable
     }
 
-    override fun submitTimerAsync(delay: Long, period: Long, task: Runnable): Future<*> {
-        Bukkit.getAsyncScheduler().runAtFixedRate(this, { task.run() }, delay * 50, period * 50, TimeUnit.MILLISECONDS)
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, task, delay, period)
-        return CompletableFuture.completedFuture<Void>(null)
-    }
-
-    override fun submitCommand(command: String): CompletableFuture<AExecution> {
-        val sender = BukkitConsoleSender(this)
-        submit {
-            sender.execute(command)
-        }
-        return CompletableFuture.supplyAsync {
-            Thread.sleep(1000L * generalConfig.getInt("command_execution.delay"))
-            sender
-        }
+    override fun submitTimerAsync(delay: Long, period: Long, task: Runnable): Cancelable {
+        val newTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, task, delay, period)
+        val cancelable = BukkitTaskCancelable(newTask)
+        taskList.add(cancelable)
+        return cancelable
     }
 
     fun getAdventure(): BukkitAudiences {
@@ -241,5 +246,37 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
         libraryManager.addMavenCentral()
         libraryManager.addJitPack()
         libraryManager.loadLibraries(adventureBukkitLib, guavaLib, hikaricpLib, sqliteLib, mysqlLib, aconfigurationLib, databaseLib, aonebotLib)
+    }
+
+    override fun setSender() {
+        generalConfig.getStringList("command_execution.sort").forEach {
+            when (it.uppercase()) {
+                "NATIVE" -> if (NativeServerSender(this).check()) {
+                    sender = NativeServerSender::class.java
+                    return
+                }
+                "DECIDATED_SERVER" -> if (DecidatedServerSender(this).check()) {
+                    sender = DecidatedServerSender::class.java
+                    return
+                }
+                "MINECRAFT_SERVER" -> if (MinecraftServerSender(this).check()) {
+                    sender = MinecraftServerSender::class.java
+                    return
+                }
+                "RCON" -> {
+                    val instance = RCONSender(this)
+                    val pass = instance.check()
+                    if (pass) {
+                        sender = RCONSender::class.java
+                        instance.close()
+                        return
+                    }
+                }
+                "SIMULATE_CONSOLE" -> {
+                    sender = BukkitConsoleSender::class.java
+                    return
+                }
+            }
+        }
     }
 }
