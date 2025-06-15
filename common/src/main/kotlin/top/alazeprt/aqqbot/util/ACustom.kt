@@ -13,56 +13,102 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
         var outputString: String
         if (player.isEmpty()) {
             outputString = mapFormat(unbind_output.joinToString("\n"), map)
+            val executeMap = mutableMapOf<Int, String?>()
+            matchesCommand(outputString).forEach {
+                executeMap[it] = null
+            }
+            var finished = true
+            plugin.log(LogLevel.INFO, unbind_execute.joinToString(","))
             if (unbind_execute.isNotEmpty() && unbind_execute[0].isNotEmpty()) {
+                finished = false
                 plugin.submit {
-                    unbind_execute.forEach {
-                        var str = it
+                    for (i in unbind_execute.indices) {
+                        var str = unbind_execute[i]
                         if (plugin.getPlayerByQQ(userId.toLong()).isNotEmpty()) {
-                            str = it.replace("\$player", plugin.getPlayerByQQ(userId.toLong())[0].getName())
+                            str = str.replace("\$player", plugin.getPlayerByQQ(userId.toLong())[0].getName())
                         }
-                        plugin.submit {
-                            plugin.submitCommand(mapFormat(str, map))
+                        val result = plugin.submitCommand(mapFormat(str, map))
+                        if (executeMap.containsKey(i)) {
+                            if (format) {
+                                executeMap[i] = result.get().getFormattedString()
+                            } else {
+                                executeMap[i] = result.get().getRawString()
+                            }
+                            println(i.toString() + "->" + executeMap[i])
                         }
                     }
+                    finished = true
                 }
             }
-            outputString = setPlaceholders(null, outputString)
-            if (format) {
-                outputString = AFormatter.pluginClear(outputString)
-                outputString = AFormatter.chatClear(outputString)
-            }
-            if (outputString.contains("\$random\n")) {
-                val optionsOutput: List<String> = outputString.split("\$random\n")
-                val outputList = optionsOutput.random()
-                BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), outputList))
-            } else {
-                BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), outputString))
+            plugin.submitAsync {
+                while (!finished) {
+                    Thread.sleep(500)
+                }
+                executeMap.forEach {
+                    outputString = outputString.replace("\$executes[${it.key}]", it.value?: "")
+                }
+                outputString = setPlaceholders(null, outputString)
+                if (format) {
+                    outputString = AFormatter.pluginClear(outputString)
+                    outputString = AFormatter.chatClear(outputString)
+                }
+                if (outputString.contains("\$random\n")) {
+                    val optionsOutput: List<String> = outputString.split("\$random\n")
+                    val outputList = optionsOutput.random()
+                    BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), outputList))
+                } else {
+                    BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), outputString))
+                }
             }
         } else {
             outputString = mapFormat(output.joinToString("\n"), map)
+            val executeMap = mutableMapOf<Int, String?>()
+            matchesCommand(outputString).forEach {
+                executeMap[it] = null
+            }
+            var finished = true
+            plugin.log(LogLevel.INFO, executeMap.size.toString())
             if (execute.isNotEmpty() && execute[0].isNotEmpty()) {
+                finished = false
                 plugin.submit {
-                    execute.forEach {
-                        var str = it
+                    for (i in execute.indices) {
+                        var str = execute[i]
                         if (plugin.getPlayerByQQ(userId.toLong()).isNotEmpty()) {
-                            str = it.replace("\$player", plugin.getPlayerByQQ(userId.toLong())[0].getName())
+                            str = str.replace("\$player", plugin.getPlayerByQQ(userId.toLong())[0].getName())
                         }
-                        plugin.submitCommand(mapFormat(str, map))
+                        val result = plugin.submitCommand(mapFormat(str, map))
+                        if (executeMap.containsKey(i)) {
+                            if (format) {
+                                executeMap[i] = result.get().getFormattedString()
+                            } else {
+                                executeMap[i] = result.get().getRawString()
+                            }
+                        }
                     }
+                    finished = true
                 }
             }
-            val playerName = player[if (player.size < account) 0 else account - 1]
-            outputString = setPlaceholders(plugin.adapter!!.getOfflinePlayer(playerName), outputString)
-            if (format) {
-                outputString = AFormatter.pluginClear(outputString)
-                outputString = AFormatter.chatClear(outputString)
-            }
-            if (outputString.contains("\$random\n")) {
-                val optionsOutput: List<String> = outputString.split("\$random\n")
-                val outputList = optionsOutput.random()
-                BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), outputList))
-            } else {
-                BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), outputString))
+            plugin.submitAsync {
+                while (!finished) {
+                    Thread.sleep(500)
+                }
+                executeMap.forEach {
+                    println(it.key.toString() + "->" + it.value)
+                    outputString = outputString.replace("\$executes[${it.key}]", it.value?: "")
+                }
+                val playerName = player[if (player.size < account) 0 else account - 1]
+                outputString = setPlaceholders(plugin.adapter!!.getOfflinePlayer(playerName), outputString)
+                if (format) {
+                    outputString = AFormatter.pluginClear(outputString)
+                    outputString = AFormatter.chatClear(outputString)
+                }
+                if (outputString.contains("\$random\n")) {
+                    val optionsOutput: List<String> = outputString.split("\$random\n")
+                    val outputList = optionsOutput.random()
+                    BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), outputList))
+                } else {
+                    BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), outputString))
+                }
             }
         }
         return true
@@ -73,6 +119,13 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
             val key = match.groupValues[1]
             map[key] ?: ""
         }
+    }
+
+    private fun matchesCommand(string: String): List<Int> {
+        val regex = "\\\$executes\\[([0-9]\\d*)]".toRegex()
+        return regex.findAll(string)
+            .mapNotNull { it.groupValues[1].toIntOrNull() }
+            .toList()
     }
 
     private fun matches(string: String, commandPattern: String): Map<String, String>? {
