@@ -35,7 +35,7 @@ class WhitelistHandler(val plugin: AQQBot) {
             playerName = name!!
         } else {
             playerName = data
-            if (!validateName(playerName)) {
+            if (!validateName(plugin, playerName)) {
                 BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.invalid_name"), true))
                 return false
             }

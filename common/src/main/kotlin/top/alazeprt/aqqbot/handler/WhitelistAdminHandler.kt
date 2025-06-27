@@ -17,7 +17,7 @@ class WhitelistAdminHandler(val plugin: AQQBot) {
         if (plugin.hasQQ(userId.toLong())) {
             plugin.removePlayer(userId.toLong())
         }
-        if (!validateName(playerName)) {
+        if (!validateName(plugin, playerName)) {
             BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.invalid_name"), true))
             return false
         }
