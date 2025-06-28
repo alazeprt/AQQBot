@@ -120,7 +120,7 @@ class AFormatter(val plugin: AQQBot) {
         }
 
         fun validateName(plugin: AQQBot?, name: String): Boolean {
-            val regex = plugin?.generalConfig?.getString("whitelist.name_rule")?: "^\\w+\$"
+            val regex = plugin?.generalConfig?.getString("whitelist.name_rule")?: "[a-zA-Z0-9_]+"
             return name.matches(regex.toRegex())
         }
     }

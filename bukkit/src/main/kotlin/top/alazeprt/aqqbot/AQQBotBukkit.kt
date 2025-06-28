@@ -20,6 +20,7 @@ import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.*
 import java.io.File
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Future
 
 
@@ -28,10 +29,10 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
 
     override var adapter: AQQBotAdapter? = BukkitAdapter
 
-    override val verifyCodeMap: MutableMap<String, Pair<String, Long>> = mutableMapOf()
+    override val verifyCodeMap: MutableMap<String, Pair<String, Long>> = ConcurrentHashMap()
 
-    override val bindCooldownMap: MutableMap<String, Long> = mutableMapOf()
-    override val unbindCooldownMap: MutableMap<String, Long> = mutableMapOf()
+    override val bindCooldownMap: MutableMap<String, Long> = ConcurrentHashMap()
+    override val unbindCooldownMap: MutableMap<String, Long> = ConcurrentHashMap()
 
     override lateinit var dataProvider: DataProvider
 
@@ -217,8 +218,8 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
                 val output = customConfig.getStringList("$it.output")
                 val unbind_output = customConfig.getStringList("$it.unbind_output")
                 val format = customConfig.getBoolean("$it.format")
-                val choose_account = if (customConfig.getInt("$it.chooseAccount") == 0) 1
-                else customConfig.getInt("$it.chooseAccount")
+                val choose_account = if (customConfig.getInt("$it.choose_account") == 0) 1
+                else customConfig.getInt("$it.choose_account")
                 customCommands.add(ABukkitCustom(this, command, execute, unbind_execute, output, unbind_output, format, choose_account))
             }
         }

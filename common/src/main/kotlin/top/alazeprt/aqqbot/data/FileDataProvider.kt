@@ -5,12 +5,13 @@ import top.alazeprt.aconfiguration.file.YamlConfiguration
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 class FileDataProvider(val plugin: AQQBot) : DataProvider {
 
     private val file = File(plugin.getDataFolder(), "data.yml")
     private lateinit var dataConfig: FileConfiguration
-    val dataMap: MutableMap<String, MutableList<String>> = mutableMapOf()
+    val dataMap: MutableMap<String, MutableList<String>> = ConcurrentHashMap()
 
     override fun loadData(type: DataStorageType) {
         dataConfig = YamlConfiguration.loadConfiguration(file)

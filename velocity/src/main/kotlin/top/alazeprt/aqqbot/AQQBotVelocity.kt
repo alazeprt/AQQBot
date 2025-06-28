@@ -31,6 +31,7 @@ import java.io.File
 import java.nio.file.Path
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
@@ -41,14 +42,14 @@ class AQQBotVelocity : AQQBot {
 
     override var adapter: AQQBotAdapter? = VelocityAdapter(this)
 
-    override val verifyCodeMap: MutableMap<String, Pair<String, Long>> = mutableMapOf()
+    override val verifyCodeMap: MutableMap<String, Pair<String, Long>> = ConcurrentHashMap()
 
     override lateinit var dataProvider: DataProvider
 
     override lateinit var enableGroups: MutableList<String>
 
-    override val bindCooldownMap: MutableMap<String, Long> = mutableMapOf()
-    override val unbindCooldownMap: MutableMap<String, Long> = mutableMapOf()
+    override val bindCooldownMap: MutableMap<String, Long> = ConcurrentHashMap()
+    override val unbindCooldownMap: MutableMap<String, Long> = ConcurrentHashMap()
 
     override lateinit var toGameFormatter: AFormatter
     override lateinit var sender: Class<out AExecution>
@@ -132,8 +133,8 @@ class AQQBotVelocity : AQQBot {
                 val output = customConfig.getStringList("$it.output")
                 val unbind_output = customConfig.getStringList("$it.unbind_output")
                 val format = customConfig.getBoolean("$it.format")
-                val choose_account = if (customConfig.getInt("$it.chooseAccount") == 0) 1
-                else customConfig.getInt("$it.chooseAccount")
+                val choose_account = if (customConfig.getInt("$it.choose_account") == 0) 1
+                else customConfig.getInt("$it.choose_account")
                 customCommands.add(AVelocityCustom(
                     this, command, execute, unbind_execute, output, unbind_output, format, choose_account))
             }

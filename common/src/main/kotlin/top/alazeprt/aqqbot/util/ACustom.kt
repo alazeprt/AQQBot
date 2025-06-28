@@ -34,7 +34,6 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
                             } else {
                                 executeMap[i] = result.get().getRawString()
                             }
-                            println(i.toString() + "->" + executeMap[i])
                         }
                     }
                     finished = true
@@ -93,7 +92,6 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
                     Thread.sleep(500)
                 }
                 executeMap.forEach {
-                    println(it.key.toString() + "->" + it.value)
                     outputString = outputString.replace("\$executes[${it.key}]", it.value?: "")
                 }
                 val playerName = player[if (player.size < account) 0 else account - 1]

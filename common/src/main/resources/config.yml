@@ -45,7 +45,7 @@ whitelist:
 
   # 名称验证规则
   # 可以修改规则以适应一些插件的特殊字符 (如-)
-  name_rule: "^\\w+\$"
+  name_rule: "[a-zA-Z0-9_]+"
 
   # 功能指令前缀
   prefix:
