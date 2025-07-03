@@ -5,6 +5,7 @@
 # 此部分为发送到Q群的消息
 qq:
   whitelist:
+    in_cooldown: "你仍在绑定的冷却时间内, 请等待 ${cooldown_time} 秒后重试!"
     already_bind: "你已经绑定过了"
     invalid_name: "名称不合法! (名称只能由字母、数字、下划线组成)"
     already_exist: "该名称已被他人占用!"

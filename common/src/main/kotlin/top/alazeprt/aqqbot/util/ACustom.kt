@@ -18,7 +18,6 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
                 executeMap[it] = null
             }
             var finished = true
-            plugin.log(LogLevel.INFO, unbind_execute.joinToString(","))
             if (unbind_execute.isNotEmpty() && unbind_execute[0].isNotEmpty()) {
                 finished = false
                 plugin.submit {
@@ -28,11 +27,11 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
                             str = str.replace("\$player", plugin.getPlayerByQQ(userId.toLong())[0].getName())
                         }
                         val result = plugin.submitCommand(mapFormat(str, map))
-                        if (executeMap.containsKey(i)) {
+                        if (executeMap.containsKey(i+1)) {
                             if (format) {
-                                executeMap[i] = result.get().getFormattedString()
+                                executeMap[i+1] = result.get().getFormattedString()
                             } else {
-                                executeMap[i] = result.get().getRawString()
+                                executeMap[i+1] = result.get().getRawString()
                             }
                         }
                     }
@@ -66,7 +65,6 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
                 executeMap[it] = null
             }
             var finished = true
-            plugin.log(LogLevel.INFO, executeMap.size.toString())
             if (execute.isNotEmpty() && execute[0].isNotEmpty()) {
                 finished = false
                 plugin.submit {
@@ -76,11 +74,11 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
                             str = str.replace("\$player", plugin.getPlayerByQQ(userId.toLong())[0].getName())
                         }
                         val result = plugin.submitCommand(mapFormat(str, map))
-                        if (executeMap.containsKey(i)) {
+                        if (executeMap.containsKey(i+1)) {
                             if (format) {
-                                executeMap[i] = result.get().getFormattedString()
+                                executeMap[i+1] = result.get().getFormattedString()
                             } else {
-                                executeMap[i] = result.get().getRawString()
+                                executeMap[i+1] = result.get().getRawString()
                             }
                         }
                     }

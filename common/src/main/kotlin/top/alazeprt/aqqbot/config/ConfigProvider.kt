@@ -48,7 +48,13 @@ interface ConfigProvider {
             generalConfig.set("whitelist.cooldown.bind", 60)
             generalConfig.set("whitelist.cooldown.unbind", 86400)
         }
-        generalConfig.save(file)
+        if (generalConfig.getInt("version") != 18) {
+            generalConfig.set("command_execution.sort", listOf("NATIVE", "DEDICATED_SERVER", "MINECRAFT_SERVER", "SIMULATE_CONSOLE"))
+            generalConfig.set("command_execution.rcon.host", "127.0.0.1")
+            generalConfig.set("command_execution.rcon.port", "25575")
+            generalConfig.set("command_execution.rcon.password", "password")
+            generalConfig.set("whitelist.name_rule", "[a-zA-Z0-9_]+")
+        }
     }
 
     fun loadMessageConfig() {
@@ -72,7 +78,7 @@ interface ConfigProvider {
     fun getDataFolder(): File
 
     fun configNeedUpdate(): Boolean {
-        if (generalConfig.getInt("version") != 17) {
+        if (generalConfig.getInt("version") != 18) {
             val file = File(getDataFolder(), "config_new.yml")
             this.javaClass.getResource("/config.yml")?.let { file.writeText(it.readText()) }
             return true

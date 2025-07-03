@@ -33,17 +33,20 @@ abstract class DatabaseDataProvider(val plugin: AQQBot): DataProvider {
     }
 
     override fun addPlayer(qq: Long, player: AOfflinePlayer) {
+        plugin.debugModule?.debugLogger?.log("database: add player $qq -> ${player.getName()}")
         var originList: MutableList<String> = mutableListOf();
         if (hasQQ(qq)) {
             table.select(dataSource) {
                 where("userId" eq qq)
                 rows("name")
             }.map {
+                plugin.debugModule?.debugLogger?.log("database: get origin data for $qq: ${getString("name")}")
                 originList = if (getString("name").split(", ").toMutableList().isEmpty())
                     mutableListOf(getString("name")) else getString("name").split(", ").toMutableList()
             }
         }
         originList.add(player.getName())
+        plugin.debugModule?.debugLogger?.log("database: new data for $qq: ${originList.joinToString(", ")}")
         if (originList.size == 1) {
             table.insert(dataSource, "userId", "name") {
                 value(qq, originList.joinToString(", "))
@@ -57,12 +60,14 @@ abstract class DatabaseDataProvider(val plugin: AQQBot): DataProvider {
     }
 
     override fun removePlayer(qq: Long) {
+        plugin.debugModule?.debugLogger?.log("database: remove all player for $qq")
         table.delete(dataSource) {
             where("userId" eq qq)
         }
     }
 
     override fun removePlayer(player: AOfflinePlayer) {
+        plugin.debugModule?.debugLogger?.log("database: remove player $player")
         val userId = ""
         val list = mutableListOf<String>()
         table.select(dataSource) {
@@ -71,18 +76,22 @@ abstract class DatabaseDataProvider(val plugin: AQQBot): DataProvider {
             if (if (getString("name").split(", ").toMutableList().isEmpty())
                     getString("name") == player.getName()
                 else getString("name").split(", ").toMutableList().contains(player.getName())) {
+                plugin.debugModule?.debugLogger?.log("database: get data in ${getString("userId")}: ${getString("name")}")
                 val newList = if (getString("name").split(", ").toMutableList().isEmpty())
                     mutableListOf(getString("name")) else getString("name").split(", ").toMutableList()
                 newList.remove(player.getName())
                 list.addAll(newList)
             }
         }
+        plugin.debugModule?.debugLogger?.log("database: new data for $userId: ${list.joinToString(", ")}")
         if (list.joinToString(", ").isBlank()) {
+            plugin.debugModule?.debugLogger?.log("database: remove all player for $userId")
             table.delete(dataSource) {
                 where("userId" eq userId)
             }
             return
         }
+        plugin.debugModule?.debugLogger?.log("database: update data for $userId: ${list.joinToString(", ")}")
         table.update(dataSource) {
             set("name", list.joinToString(", "))
             where("userId" eq userId)
@@ -90,6 +99,7 @@ abstract class DatabaseDataProvider(val plugin: AQQBot): DataProvider {
     }
 
     override fun removePlayer(qq: Long, player: AOfflinePlayer) {
+        plugin.debugModule?.debugLogger?.log("database: remove player $qq")
         val list = mutableListOf<String>()
         table.select(dataSource) {
             rows("name")
@@ -98,18 +108,22 @@ abstract class DatabaseDataProvider(val plugin: AQQBot): DataProvider {
             if (if (getString("name").split(", ").toMutableList().isEmpty())
                     getString("name") == player.getName()
                 else getString("name").split(", ").toMutableList().contains(player.getName())) {
+                plugin.debugModule?.debugLogger?.log("database: get data in $qq: ${getString("name")}")
                 val newList = if (getString("name").split(", ").toMutableList().isEmpty())
                     mutableListOf(getString("name")) else getString("name").split(", ").toMutableList()
                 newList.remove(player.getName())
                 list.addAll(newList)
             }
         }
+        plugin.debugModule?.debugLogger?.log("database: new data for $qq: ${list.joinToString(", ")}")
         if (list.joinToString(", ").isBlank()) {
+            plugin.debugModule?.debugLogger?.log("database: remove all player for $qq")
             table.delete(dataSource) {
                 where("userId" eq qq)
             }
             return
         }
+        plugin.debugModule?.debugLogger?.log("database: update data for $qq: ${list.joinToString(", ")}")
         table.update(dataSource) {
             set("name", list.joinToString(", "))
             where("userId" eq qq)

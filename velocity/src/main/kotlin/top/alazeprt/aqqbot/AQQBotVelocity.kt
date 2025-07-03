@@ -36,7 +36,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
 
-@Plugin(id = "aqqbot", name = "AQQBot", version = "2.0-alpha.10", url = "https://aqqbot.alazeprt.top", authors = ["alazeprt"])
+@Plugin(id = "aqqbot", name = "AQQBot", version = "2.0-beta.10", url = "https://aqqbot.alazeprt.top", authors = ["alazeprt"])
 class AQQBotVelocity : AQQBot {
     override var debugModule: ADebug? = null
 

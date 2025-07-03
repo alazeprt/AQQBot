@@ -38,10 +38,15 @@ class AQBListener(val plugin: AQQBot) : Listener {
                         }
                     }
                 }
+                plugin.debugModule?.debugLogger?.log("receive message from ${event.groupId} which is sent by ${event.senderId}: $message")
                 val handleInfo = InformationHandler(plugin).handle(message, event)
+                plugin.debugModule?.debugLogger?.log("is handle information?: $handleInfo")
                 val handleWl = WhitelistHandler(plugin).handle(message, event)
+                plugin.debugModule?.debugLogger?.log("is handle whitelist?: $handleWl")
                 val handleWlAdmin = WhitelistAdminHandler(plugin).handle(message, event, memberList)
+                plugin.debugModule?.debugLogger?.log("is handle whitelist admin?: $handleWlAdmin")
                 val handleCommand = CommandHandler(plugin).handle(message, event, memberList)
+                plugin.debugModule?.debugLogger?.log("is handle command?: $handleCommand")
                 var handleCustom = false
                 plugin.customCommands.forEach {
                     if (it.handle(message, event.senderId.toString(), event.groupId.toString())) {
@@ -49,6 +54,7 @@ class AQBListener(val plugin: AQQBot) : Listener {
                         return@forEach
                     }
                 }
+                plugin.debugModule?.debugLogger?.log("is handle custom command?: $handleCustom")
                 var member: GroupMember? = null
                 memberList.forEach { groupMember ->
                     if (groupMember.member.userId == event.senderId) {
@@ -60,6 +66,7 @@ class AQBListener(val plugin: AQQBot) : Listener {
                     return@action
                 }
                 val newMessage: String = canForwardMessage(message) ?: return@action
+                plugin.debugModule?.debugLogger?.log("forward message to server: $newMessage")
                 plugin.adapter!!.broadcastMessage(
                     AFormatter.pluginToChat(
                         plugin.getMessageManager().get(

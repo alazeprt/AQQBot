@@ -8,18 +8,23 @@ import top.alazeprt.aqqbot.profile.APlayer
 
 class AJoinEvent(val plugin: AQQBot, private val player: APlayer) : AEvent {
     override fun handle() {
+        plugin.debugModule?.debugLogger?.log("${player.getName()} joined the game")
         var handle2 = false
         val handle1 = whitelistHandler(plugin, player.getName()) { it ->
             if (plugin.floodgateApi && FloodgateApi.getInstance()?.isFloodgatePlayer(player.getUUID()) == true) {
+                plugin.debugModule?.debugLogger?.log("${player.getName()} is bedrock player")
                 if (FloodgateApi.getInstance()?.getPlayer(player.getUUID())?.username.isNullOrBlank()) {
+                    plugin.debugModule?.debugLogger?.log("kick ${player.getName()} because floodgate username is null")
                     player.kick(it)
                     return@whitelistHandler
                 }
                 handle2 = whitelistHandler(plugin,
                     FloodgateApi.getInstance()?.getPlayer(player.getUUID())?.username!!) {
+                    plugin.debugModule?.debugLogger?.log("kick ${player.getName()} because unbind")
                     player.kick(it)
                 }
             } else {
+                plugin.debugModule?.debugLogger?.log("kick ${player.getName()} because unbind")
                 player.kick(it)
             }
         }
