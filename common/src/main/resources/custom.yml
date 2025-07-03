@@ -76,3 +76,42 @@ cpu:
   output: ["服务器CPU占用率: %spark_cpu_system%"]
   unbind_output: ["服务器CPU占用率: %spark_cpu_system%"]
   format: true
+
+# 例 4
+# 返回服务器的内存占用率
+memory:
+  enable: false
+  command: ["/memory", "/内存占用", "内存占用", "/内存占用率", "内存占用率", "RAM", "/RAM"]
+  execute: [""]
+  unbind_execute: [""]
+  choose_account: 1
+  image:
+    # 图片路径 (图片均要放在 AQQBot/images 目录下)
+    path: "memory.png"
+
+    # 图片元素 (目前仅支持文字)
+    elements:
+      # 示例元素
+      memory:
+        type: "text" # 元素类型 (目前仅支持 text 即文字)
+        data: "服务器内存占用率: %server_ram_used% / %server_ram_total%"
+        x: 50 # 元素所在的x坐标
+        y: 50 # 元素所在的y坐标
+        size: 24 # 字体大小
+        font: "Arial" # 字体名称
+        color: "#FFFFFF" # 字体颜色 (RGB 格式)
+        bold: false # 是否使用粗体
+        italic: false # 是否使用斜体
+  unbind_image:
+    path: "memory.png"
+    elements:
+      memory:
+        type: "text"
+        data: "服务器内存占用率: %server_ram_used% / %server_ram_total%"
+        x: 50
+        y: 50
+        size: 24
+        font: "Arial"
+        color: "#FFFFFF"
+        bold: false
+        italic: false

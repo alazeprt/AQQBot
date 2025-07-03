@@ -4,7 +4,6 @@ import top.alazeprt.aonebot.action.GetGroupMemberInfo
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aonebot.action.SetGroupCard
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
-import top.alazeprt.aonebot.util.GroupRole
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.bot.BotProvider
 import top.alazeprt.aqqbot.util.AFormatter.Companion.validateName

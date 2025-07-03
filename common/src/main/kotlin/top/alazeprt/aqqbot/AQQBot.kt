@@ -20,7 +20,6 @@ import top.alazeprt.aqqbot.util.AFormatter
 import top.alazeprt.aqqbot.util.LogLevel
 import java.net.URI
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ConcurrentHashMap
 
 interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, TaskProvider {
 

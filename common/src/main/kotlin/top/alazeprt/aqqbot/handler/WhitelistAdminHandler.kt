@@ -1,6 +1,5 @@
 package top.alazeprt.aqqbot.handler
 
-import top.alazeprt.aonebot.action.GetGroupMemberList
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aonebot.result.GroupMemberList

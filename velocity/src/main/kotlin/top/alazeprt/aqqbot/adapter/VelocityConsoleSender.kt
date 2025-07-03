@@ -15,7 +15,6 @@ import net.kyori.ansi.ColorLevel
 import top.alazeprt.aqqbot.AQQBotVelocity
 import top.alazeprt.aqqbot.util.AExecution
 import top.alazeprt.aqqbot.util.AFormatter
-import top.alazeprt.aqqbot.util.LogLevel
 import java.util.concurrent.CompletableFuture
 
 

@@ -1,8 +1,8 @@
 package top.alazeprt.aqqbot.command.impl
 
-import top.alazeprt.aqqbot.util.LogLevel
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.util.AFormatter
+import top.alazeprt.aqqbot.util.LogLevel
 
 class ACommandImpl(val plugin: AQQBot) {
     fun startReload(): Long {

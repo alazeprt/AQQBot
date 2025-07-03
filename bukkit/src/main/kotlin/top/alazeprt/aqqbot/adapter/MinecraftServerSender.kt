@@ -6,7 +6,6 @@ import top.alazeprt.aqqbot.util.AExecution
 import top.alazeprt.aqqbot.util.AFormatter
 import top.alazeprt.aqqbot.util.AReflection
 import java.lang.reflect.Method
-import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.util.concurrent.CompletableFuture
 

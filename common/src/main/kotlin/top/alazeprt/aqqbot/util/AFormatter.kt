@@ -2,9 +2,7 @@ package top.alazeprt.aqqbot.util
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import top.alazeprt.aqqbot.util.LogLevel
 import top.alazeprt.aqqbot.AQQBot
-
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
