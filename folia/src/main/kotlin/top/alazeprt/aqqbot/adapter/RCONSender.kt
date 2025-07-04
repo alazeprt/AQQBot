@@ -11,18 +11,18 @@ class RCONSender(private val plugin: AQQBot): AExecution {
     private lateinit var rcon: Rcon
     private lateinit var message: String
 
-    fun check(): Boolean {
+    fun check(groupId: Long?): Boolean {
         try {
-            return initial()
+            return initial(groupId)
         } catch (e: Exception) {
             return false
         }
     }
 
-    private fun initial(): Boolean {
-        val address = plugin.generalConfig.getString("command_execution.rcon.host")
-        val port = plugin.generalConfig.getInt("command_execution.rcon.port")
-        val password = plugin.generalConfig.getString("command_execution.rcon.password")
+    private fun initial(groupId: Long?): Boolean {
+        val address = plugin.generalConfig.getString("command_execution.rcon.host", groupId)
+        val port = plugin.generalConfig.getInt("command_execution.rcon.port", groupId)
+        val password = plugin.generalConfig.getString("command_execution.rcon.password", groupId)
         if (address == null || port !in 0..65535 || password == null) return false
         rcon = Rcon(address, port, password)
         return true
@@ -32,8 +32,8 @@ class RCONSender(private val plugin: AQQBot): AExecution {
         rcon.close()
     }
 
-    override fun execute(command: String): CompletableFuture<AExecution> {
-        initial()
+    override fun execute(command: String, groupId: Long?): CompletableFuture<AExecution> {
+        initial(groupId)
         message = rcon.command(command)
         return CompletableFuture.completedFuture(this)
     }
@@ -42,8 +42,8 @@ class RCONSender(private val plugin: AQQBot): AExecution {
         return message
     }
 
-    override fun getFormattedString(): String {
-        return AFormatter(plugin).regexFilter(plugin.generalConfig.getStringList("command_execution.filter"),
+    override fun getFormattedString(groupId: Long?): String {
+        return AFormatter(plugin).regexFilter(plugin.generalConfig.getStringList("command_execution.filter", groupId),
             AFormatter.chatClear(message)
         )
     }

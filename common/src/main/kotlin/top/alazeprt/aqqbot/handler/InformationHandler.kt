@@ -95,29 +95,29 @@ class InformationHandler(val plugin: AQQBot) {
     }
 
     fun handle(message: String, event: GroupMessageEvent): Boolean {
-        plugin.generalConfig.getStringList("information.tps.command").forEach {
-            if (!plugin.generalConfig.getBoolean("information.tps.enable")) return@forEach
+        plugin.generalConfig.getStringList("information.tps.command", event.groupId).forEach {
+            if (!plugin.generalConfig.getBoolean("information.tps.enable", event.groupId)) return@forEach
             if (message.lowercase() == it.lowercase()) {
                 getTPS(event.groupId)
                 return true
             }
         }
-        plugin.generalConfig.getStringList("information.mspt.command").forEach {
-            if (!plugin.generalConfig.getBoolean("information.mspt.enable")) return@forEach
+        plugin.generalConfig.getStringList("information.mspt.command", event.groupId).forEach {
+            if (!plugin.generalConfig.getBoolean("information.mspt.enable", event.groupId)) return@forEach
             if (message.lowercase() == it.lowercase()) {
                 getMSPT(event.groupId)
                 return true
             }
         }
-        plugin.generalConfig.getStringList("information.list.command").forEach {
-            if (!plugin.generalConfig.getBoolean("information.list.enable")) return@forEach
+        plugin.generalConfig.getStringList("information.list.command", event.groupId).forEach {
+            if (!plugin.generalConfig.getBoolean("information.list.enable", event.groupId)) return@forEach
             if (message.lowercase() == it.lowercase()) {
                 getPlayerList(event.groupId)
                 return true
             }
         }
-        plugin.generalConfig.getStringList("information.cpu.command").forEach {
-            if (!plugin.generalConfig.getBoolean("information.cpu.enable")) return@forEach
+        plugin.generalConfig.getStringList("information.cpu.command", event.groupId).forEach {
+            if (!plugin.generalConfig.getBoolean("information.cpu.enable", event.groupId)) return@forEach
             if (message.lowercase() == it.lowercase()) {
                 getCPUInfo(event.groupId)
                 return true

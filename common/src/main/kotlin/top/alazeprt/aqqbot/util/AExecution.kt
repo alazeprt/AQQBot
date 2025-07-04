@@ -5,7 +5,7 @@ import java.util.concurrent.CompletableFuture
 interface AExecution {
     fun getRawString(): String
 
-    fun getFormattedString(): String
+    fun getFormattedString(groupId: Long?): String
 
-    fun execute(command: String): CompletableFuture<AExecution>
+    fun execute(command: String, groupId: Long?): CompletableFuture<AExecution>
 }

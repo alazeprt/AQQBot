@@ -28,16 +28,16 @@ class NativeServerSender(private val plugin: AQQBot) : AExecution {
         }
     }
 
-    override fun execute(command: String): CompletableFuture<AExecution> {
+    override fun execute(command: String, groupId: Long?): CompletableFuture<AExecution> {
         Bukkit.dispatchCommand(commandSender, command)
         return CompletableFuture.supplyAsync {
-            Thread.sleep(plugin.generalConfig.getLong("command_execution.delay") * 1000L)
+            Thread.sleep(plugin.generalConfig.getLong("command_execution.delay", groupId) * 1000L)
             this
         }
     }
 
-    override fun getFormattedString(): String {
-        return AFormatter(plugin).regexFilter(plugin.generalConfig.getStringList("command_execution.filter"),
+    override fun getFormattedString(groupId: Long?): String {
+        return AFormatter(plugin).regexFilter(plugin.generalConfig.getStringList("command_execution.filter", groupId),
             AFormatter.chatClear(messageList.joinToString("\n"))
         )
     }

@@ -44,19 +44,19 @@ class AQQBotVelocity : AQQBot {
 
     override lateinit var dataProvider: DataProvider
 
-    override lateinit var enableGroups: MutableList<String>
+    override lateinit var enableGroups: MutableMap<String, FileConfiguration?>
 
     override val bindCooldownMap: MutableMap<String, Long> = ConcurrentHashMap()
     override val unbindCooldownMap: MutableMap<String, Long> = ConcurrentHashMap()
 
-    override lateinit var toGameFormatter: AFormatter
-    override lateinit var sender: Class<out AExecution>
-    override lateinit var toGroupFormatter: AFormatter
+    override lateinit var toGameFormatter: MutableMap<Long, AFormatter>
+    override lateinit var sender: MutableMap<Long, Class<out AExecution>>
+    override lateinit var toGroupFormatter: MutableMap<Long, AFormatter>
 
     override lateinit var libraryManager: LibraryManager
 
     override lateinit var customCommands: MutableList<ACustom>
-    override lateinit var generalConfig: FileConfiguration
+    override lateinit var generalConfig: GroupConfiguration
     override lateinit var messageConfig: FileConfiguration
     override lateinit var botConfig: FileConfiguration
     override lateinit var customConfig: FileConfiguration
@@ -258,7 +258,9 @@ class AQQBotVelocity : AQQBot {
     }
 
     override fun setSender() {
-        this.sender = VelocityConsoleSender::class.java
+        enableGroups.forEach { group, _ ->
+            this.sender[group.toLong()] = VelocityConsoleSender::class.java
+        }
     }
 
     @Subscribe

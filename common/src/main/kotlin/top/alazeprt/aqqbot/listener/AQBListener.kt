@@ -17,7 +17,7 @@ import top.alazeprt.aqqbot.util.AFormatter
 class AQBListener(val plugin: AQQBot) : Listener {
     @SubscribeBotEvent
     fun onGroupMessage(event: GroupMessageEvent) {
-        if (!plugin.enableGroups.contains(event.groupId.toString())) {
+        if (!plugin.enableGroups.keys.contains(event.groupId.toString())) {
             return
         }
         var message = ""
@@ -62,10 +62,10 @@ class AQBListener(val plugin: AQQBot) : Listener {
                     }
                 }
                 if (member == null) return@action
-                if (!(canForwardMessage(message) != null && !(handleInfo || handleWlAdmin || handleWl || handleCommand || handleCustom))) {
+                if (!(canForwardMessage(message, event.groupId) != null && !(handleInfo || handleWlAdmin || handleWl || handleCommand || handleCustom))) {
                     return@action
                 }
-                val newMessage: String = canForwardMessage(message) ?: return@action
+                val newMessage: String = canForwardMessage(message, event.groupId) ?: return@action
                 plugin.debugModule?.debugLogger?.log("forward message to server: $newMessage")
                 plugin.adapter!!.broadcastMessage(
                     AFormatter.pluginToChat(
@@ -100,26 +100,26 @@ class AQBListener(val plugin: AQQBot) : Listener {
         }
     }
 
-    private fun canForwardMessage(message: String): String? {
-        if (!plugin.generalConfig.getBoolean("chat.group_to_server.enable")) {
+    private fun canForwardMessage(message: String, groupId: Long): String? {
+        if (!plugin.generalConfig.getBoolean("chat.group_to_server.enable", groupId)) {
             return null
         }
         val formatter = plugin.toGameFormatter
         var newMessage = message;
-        if (message.length > plugin.generalConfig.getInt("chat.max_forward_length")) {
-            newMessage = newMessage.substring(0, plugin.generalConfig.getInt("chat.max_forward_length")) + "..."
+        if (message.length > plugin.generalConfig.getInt("chat.max_forward_length", groupId)) {
+            newMessage = newMessage.substring(0, plugin.generalConfig.getInt("chat.max_forward_length", groupId)) + "..."
         }
-        if (plugin.generalConfig.getStringList("chat.group_to_server.prefix").contains("")) {
-            val str = formatter.regexFilter(plugin.generalConfig.getStringList("chat.group_to_server.filter"), newMessage)
+        if (plugin.generalConfig.getStringList("chat.group_to_server.prefix", groupId).contains("")) {
+            val str = formatter[groupId]?.regexFilter(plugin.generalConfig.getStringList("chat.group_to_server.filter", groupId), newMessage)?: newMessage
             return if (str.contains("!CANCEL")) {
                 null
             } else {
                 str
             }
         }
-        plugin.generalConfig.getStringList("chat.group_to_server.prefix").forEach {
+        plugin.generalConfig.getStringList("chat.group_to_server.prefix", groupId).forEach {
             if (newMessage.startsWith(it)) {
-                val str = formatter.regexFilter(plugin.generalConfig.getStringList("chat.group_to_server.filter"), newMessage.substring(it.length))
+                val str = formatter[groupId]?.regexFilter(plugin.generalConfig.getStringList("chat.group_to_server.filter", groupId), newMessage.substring(it.length))?: newMessage.substring(it.length)
                 return if (str.contains("!CANCEL")) {
                     null
                 } else {

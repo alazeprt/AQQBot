@@ -15,9 +15,9 @@ open class DebugLogger(val plugin: AQQBot) {
     private var initialized = false
 
     fun log(message: String) {
-        if (!config.getBoolean("debug.enable") || !config.getBoolean("debug.logger.enable")) return
+        if (!config.getBoolean("debug.enable", null) || !config.getBoolean("debug.logger.enable", null)) return
         val time = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
-        if (config.getLong("debug.logger.save_interval") == 0L) {
+        if (config.getLong("debug.logger.save_interval", null) == 0L) {
             loggerFile.appendText("[$time] $message\n")
         } else {
             loggerList.add("[$time] $message\n")
@@ -25,9 +25,9 @@ open class DebugLogger(val plugin: AQQBot) {
     }
 
     fun initial() {
-        loggerFile = File(plugin.getDataFolder(), config.getString("debug.logger.file")?: "debug.log")
-        if (config.getLong("debug.logger.save_interval") >= 1L) {
-            plugin.submitTimerAsync(0L, config.getLong("debug.logger.save_interval") * 20L) {
+        loggerFile = File(plugin.getDataFolder(), config.getString("debug.logger.file", null))
+        if (config.getLong("debug.logger.save_interval", null) >= 1L) {
+            plugin.submitTimerAsync(0L, config.getLong("debug.logger.save_interval", null) * 20L) {
                 if (loggerList.isNotEmpty()) {
                     loggerFile.appendText(loggerList.joinToString(""))
                 }
@@ -37,7 +37,7 @@ open class DebugLogger(val plugin: AQQBot) {
     }
 
     fun close() {
-        if (config.getLong("debug.logger.save_interval") != 0L) {
+        if (config.getLong("debug.logger.save_interval", null) != 0L) {
             if (loggerList.isNotEmpty()) {
                 loggerFile.appendText(loggerList.joinToString(""))
             }

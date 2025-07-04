@@ -16,7 +16,7 @@ class WhitelistAdminHandler(val plugin: AQQBot) {
         if (plugin.hasQQ(userId.toLong())) {
             plugin.removePlayer(userId.toLong())
         }
-        if (!validateName(plugin, playerName)) {
+        if (!validateName(plugin, playerName, groupId)) {
             BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.invalid_name"), true))
             return false
         }
@@ -56,18 +56,18 @@ class WhitelistAdminHandler(val plugin: AQQBot) {
     fun handle(message: String, event: GroupMessageEvent, memberList: GroupMemberList): Boolean {
         var bind = false
         var unbind = false
-        config.getStringList("whitelist.admin.bind").forEach {
+        config.getStringList("whitelist.admin.bind", event.groupId).forEach {
             if (message.lowercase().startsWith(it.lowercase())) {
                 bind = true
             }
         }
-        config.getStringList("whitelist.admin.unbind").forEach {
+        config.getStringList("whitelist.admin.unbind", event.groupId).forEach {
             if (message.lowercase().startsWith(it.lowercase())) {
                 unbind = true
             }
         }
         if (!bind && !unbind) return false
-        if (!plugin.generalConfig.getBoolean("whitelist.admin.enable")) {
+        if (!plugin.generalConfig.getBoolean("whitelist.admin.enable", event.groupId)) {
             return false
         }
         if (message.split(" ").size != 3) return false

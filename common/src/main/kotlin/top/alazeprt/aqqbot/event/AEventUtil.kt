@@ -10,14 +10,14 @@ import java.util.function.Consumer
 
 object AEventUtil {
     fun whitelistHandler(plugin: AQQBot, playerName: String, kickMethod: Consumer<String>): Boolean {
-        if (!plugin.generalConfig.getBoolean("whitelist.enable") || !plugin.generalConfig.getBoolean("whitelist.need_bind_to_login")) return false
+        if (!plugin.generalConfig.getBoolean("whitelist.enable", null) || !plugin.generalConfig.getBoolean("whitelist.need_bind_to_login", null)) return false
         if (!plugin.hasPlayer(plugin.adapter!!.getOfflinePlayer(playerName))) {
-            if (plugin.generalConfig.getString("whitelist.verify_method")?.uppercase() == "GROUP_NAME") {
-                kickMethod.accept(AFormatter.pluginToChat(plugin.getMessageManager().get("game.not_bind", mutableMapOf(Pair("command", plugin.generalConfig.getStringList("whitelist.prefix.bind")[0])))))
+            if (plugin.generalConfig.getString("whitelist.verify_method", null).uppercase() == "GROUP_NAME") {
+                kickMethod.accept(AFormatter.pluginToChat(plugin.getMessageManager().get("game.not_bind", mutableMapOf(Pair("command", plugin.generalConfig.getStringList("whitelist.prefix.bind", null)[0])))))
                 return true
-            } else if (plugin.generalConfig.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {
+            } else if (plugin.generalConfig.getString("whitelist.verify_method", null).uppercase() == "VERIFY_CODE") {
                 val verifyCode = if (plugin.verifyCodeMap.containsKey(playerName)) plugin.verifyCodeMap.get(playerName)!!.first else UUID.randomUUID().toString().substring(0, 6)
-                kickMethod.accept(AFormatter.pluginToChat(AFormatter.pluginToChat(plugin.getMessageManager().get("game.not_verified", mutableMapOf(Pair("command", plugin.generalConfig.getStringList("whitelist.prefix.bind")[0]), Pair("code", verifyCode))))))
+                kickMethod.accept(AFormatter.pluginToChat(AFormatter.pluginToChat(plugin.getMessageManager().get("game.not_verified", mutableMapOf(Pair("command", plugin.generalConfig.getStringList("whitelist.prefix.bind", null)[0]), Pair("code", verifyCode))))))
                 if (!plugin.verifyCodeMap.containsKey(playerName)) {
                     plugin.verifyCodeMap.put(playerName, Pair(verifyCode, System.currentTimeMillis()))
                 }
@@ -29,16 +29,17 @@ object AEventUtil {
 
     fun playerStatusHandler(plugin: AQQBot, player: APlayer, isJoin: Boolean) {
         val playerName = player.getName()
-        if (plugin.generalConfig.getBoolean("notify.player_status.enable")) {
+        if (plugin.generalConfig.getBoolean("notify.player_status.enable", null)) {
             val qq: Long = plugin.getQQByPlayer(plugin.adapter!!.getOfflinePlayer(playerName))?: -1L
             plugin.submitAsync {
                 plugin.enableGroups.forEach {
+                    if (!plugin.generalConfig.getBoolean("notify.player_status.group_enable", it.key.toLong())) return@submitAsync
                     val messagePath = "notify.player_status.${if (isJoin) "join" else "leave"}"
-                    val message = if (plugin.generalConfig.getStringList(messagePath).isEmpty())
-                        plugin.generalConfig.getString(messagePath)?: ""
-                    else plugin.generalConfig.getStringList(messagePath).random()
+                    val message = if (plugin.generalConfig.getStringList(messagePath, it.key.toLong()).isEmpty())
+                        plugin.generalConfig.getString(messagePath, it.key.toLong())?: ""
+                    else plugin.generalConfig.getStringList(messagePath, it.key.toLong()).random()
                     BotProvider.getBot()?.action(
-                        SendGroupMessage(it.toLong(), plugin.setPlaceholders(player, message)
+                        SendGroupMessage(it.key.toLong(), plugin.setPlaceholders(player, message)
                             .replace("\${playerName}", playerName)
                             .replace("\${userId}", qq.toString()), true)
                     )
@@ -47,23 +48,23 @@ object AEventUtil {
         }
     }
 
-    fun canForwardMessage(plugin: AQQBot, message: String): String? {
-        if (!plugin.generalConfig.getBoolean("chat.server_to_group.enable")) {
+    fun canForwardMessage(plugin: AQQBot, message: String, groupId: Long): String? {
+        if (!plugin.generalConfig.getBoolean("chat.server_to_group.enable", groupId)) {
             return null
         }
         val formatter = plugin.toGroupFormatter
-        var formattedMessage = formatter.regexFilter(plugin.generalConfig.getStringList("chat.server_to_group.filter"), message)
+        var formattedMessage = formatter[groupId]?.regexFilter(plugin.generalConfig.getStringList("chat.server_to_group.filter", groupId), message)?: message
         if (formattedMessage.contains("!CANCEL")) return null
-        if (plugin.generalConfig.getBoolean("chat.server_to_group.default_format")) {
+        if (plugin.generalConfig.getBoolean("chat.server_to_group.default_format", groupId)) {
             formattedMessage = AFormatter.chatClear(formattedMessage)
         }
-        if (formattedMessage.length > plugin.generalConfig.getInt("chat.max_forward_length")) {
-            formattedMessage = formattedMessage.substring(0, plugin.generalConfig.getInt("chat.max_forward_length")) + "..."
+        if (formattedMessage.length > plugin.generalConfig.getInt("chat.max_forward_length", groupId)) {
+            formattedMessage = formattedMessage.substring(0, plugin.generalConfig.getInt("chat.max_forward_length", groupId)) + "..."
         }
-        if (plugin.generalConfig.getStringList("chat.server_to_group.prefix").contains("")) {
+        if (plugin.generalConfig.getStringList("chat.server_to_group.prefix", groupId).contains("")) {
             return formattedMessage
         }
-        plugin.generalConfig.getStringList("chat.server_to_group.prefix").forEach {
+        plugin.generalConfig.getStringList("chat.server_to_group.prefix", groupId).forEach {
             if (formattedMessage.startsWith(it)) {
                 return formattedMessage.substring(it.length)
             }

@@ -13,11 +13,11 @@ class CommandHandler(val plugin: AQQBot) {
     private val config = plugin.generalConfig
     
     fun handle(message: String, event: GroupMessageEvent, memberList: GroupMemberList): Boolean {
-        if (!config.getBoolean("command_execution.enable")) {
+        if (!config.getBoolean("command_execution.enable", event.groupId)) {
             return false
         }
         if (message.split(" ").size < 2) return false
-        config.getStringList("command_execution.prefix").forEach prefix@ { prefix ->
+        config.getStringList("command_execution.prefix", event.groupId).forEach prefix@ { prefix ->
             if (message.lowercase().startsWith(prefix.lowercase())) {
                 var hasPermission = false
                 var member: GroupMember? = null
@@ -27,7 +27,7 @@ class CommandHandler(val plugin: AQQBot) {
                         return@forEach
                     }
                 }
-                config.getStringList("command_execution.allow").forEach {
+                config.getStringList("command_execution.allow", event.groupId).forEach {
                     if (it.startsWith("\$")) {
                         if (it == "\$OWNER" && member?.role == GroupRole.OWNER) {
                             hasPermission = true
@@ -53,10 +53,10 @@ class CommandHandler(val plugin: AQQBot) {
                     val command = commandList.joinToString(" ")
                     BotProvider.getBot()?.action(SendGroupMessage(event.groupId, plugin.getMessageManager().get("qq.executing_command")))
                     plugin.submit {
-                        plugin.submitCommand(command).thenAccept {
-                            if (config.getBoolean("command_execution.format")) {
+                        plugin.submitCommand(command, event.groupId).thenAccept {
+                            if (config.getBoolean("command_execution.format", event.groupId)) {
                                 BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
-                                    it.getFormattedString().ifEmpty { plugin.getMessageManager().get("qq.execution_finished") }))
+                                    it.getFormattedString(event.groupId).ifEmpty { plugin.getMessageManager().get("qq.execution_finished") }))
                             } else {
                                 BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
                                     it.getRawString().ifEmpty { plugin.getMessageManager().get("qq.execution_finished") }))

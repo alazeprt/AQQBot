@@ -18,5 +18,5 @@ interface TaskProvider {
 
     fun submitTimerAsync(delay: Long, period: Long, task: Runnable): Cancelable
 
-    fun submitCommand(command: String): CompletableFuture<AExecution>
+    fun submitCommand(command: String, groupId: Long): CompletableFuture<AExecution>
 }

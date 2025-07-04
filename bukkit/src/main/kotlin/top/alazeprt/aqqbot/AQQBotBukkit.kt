@@ -34,17 +34,17 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
 
     override lateinit var dataProvider: DataProvider
 
-    override lateinit var enableGroups: MutableList<String>
+    override lateinit var enableGroups: MutableMap<String, FileConfiguration?>
 
-    override lateinit var toGameFormatter: AFormatter
-    override lateinit var toGroupFormatter: AFormatter
+    override lateinit var toGameFormatter: MutableMap<Long, AFormatter>
+    override lateinit var toGroupFormatter: MutableMap<Long, AFormatter>
 
-    override lateinit var sender: Class<out AExecution>
+    override lateinit var sender: MutableMap<Long, Class<out AExecution>>
 
     override lateinit var libraryManager: LibraryManager
 
     override lateinit var customCommands: MutableList<ACustom>
-    override lateinit var generalConfig: FileConfiguration
+    override lateinit var generalConfig: GroupConfiguration
     override lateinit var messageConfig: FileConfiguration
     override lateinit var botConfig: FileConfiguration
     override lateinit var customConfig: FileConfiguration
@@ -114,32 +114,34 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     }
 
     override fun setSender() {
-        generalConfig.getStringList("command_execution.sort").forEach {
-            when (it.uppercase()) {
-                "NATIVE" -> if (NativeServerSender(this).check()) {
-                    sender = NativeServerSender::class.java
-                    return
-                }
-                "DECIDATED_SERVER" -> if (DecidatedServerSender(this).check()) {
-                    sender = DecidatedServerSender::class.java
-                    return
-                }
-                "MINECRAFT_SERVER" -> if (MinecraftServerSender(this).check()) {
-                    sender = MinecraftServerSender::class.java
-                    return
-                }
-                "RCON" -> {
-                    val instance = RCONSender(this)
-                    val pass = instance.check()
-                    if (pass) {
-                        sender = RCONSender::class.java
-                        instance.close()
-                        return
+        enableGroups.forEach out@ { group, _ ->
+            generalConfig.getStringList("command_execution.sort", group.toLong()).forEach {
+                when (it.uppercase()) {
+                    "NATIVE" -> if (NativeServerSender(this).check()) {
+                        sender[group.toLong()] = NativeServerSender::class.java
+                        return@out
                     }
-                }
-                "SIMULATE_CONSOLE" -> {
-                    sender = BukkitConsoleSender::class.java
-                    return
+                    "DECIDATED_SERVER" -> if (DecidatedServerSender(this).check()) {
+                        sender[group.toLong()] = DecidatedServerSender::class.java
+                        return@out
+                    }
+                    "MINECRAFT_SERVER" -> if (MinecraftServerSender(this).check()) {
+                        sender[group.toLong()] = MinecraftServerSender::class.java
+                        return@out
+                    }
+                    "RCON" -> {
+                        val instance = RCONSender(this)
+                        val pass = instance.check(group.toLong())
+                        if (pass) {
+                            sender[group.toLong()] = RCONSender::class.java
+                            instance.close()
+                            return@out
+                        }
+                    }
+                    "SIMULATE_CONSOLE" -> {
+                        sender[group.toLong()] = BukkitConsoleSender::class.java
+                        return@out
+                    }
                 }
             }
         }

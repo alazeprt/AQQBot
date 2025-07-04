@@ -75,7 +75,7 @@ object AImageUtil {
         return try {
             Font(fontName, fontStyle, fontSize)
         } catch (e: Exception) {
-            println("Failed to load font '$fontName'")
+            e.printStackTrace()
             Font(Font.SANS_SERIF, Font.PLAIN, fontSize)
         }
     }

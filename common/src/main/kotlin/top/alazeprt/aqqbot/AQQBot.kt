@@ -17,9 +17,11 @@ import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.task.TaskProvider
 import top.alazeprt.aqqbot.util.AExecution
 import top.alazeprt.aqqbot.util.AFormatter
+import top.alazeprt.aqqbot.util.GroupConfiguration
 import top.alazeprt.aqqbot.util.LogLevel
 import java.net.URI
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
 
 interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, TaskProvider {
 
@@ -34,14 +36,14 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
 
     var dataProvider: DataProvider
 
-    var toGroupFormatter: AFormatter
-    var toGameFormatter: AFormatter
+    var toGroupFormatter: MutableMap<Long, AFormatter>
+    var toGameFormatter: MutableMap<Long, AFormatter>
 
-    var sender: Class<out AExecution>
+    var sender: MutableMap<Long, Class<out AExecution>>
 
     var libraryManager: LibraryManager
 
-    override var generalConfig: FileConfiguration
+    override var generalConfig: GroupConfiguration
     override var messageConfig: FileConfiguration
     override var botConfig: FileConfiguration
 
@@ -51,19 +53,24 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         log(LogLevel.INFO, "Loading config...")
         loadConfig(this)
         log(LogLevel.INFO, "Loading data...")
-        loadData(DataStorageType.valueOf(generalConfig.getString("storage.type").uppercase()))
+        loadData(DataStorageType.valueOf(generalConfig.getString("storage.type", null).uppercase()))
         log(LogLevel.INFO, "Loading debug system...")
         loadDebug()
         log(LogLevel.INFO, "Registering commands...")
         loadCommands(this)
         log(LogLevel.INFO, "Loading command execution system ...")
+        sender = ConcurrentHashMap()
         setSender()
-        log(LogLevel.INFO, "Command Execution System: ${sender.name}")
+        log(LogLevel.INFO, "Command Execution System: ${sender.map { it.key.toString() to it.value.name }.joinToString(", ")}")
         log(LogLevel.INFO, "Loading formatters...")
-        toGroupFormatter = AFormatter(this)
-        toGameFormatter = AFormatter(this)
-        toGroupFormatter.initialUrl(generalConfig.getStringList("chat.server_to_group.filter"))
-        toGameFormatter.initialUrl(generalConfig.getStringList("chat.group_to_server.filter"))
+        toGroupFormatter = ConcurrentHashMap()
+        toGameFormatter = ConcurrentHashMap()
+        enableGroups.forEach { group, _ ->
+            toGroupFormatter[group.toLong()] = AFormatter(this)
+            toGameFormatter[group.toLong()] = AFormatter(this)
+            toGroupFormatter[group.toLong()]?.initialUrl(generalConfig.getStringList("chat.server_to_group.filter", group.toLong()))
+            toGameFormatter[group.toLong()]?.initialUrl(generalConfig.getStringList("chat.group_to_server.filter", group.toLong()))
+        }
         adapter = loadAdapter()
         log(LogLevel.INFO, "Connecting to the bot...")
         if (botConfig.getString("access_token").isNullOrBlank()) {
@@ -96,11 +103,11 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         }
         log(LogLevel.INFO, "Loading hooks...")
         loadHook(this)
-        if (generalConfig.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {
+        if (generalConfig.getAllString("whitelist.verify_method").map { it.uppercase() }.contains("VERIFY_CODE")) {
             submitTimerAsync(0L, 5 * 20L) {
                 verifyCodeMap.forEach {
                     if (System.currentTimeMillis() - it.value.second >
-                           generalConfig.getLong("whitelist.verify_code_expire_time") * 1000L) {
+                           generalConfig.getAllLong("whitelist.verify_code_expire_time")[0] * 1000L) {
                         verifyCodeMap.remove(it.key)
                     }
                 }
@@ -122,13 +129,14 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
                 }
             }
         }
-        if (generalConfig.getBoolean("notify.server_status.enable") && getBot() != null &&
-                getBot()!!.isConnected()) {
+        if (getBot() != null && getBot()!!.isConnected()) {
             enableGroups.forEach {
-                getBot()!!.action(SendGroupMessage(it.toLong(),
-                    if (generalConfig.getStringList("notify.server_status.start").isEmpty())
-                        generalConfig.getString("notify.server_status.start")?: "[AQQBot] 服务器已启动!"
-                    else generalConfig.getStringList("notify.server_status.start").random()?: "[AQQBot] 服务器已启动!"))
+                if (!generalConfig.getBoolean("notify.server_status.enable", it.key.toLong())) return@forEach
+                getBot()!!.action(SendGroupMessage(it.key.toLong(),
+                    if (generalConfig.getStringList("notify.server_status.start", it.key.toLong()).isEmpty())
+                        generalConfig.getString("notify.server_status.start", it.key.toLong())
+                    else generalConfig.getStringList("notify.server_status.start", it.key.toLong()).random()
+                ))
             }
         }
     }
@@ -137,18 +145,19 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
 
     fun disable() {
         log(LogLevel.INFO, "Disconnecting bot...")
-        if (generalConfig.getBoolean("notify.server_status.enable") && getBot() != null &&
-            getBot()!!.isConnected) {
+        if (getBot() != null && getBot()!!.isConnected) {
             enableGroups.forEach {
-                getBot()!!.action(SendGroupMessage(it.toLong(),
-                    if (generalConfig.getStringList("notify.server_status.stop").isEmpty())
-                        generalConfig.getString("notify.server_status.stop")?: "[AQQBot] 服务器已关闭!"
-                    else generalConfig.getStringList("notify.server_status.stop").random()?: "[AQQBot] 服务器已关闭!"))
+                if (!generalConfig.getBoolean("notify.server_status.enable", it.key.toLong())) return@forEach
+                getBot()!!.action(SendGroupMessage(it.key.toLong(),
+                    if (generalConfig.getStringList("notify.server_status.stop", it.key.toLong()).isEmpty())
+                        generalConfig.getString("notify.server_status.stop", it.key.toLong())
+                    else generalConfig.getStringList("notify.server_status.stop", it.key.toLong()).random()
+                ))
             }
         }
         unloadBot()
         log(LogLevel.INFO, "Saving data...")
-        saveData(DataStorageType.valueOf(generalConfig.getString("storage.type").uppercase()))
+        saveData(DataStorageType.valueOf(generalConfig.getString("storage.type", null).uppercase()))
         log(LogLevel.INFO, "Unloading debug system...")
         unloadDebug()
     }
@@ -244,11 +253,11 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         return dataProvider.getPlayerByQQ(qq)
     }
 
-    override fun submitCommand(command: String): CompletableFuture<AExecution> {
-        val senderInstance: AExecution = sender.constructors[0].newInstance(this) as AExecution
+    override fun submitCommand(command: String, groupId: Long): CompletableFuture<AExecution> {
+        val senderInstance: AExecution = sender[groupId]!!.constructors[0].newInstance(this) as AExecution
         if (senderInstance.javaClass.methods.map { it.name }.contains("check")) {
             senderInstance.javaClass.getMethod("check").invoke(senderInstance)
         }
-        return senderInstance.execute(command)
+        return senderInstance.execute(command, groupId)
     }
 }

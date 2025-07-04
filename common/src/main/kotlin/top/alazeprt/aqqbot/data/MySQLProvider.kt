@@ -14,11 +14,11 @@ class MySQLProvider(plugin: AQQBot) : DatabaseDataProvider(plugin) {
 
     override fun loadData(type: DataStorageType) {
         val config = plugin.generalConfig
-        val host = HostSQL(config.getString("storage.mysql.host"),
-            config.getInt("storage.mysql.port").toString(),
-            config.getString("storage.mysql.user"),
-            config.getString("storage.mysql.password"),
-            config.getString("storage.mysql.database"))
+        val host = HostSQL(config.getString("storage.mysql.host", null),
+            config.getInt("storage.mysql.port", null).toString(),
+            config.getString("storage.mysql.user", null),
+            config.getString("storage.mysql.password", null),
+            config.getString("storage.mysql.database", null),)
         val dataSourceFile = File(plugin.getDataFolder(), "datasource.yml")
         if (!dataSourceFile.exists()) {
             plugin.saveResource("datasource.yml", false)

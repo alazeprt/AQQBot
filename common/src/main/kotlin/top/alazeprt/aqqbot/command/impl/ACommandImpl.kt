@@ -16,7 +16,7 @@ class ACommandImpl(val plugin: AQQBot) {
 
     fun forceBind(userId: String, playerName: String): String {
         plugin.removePlayer(userId.toLong())
-        if (!AFormatter.validateName(plugin, playerName)) {
+        if (!AFormatter.validateName(plugin, playerName, null)) {
             return AFormatter.pluginToChat(plugin.getMessageManager().get("game.invalid_arguments"))
         }
         plugin.removePlayer(plugin.adapter!!.getOfflinePlayer(playerName))

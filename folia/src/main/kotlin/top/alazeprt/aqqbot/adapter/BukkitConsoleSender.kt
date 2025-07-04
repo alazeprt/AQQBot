@@ -134,8 +134,8 @@ class BukkitConsoleSender(val plugin: AQQBotBukkit) : ConsoleCommandSender, AExe
         messageList.add(p1)
     }
 
-    override fun getFormattedString(): String {
-        return AFormatter(plugin).regexFilter(plugin.generalConfig.getStringList("command_execution.filter"),
+    override fun getFormattedString(groupId: Long?): String {
+        return AFormatter(plugin).regexFilter(plugin.generalConfig.getStringList("command_execution.filter", groupId),
             AFormatter.chatClear(messageList.joinToString("\n"))
         )
     }
@@ -144,10 +144,10 @@ class BukkitConsoleSender(val plugin: AQQBotBukkit) : ConsoleCommandSender, AExe
         return messageList.joinToString("\n")
     }
 
-    override fun execute(command: String): CompletableFuture<AExecution> {
+    override fun execute(command: String, groupId: Long?): CompletableFuture<AExecution> {
         Bukkit.dispatchCommand(this, command)
         return CompletableFuture.supplyAsync {
-            Thread.sleep(plugin.generalConfig.getLong("command_execution.delay") * 1000L)
+            Thread.sleep(plugin.generalConfig.getLong("command_execution.delay", groupId) * 1000L)
             this
         }
     }

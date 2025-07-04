@@ -59,10 +59,10 @@ class VelocityConsoleSender(val plugin: AQQBotVelocity) : CommandSource, AExecut
         tmpMessage = ""
     }
 
-    override fun getFormattedString(): String {
-        var str = AFormatter(plugin).regexFilter(plugin.generalConfig.getStringList("command_execution.filter"),
+    override fun getFormattedString(groupId: Long?): String {
+        var str = AFormatter(plugin).regexFilter(plugin.generalConfig.getStringList("command_execution.filter", groupId),
             AFormatter.chatClear(AFormatter.chatClear(messageList.joinToString("\n"))))
-        plugin.generalConfig.getStringList("command_execution.format_list").forEach {
+        plugin.generalConfig.getStringList("command_execution.format_list", groupId).forEach {
             if (it != "") {
                 str = str.replace(it, "")
             }
@@ -71,19 +71,14 @@ class VelocityConsoleSender(val plugin: AQQBotVelocity) : CommandSource, AExecut
     }
 
     override fun getRawString(): String {
-        var str = messageList.joinToString("\n")
-        plugin.generalConfig.getStringList("command_execution.format_list").forEach {
-            if (it != "") {
-                str = str.replace(it, "")
-            }
-        }
+        val str = messageList.joinToString("\n")
         return str
     }
 
-    override fun execute(command: String): CompletableFuture<AExecution> {
+    override fun execute(command: String, groupId: Long?): CompletableFuture<AExecution> {
         future = plugin.server.commandManager.executeImmediatelyAsync(this, command)
         return CompletableFuture.supplyAsync {
-            Thread.sleep(1000L * plugin.generalConfig.getInt("command_execution.delay"))
+            Thread.sleep(1000L * plugin.generalConfig.getInt("command_execution.delay", groupId))
             this
         }
     }

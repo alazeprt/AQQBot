@@ -9,15 +9,13 @@ import top.alazeprt.aqqbot.profile.APlayer
 class AChatEvent(val plugin: AQQBot, private val player: APlayer, private val message: String): AEvent {
     override fun handle() {
         plugin.debugModule?.debugLogger?.log("receive message from game: ${player.getName()}: $message")
-        if (canForwardMessage(plugin, message) != null) {
-            plugin.debugModule?.debugLogger?.log("forward message from game: ${player.getName()}: $message")
-            plugin.submitAsync {
-                val message = canForwardMessage(plugin, message)?: return@submitAsync
-                plugin.enableGroups.forEach {
-                    BotProvider.getBot()?.action(SendGroupMessage(
-                        it.toLong(), plugin.getMessageManager().
-                        get("qq.chat_from_game", mutableMapOf("player" to player.getName(), "message" to message))))
-                }
+        plugin.debugModule?.debugLogger?.log("forward message from game: ${player.getName()}: $message")
+        plugin.submitAsync {
+            plugin.enableGroups.forEach {
+                val message = canForwardMessage(plugin, message, it.key.toLong())?: return@forEach
+                BotProvider.getBot()?.action(SendGroupMessage(
+                    it.key.toLong(), plugin.getMessageManager().
+                    get("qq.chat_from_game", mutableMapOf("player" to player.getName(), "message" to message))))
             }
         }
     }

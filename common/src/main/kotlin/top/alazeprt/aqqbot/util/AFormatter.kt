@@ -117,8 +117,8 @@ class AFormatter(val plugin: AQQBot) {
             return string.replace(Regex("§([0-9a-fklmnor])"), "")
         }
 
-        fun validateName(plugin: AQQBot?, name: String): Boolean {
-            val regex = plugin?.generalConfig?.getString("whitelist.name_rule")?: "[a-zA-Z0-9_]+"
+        fun validateName(plugin: AQQBot?, name: String, groupId: Long?): Boolean {
+            val regex = plugin?.generalConfig?.getString("whitelist.name_rule", groupId)?: "[a-zA-Z0-9_]+"
             return name.matches(regex.toRegex())
         }
     }

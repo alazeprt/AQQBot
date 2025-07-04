@@ -36,10 +36,10 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
                         if (plugin.getPlayerByQQ(userId.toLong()).isNotEmpty()) {
                             str = str.replace("\$player", plugin.getPlayerByQQ(userId.toLong())[0].getName())
                         }
-                        val result = plugin.submitCommand(mapFormat(str, map))
+                        val result = plugin.submitCommand(mapFormat(str, map), groupId.toLong())
                         if (executeMap.containsKey(i+1)) {
                             if (format) {
-                                executeMap[i+1] = result.get().getFormattedString()
+                                executeMap[i+1] = result.get().getFormattedString(groupId.toLong())
                             } else {
                                 executeMap[i+1] = result.get().getRawString()
                             }
@@ -110,10 +110,10 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
                         if (plugin.getPlayerByQQ(userId.toLong()).isNotEmpty()) {
                             str = str.replace("\$player", plugin.getPlayerByQQ(userId.toLong())[0].getName())
                         }
-                        val result = plugin.submitCommand(mapFormat(str, map))
+                        val result = plugin.submitCommand(mapFormat(str, map), groupId.toLong())
                         if (executeMap.containsKey(i+1)) {
                             if (format) {
-                                executeMap[i+1] = result.get().getFormattedString()
+                                executeMap[i+1] = result.get().getFormattedString(groupId.toLong())
                             } else {
                                 executeMap[i+1] = result.get().getRawString()
                             }

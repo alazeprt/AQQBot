@@ -26,7 +26,7 @@ class DecidatedServerSender(private val plugin: AQQBot): AExecution {
         }
     }
 
-    override fun execute(command: String): CompletableFuture<AExecution> {
+    override fun execute(command: String, groupId: Long?): CompletableFuture<AExecution> {
         message = method.invoke(dedicatedServer, command) as String
         return CompletableFuture.completedFuture(this)
     }
@@ -35,8 +35,8 @@ class DecidatedServerSender(private val plugin: AQQBot): AExecution {
         return message
     }
 
-    override fun getFormattedString(): String {
-        return AFormatter(plugin).regexFilter(plugin.generalConfig.getStringList("command_execution.filter"),
+    override fun getFormattedString(groupId: Long?): String {
+        return AFormatter(plugin).regexFilter(plugin.generalConfig.getStringList("command_execution.filter", groupId),
             AFormatter.chatClear(message)
         )
     }
