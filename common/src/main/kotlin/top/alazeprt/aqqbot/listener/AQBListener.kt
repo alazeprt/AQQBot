@@ -36,6 +36,8 @@ class AQBListener(val plugin: AQQBot) : Listener {
                                 message += "@${member.member.nickname}"
                             }
                         }
+                    } else if (jsonObject.get("type").asString == "face") {
+                        message += "[表情包-"
                     }
                 }
                 plugin.debugModule?.debugLogger?.log("receive message from ${event.groupId} which is sent by ${event.senderId}: $message")
