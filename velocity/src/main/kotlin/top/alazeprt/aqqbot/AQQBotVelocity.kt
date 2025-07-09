@@ -265,7 +265,7 @@ class AQQBotVelocity : AQQBot {
 
     @Subscribe
     fun onJoin(event: LoginEvent) {
-        AJoinEvent(this, VelocityPlayer(event.player)).handle()
+        AJoinEvent(this, VelocityPlayer(event.player), {VelocityPlayer(event.player).kick(it)}).handle()
     }
 
     @Subscribe
