@@ -7,5 +7,6 @@ import top.alazeprt.aqqbot.util.Cancelable
 class BukkitTaskCancelable(val plugin: Plugin): Cancelable {
     override fun cancel(mayInterruptIfRunning: Boolean) {
         plugin.server.globalRegionScheduler.cancelTasks(plugin)
+        plugin.server.asyncScheduler.cancelTasks(plugin)
     }
 }
