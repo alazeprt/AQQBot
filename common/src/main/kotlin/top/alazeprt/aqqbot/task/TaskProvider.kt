@@ -5,7 +5,6 @@ import top.alazeprt.aqqbot.util.Cancelable
 import java.util.concurrent.CompletableFuture
 
 interface TaskProvider {
-    // TODO: add cancel() method for every task submitted
     fun submit(task: Runnable): Cancelable
 
     fun submitAsync(task: Runnable): Cancelable
