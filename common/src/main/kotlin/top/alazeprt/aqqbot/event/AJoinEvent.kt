@@ -5,7 +5,6 @@ import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.event.AEventUtil.playerStatusHandler
 import top.alazeprt.aqqbot.event.AEventUtil.whitelistHandler
 import top.alazeprt.aqqbot.profile.APlayer
-import java.lang.reflect.Method
 import java.util.function.Consumer
 
 class AJoinEvent(val plugin: AQQBot, private val player: APlayer, val kickMethod: Consumer<String>) : AEvent {

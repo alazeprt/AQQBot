@@ -10,14 +10,16 @@ object BotProvider {
     private var botClient: WebsocketBotClient? = null
 
     private var hasLoaded = false
+    private var hasRegistered = false
 
     fun loadBot(plugin: AQQBot, uri: URI) {
         try {
             val client = WebsocketBotClient(uri)
             client.connect()
             botClient = client
-            if (!hasLoaded) {
+            if (!hasLoaded && !hasRegistered) {
                 botClient!!.registerEvent(AQBListener(plugin))
+                hasRegistered = true
             }
             hasLoaded = true
         } catch (e: Exception) {
@@ -30,8 +32,9 @@ object BotProvider {
             val client = WebsocketBotClient(uri, token)
             client.connect()
             botClient = client
-            if (!hasLoaded) {
+            if (!hasLoaded && !hasRegistered) {
                 botClient!!.registerEvent(AQBListener(plugin))
+                hasRegistered = true
             }
             hasLoaded = true
         } catch (e: Exception) {
