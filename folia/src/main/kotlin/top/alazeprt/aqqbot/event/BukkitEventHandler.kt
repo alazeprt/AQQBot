@@ -17,7 +17,7 @@ class BukkitEventHandler(val plugin: AQQBotBukkit) : Listener {
     @EventHandler
     fun onJoin(event: PlayerLoginEvent) {
         AJoinEvent(plugin, BukkitPlayer(event.player)) {
-            event.result = PlayerLoginEvent.Result.KICK_OTHER
+            event.result = PlayerLoginEvent.Result.KICK_WHITELIST
             event.kickMessage = it
         }.handle()
     }
