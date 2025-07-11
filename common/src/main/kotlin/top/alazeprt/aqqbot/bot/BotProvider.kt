@@ -9,34 +9,35 @@ object BotProvider {
 
     private var botClient: WebsocketBotClient? = null
 
-    private var hasLoaded = false
-    private var hasRegistered = false
+    private var aqbListener: AQBListener? = null
 
     fun loadBot(plugin: AQQBot, uri: URI) {
+        if (aqbListener == null) {
+            aqbListener = AQBListener(plugin)
+        }
         try {
             val client = WebsocketBotClient(uri)
             client.connect()
             botClient = client
-            if (!hasLoaded && !hasRegistered) {
-                botClient!!.registerEvent(AQBListener(plugin))
-                hasRegistered = true
+            if (botClient?.eventList?.contains(aqbListener) == false) {
+                botClient?.registerEvent(aqbListener)
             }
-            hasLoaded = true
         } catch (e: Exception) {
             throw RuntimeException("Failed to connect to OneBot's websocket server!", e)
         }
     }
 
     fun loadBot(plugin: AQQBot, uri: URI, token: String) {
+        if (aqbListener == null) {
+            aqbListener = AQBListener(plugin)
+        }
         try {
             val client = WebsocketBotClient(uri, token)
             client.connect()
             botClient = client
-            if (!hasLoaded && !hasRegistered) {
-                botClient!!.registerEvent(AQBListener(plugin))
-                hasRegistered = true
+            if (botClient?.eventList?.contains(aqbListener) == false) {
+                botClient?.registerEvent(aqbListener)
             }
-            hasLoaded = true
         } catch (e: Exception) {
             throw RuntimeException("Failed to connect to OneBot's websocket server!", e)
         }
@@ -45,6 +46,7 @@ object BotProvider {
     fun unloadBot() {
         if (botClient != null && botClient!!.isConnected) {
             botClient!!.disconnect()
+            botClient!!.unregisterEvent(aqbListener)
             botClient = null
         }
     }

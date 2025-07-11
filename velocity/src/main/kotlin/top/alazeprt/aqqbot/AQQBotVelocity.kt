@@ -318,7 +318,7 @@ class AQQBotVelocity : AQQBot {
         val aonebotLib = Library.builder()
             .groupId("com{}github{}alazeprt")
             .artifactId("AOneBot")
-            .version("1.0.15-beta")
+            .version("1.0.16-beta")
             .relocate("com{}google{}code{}gson", "top{}alazeprt{}aonebot{}lib{}com{}google")
             .resolveTransitiveDependencies(true)
             .build()
