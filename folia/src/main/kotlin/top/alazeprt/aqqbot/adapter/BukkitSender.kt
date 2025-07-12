@@ -17,4 +17,8 @@ class BukkitSender(val sender: CommandSender) : ASender {
     override fun hasPermission(permission: String): Boolean {
         return sender.hasPermission(permission)
     }
+
+    override fun getName(): String {
+        return sender.name
+    }
 }

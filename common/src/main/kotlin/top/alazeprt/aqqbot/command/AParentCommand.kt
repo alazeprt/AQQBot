@@ -9,9 +9,15 @@ class AParentCommand(val plugin: AQQBot) : ACommand {
         if (args.isEmpty()) {
             SubHelp(plugin).onCommand(command, sender, args)
         } else when (args[0]) {
-            "forcebind" -> SubForceBind(plugin).onCommand(command, sender, args)
-            "forceunbind" -> SubForceUnbind(plugin).onCommand(command, sender, args)
-            "query" -> SubQuery(plugin).onCommand(command, sender, args)
+            "status" -> SubStatus(plugin).onCommand(command, sender, args)
+            "whitelist" -> when (args[1]) {
+                "bind" -> SubBind(plugin).onCommand(command, sender, args)
+                "unbind" -> SubUnbind(plugin).onCommand(command, sender, args)
+                "query" -> SubQuery(plugin).onCommand(command, sender, args)
+                "info" -> SubQuery(plugin).onCommand(command, sender, args)
+                "reset" -> SubReset(plugin).onCommand(command, sender, args)
+                else -> SubHelp(plugin).onCommand(command, sender, args)
+            }
             "reload" -> SubReload(plugin).onCommand(command, sender, args)
             else -> SubHelp(plugin).onCommand(command, sender, args)
         }
@@ -19,10 +25,19 @@ class AParentCommand(val plugin: AQQBot) : ACommand {
 
     override fun onComplete(args: List<String>): List<String> {
         return when (args.size) {
-            1 -> listOf("forcebind", "forceunbind", "query", "reload")
+            1 -> listOf("whitelist", "status", "help", "reload")
             2 -> return when (args[0]) {
-                "forceunbind" -> listOf("qq", "player")
-                "query" -> listOf("qq", "player")
+                "whitelist" -> listOf("bind", "unbind", "reset", "query", "info")
+                else -> emptyList()
+            }
+            3 -> return when (args[0]) {
+                "whitelist" -> return when (args[1]) {
+                    "unbind" -> listOf("qq", "player")
+                    "query" -> listOf("qq", "player")
+                    "info" -> listOf("qq", "player")
+                    "reset" -> listOf("qq", "player")
+                    else -> emptyList()
+                }
                 else -> emptyList()
             }
             else -> emptyList()

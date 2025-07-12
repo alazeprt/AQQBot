@@ -7,7 +7,6 @@ import top.alazeprt.aqqbot.util.ACustom
 import top.alazeprt.aqqbot.util.GroupConfiguration
 import java.io.File
 import java.nio.file.Files
-import java.util.concurrent.ConcurrentHashMap
 
 interface ConfigProvider {
 

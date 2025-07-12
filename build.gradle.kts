@@ -39,3 +39,13 @@ configure<JavaPluginConvention> {
 tasks.build {
     dependsOn("shadowJar")
 }
+
+subprojects {
+    tasks.withType<Jar> {
+        manifest {
+            attributes("Implementation-Version" to rootProject.version)
+            attributes("Implementation-Vendor" to "alazeprt")
+            attributes("Implementation-Website" to "https://aqqbot.alazeprt.top/")
+        }
+    }
+}

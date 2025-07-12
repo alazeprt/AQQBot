@@ -16,4 +16,8 @@ class VelocitySender(val sender: CommandSource): ASender {
     override fun hasPermission(permission: String): Boolean {
         return sender.hasPermission(permission)
     }
+
+    override fun getName(): String {
+        return sender.toString()
+    }
 }

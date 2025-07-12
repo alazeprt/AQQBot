@@ -9,4 +9,6 @@ interface ASender {
     fun sendMessage(message: Component)
 
     fun hasPermission(permission: String): Boolean
+
+    fun getName(): String
 }
