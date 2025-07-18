@@ -75,15 +75,16 @@ class ACommandImpl(val plugin: AQQBot) {
     fun status(sender: ASender) {
         sender.sendMessage(AFormatter.pluginToChat(plugin.getMessageManager().get("game.getting_status_data")))
         plugin.submitAsync {
-            val version = APluginInformation.getVersion()
-            val author = APluginInformation.getAuthor()
-            val website = APluginInformation.getWebsite()
-            val latestVersion = APluginInformation.getLatestVersion()
-            val latestCommit = APluginInformation.getLatestCommit()
-            val currentConfigVersion = APluginInformation.getCurrentConfigVersion(plugin)
-            val pluginConfigVersion = APluginInformation.getPluginConfigVersion()
-            val latestConfigVersion = APluginInformation.getLatestConfigVersion()
-            val websocketStatus = APluginInformation.getWebsocketStatus()
+            val pluginInfo = APluginInformation(plugin)
+            val version = pluginInfo.getVersion()
+            val author = pluginInfo.getAuthor()
+            val website = pluginInfo.getWebsite()
+            val latestVersion = pluginInfo.getLatestVersion()
+            val latestCommit = pluginInfo.getLatestCommit()
+            val currentConfigVersion = pluginInfo.getCurrentConfigVersion(plugin)
+            val pluginConfigVersion = pluginInfo.getPluginConfigVersion()
+            val latestConfigVersion = pluginInfo.getLatestConfigVersion()
+            val websocketStatus = pluginInfo.getWebsocketStatus()
             sender.sendMessage(AFormatter.pluginToChat(plugin.getMessageManager().getList("game.status_result", mutableMapOf(
                 "author" to author,
                 "version" to version,
