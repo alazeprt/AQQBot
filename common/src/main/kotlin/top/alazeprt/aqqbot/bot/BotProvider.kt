@@ -23,6 +23,7 @@ object BotProvider {
                 botClient?.registerEvent(aqbListener)
             }
         } catch (e: Exception) {
+            plugin.debugModule?.debugLogger?.log("Failed to connect to OneBot's websocket server: $e")
             throw RuntimeException("Failed to connect to OneBot's websocket server!", e)
         }
     }
@@ -39,6 +40,7 @@ object BotProvider {
                 botClient?.registerEvent(aqbListener)
             }
         } catch (e: Exception) {
+            plugin.debugModule?.debugLogger?.log("Failed to connect to OneBot's websocket server: $e")
             throw RuntimeException("Failed to connect to OneBot's websocket server!", e)
         }
     }

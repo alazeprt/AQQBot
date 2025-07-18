@@ -87,6 +87,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         }
         submitTimerAsync(0L, botConfig.getLong("check_interval") * 20) {
             if (getBot()?.isConnected != true) {
+                debugModule?.debugLogger?.log("Bot disconnected, trying to reconnect...")
                 if (botConfig.getString("access_token").isNullOrBlank()) {
                     loadBot(
                         this,
@@ -132,6 +133,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         if (getBot() != null && getBot()!!.isConnected()) {
             enableGroups.forEach {
                 if (!generalConfig.getBoolean("notify.server_status.enable", it.key.toLong())) return@forEach
+                debugModule?.debugLogger?.log("Plugin initialized, sending server status message to ${it.key}")
                 getBot()!!.action(SendGroupMessage(it.key.toLong(),
                     if (generalConfig.getStringList("notify.server_status.start", it.key.toLong()).isEmpty())
                         generalConfig.getString("notify.server_status.start", it.key.toLong())
@@ -147,6 +149,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         log(LogLevel.INFO, "Disconnecting bot...")
         if (getBot() != null && getBot()!!.isConnected) {
             enableGroups.forEach {
+                debugModule?.debugLogger?.log("Plugin is disabling, sending server status message to ${it.key}")
                 if (!generalConfig.getBoolean("notify.server_status.enable", it.key.toLong())) return@forEach
                 getBot()!!.action(SendGroupMessage(it.key.toLong(),
                     if (generalConfig.getStringList("notify.server_status.stop", it.key.toLong()).isEmpty())

@@ -61,6 +61,7 @@ class AFormatter(val plugin: AQQBot) {
                     }
                     remoteFilter["$urlString.$path"] = filters
                 } catch (e: Exception) {
+                    plugin.debugModule?.debugLogger?.log("Failed to get remote filter: $urlString.$path: $e")
                     e.printStackTrace()
                 }
             }

@@ -81,7 +81,7 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
                 var base64 = AImageUtil.getImageBase64(unbind_image?.path?: return@submitAsync)
                 imageMap.forEach { t, u ->
                     if (t is AImageText) {
-                        base64 = AImageUtil.addTextToImage(base64, u, t.x, t.y, t.size, t.font, t.color, t.bold, t.italic)
+                        base64 = AImageUtil.addTextToImage(base64, u, t.x, t.y, t.size, t.font, t.color, t.bold, t.italic, plugin)
                     }
                 }
                 BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), "[CQ:image,file=base64://$base64]"))
@@ -156,7 +156,7 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
                 var base64 = AImageUtil.getImageBase64(image?.path?: return@submitAsync)
                 imageMap.forEach { t, u ->
                     if (t is AImageText) {
-                        base64 = AImageUtil.addTextToImage(base64, u, t.x, t.y, t.size, t.font, t.color, t.bold, t.italic)
+                        base64 = AImageUtil.addTextToImage(base64, u, t.x, t.y, t.size, t.font, t.color, t.bold, t.italic, plugin)
                     }
                 }
                 BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), "[CQ:image,file=base64://$base64]"))

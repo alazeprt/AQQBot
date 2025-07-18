@@ -16,6 +16,7 @@ class FileDataProvider(val plugin: AQQBot) : DataProvider {
     override fun loadData(type: DataStorageType) {
         dataConfig = YamlConfiguration.loadConfiguration(file)
         dataConfig.getKeys(false).forEach {
+            plugin.debugModule?.debugLogger?.log("Loading data: $it -> ${dataConfig.getStringList(it).joinToString(", ")}")
             dataMap[it] = dataConfig.getStringList(it).toMutableList()
         }
     }
@@ -26,6 +27,7 @@ class FileDataProvider(val plugin: AQQBot) : DataProvider {
 
     override fun saveData(type: DataStorageType) {
         dataMap.forEach {
+            plugin.debugModule?.debugLogger?.log("Saving data: $it -> ${it.value.joinToString(", ")}")
             dataConfig[it.key] = it.value
         }
         dataConfig.save(File(plugin.getDataFolder(), "data.yml"))

@@ -111,6 +111,7 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
             LogLevel.ERROR -> logger.severe(message)
             LogLevel.FATAL -> logger.severe(message)
         }
+        debugModule?.debugLogger?.log("(STANDARD) [$level] $message")
     }
 
     override fun setSender() {

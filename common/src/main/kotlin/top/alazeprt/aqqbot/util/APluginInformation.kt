@@ -1,6 +1,5 @@
 package top.alazeprt.aqqbot.util
 
-import com.google.common.io.Resources.getResource
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -9,13 +8,11 @@ import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.bot.BotProvider
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import java.io.Reader
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.Base64
 import java.util.jar.Manifest
 
-object APluginInformation {
+class APluginInformation(val plugin: AQQBot) {
     fun getVersion(): String {
         return this::class.java.`package`.implementationVersion ?: "Unknown"
     }
@@ -53,6 +50,7 @@ object APluginInformation {
             val jsonObject = Gson().fromJson(response, JsonObject::class.java)
             jsonObject.get("tag_name").asString ?: "Unknown"
         } catch (e: Exception) {
+            plugin.debugModule?.debugLogger?.log("Failed to get latest version: $e")
             "Unknown"
         }
     }
@@ -76,6 +74,7 @@ object APluginInformation {
             val jsonArray = Gson().fromJson(response, JsonArray::class.java)
             jsonArray[0].asJsonObject.get("sha").asString.substring(0, 7)
         } catch (e: Exception) {
+            plugin.debugModule?.debugLogger?.log("Failed to get latest commit: $e")
             "Unknown"
         }
     }
@@ -90,6 +89,7 @@ object APluginInformation {
             val yaml = YamlConfiguration.loadConfiguration(inputStream)
             return yaml.getString("version") ?: "Unknown"
         } catch (e: Exception) {
+            plugin.debugModule?.debugLogger?.log("Failed to get plugin config version: $e")
             return "Unknown"
         }
     }
@@ -112,7 +112,7 @@ object APluginInformation {
             val yaml = YamlConfiguration.loadConfiguration(reader)
             yaml.getString("version") ?: "Unknown"
         } catch (e: Exception) {
-            e.printStackTrace()
+            plugin.debugModule?.debugLogger?.log("Failed to get latest config version: $e")
             "Unknown"
         }
     }

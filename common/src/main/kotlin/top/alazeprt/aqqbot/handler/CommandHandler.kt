@@ -51,6 +51,7 @@ class CommandHandler(val plugin: AQQBot) {
                     val commandList = message.split(" ").toMutableList()
                     commandList.removeAt(0)
                     val command = commandList.joinToString(" ")
+                    plugin.debugModule?.debugLogger?.log("${event.senderId} remotely executed command: $command")
                     BotProvider.getBot()?.action(SendGroupMessage(event.groupId, plugin.getMessageManager().get("qq.executing_command")))
                     plugin.submit {
                         plugin.submitCommand(command, event.groupId).thenAccept {

@@ -1,5 +1,6 @@
 package top.alazeprt.aqqbot.util
 
+import top.alazeprt.aqqbot.AQQBot
 import java.awt.Color
 import java.awt.Font
 import java.awt.Graphics2D
@@ -22,10 +23,12 @@ object AImageUtil {
         color: String,
         bold: Boolean = false,
         italic: Boolean = false,
+        plugin: AQQBot
     ): String {
         val imageBytes = try {
             Base64.getDecoder().decode(cleanBase64String(base64Image))
         } catch (e: Exception) {
+            plugin.debugModule?.debugLogger?.log("Failed to decode base64 image data: $base64Image")
             throw IllegalArgumentException("Invalid base64 image data: ${e.message}")
         }
 
@@ -44,13 +47,13 @@ object AImageUtil {
             setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
             setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB)
 
-            val textColor = parseColor(color)
+            val textColor = parseColor(color, plugin)
 
             var fontStyle = Font.PLAIN
             if (bold) fontStyle = fontStyle or Font.BOLD
             if (italic) fontStyle = fontStyle or Font.ITALIC
 
-            font = getFont(fontName, fontSize, fontStyle)
+            font = getFont(fontName, fontSize, fontStyle, plugin)
             this.color = textColor
         }
 
@@ -71,11 +74,12 @@ object AImageUtil {
         }
     }
 
-    private fun getFont(fontName: String, fontSize: Int, fontStyle: Int): Font {
+    private fun getFont(fontName: String, fontSize: Int, fontStyle: Int, plugin: AQQBot): Font {
         return try {
             Font(fontName, fontStyle, fontSize)
         } catch (e: Exception) {
             e.printStackTrace()
+            plugin.debugModule?.debugLogger?.log("Failed to load font: $fontName, size: $fontSize, style: $fontStyle: $e")
             Font(Font.SANS_SERIF, Font.PLAIN, fontSize)
         }
     }
@@ -88,7 +92,7 @@ object AImageUtil {
         return Base64.getEncoder().encodeToString(imageBytes)
     }
 
-    private fun parseColor(colorStr: String): Color {
+    private fun parseColor(colorStr: String, plugin: AQQBot): Color {
         return when {
             colorStr.startsWith("#") -> {
                 val hex = colorStr.substring(1)
@@ -111,6 +115,7 @@ object AImageUtil {
                 val field = Color::class.java.getField(colorStr.toLowerCase())
                 field.get(null) as Color
             } catch (e: Exception) {
+                plugin.debugModule?.debugLogger?.log("Failed to parse color: $colorStr: $e")
                 Color.WHITE
             }
         }

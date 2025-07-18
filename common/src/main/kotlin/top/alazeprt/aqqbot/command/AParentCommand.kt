@@ -6,6 +6,7 @@ import top.alazeprt.aqqbot.profile.ASender
 
 class AParentCommand(val plugin: AQQBot) : ACommand {
     override fun onCommand(command: String, sender: ASender, args: List<String>) {
+        plugin.debugModule?.debugLogger?.log("${sender.getName()} executed command: $command ${args.joinToString(" ")}")
         if (args.isEmpty()) {
             SubHelp(plugin).onCommand(command, sender, args)
         } else when (args[0]) {

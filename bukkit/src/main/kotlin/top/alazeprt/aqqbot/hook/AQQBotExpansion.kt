@@ -18,6 +18,7 @@ class AQQBotExpansion(val plugin: AQQBot): PlaceholderExpansion() {
     }
 
     override fun onRequest(player: OfflinePlayer?, params: String): String? {
+        plugin.debugModule?.debugLogger?.log("PlaceholderAPI request with params: $params")
         if (params.contentEquals("qq")) {
             return (plugin.getQQByPlayer(plugin.adapter!!.getOfflinePlayer(player?.name?: ""))?: -1).toString()
         }

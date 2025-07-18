@@ -52,6 +52,7 @@ class MinecraftServerSender(private val plugin: AQQBot): AExecution {
             try {
                 Class.forName("net.minecraft.server.rcon.RemoteControlCommandListener")
             } catch (classNotFoundException2: ClassNotFoundException) {
+                plugin.debugModule?.debugLogger?.log("Failed to use rcon: $classNotFoundException\n$classNotFoundException2")
                 throw ClassNotFoundException("Can not find RconConsoleSource class path")
             }
         }
