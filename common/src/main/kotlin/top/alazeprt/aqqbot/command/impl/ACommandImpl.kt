@@ -18,32 +18,32 @@ class ACommandImpl(val plugin: AQQBot) {
 
     fun addBind(sender: ASender, userId: String, playerName: String): String {
         if (!AFormatter.validateName(plugin, playerName, null)) {
-            return AFormatter.pluginToChat(plugin.getMessageManager().get("game.invalid_arguments"))
+            return AFormatter.pluginToChat(plugin.messageManager.get("game.invalid_arguments", null))
         }
         if (plugin.getPlayerByQQ(userId.toLong()).size >= plugin.generalConfig.getLong("whitelist.max_bind_count", null)) {
-            return AFormatter.pluginToChat(plugin.getMessageManager().get("game.bind_too_many_accounts",
-                mutableMapOf("userId" to userId, "playerName" to playerName)))
+            return AFormatter.pluginToChat(plugin.messageManager.get("game.bind_too_many_accounts",
+                mutableMapOf("userId" to userId, "playerName" to playerName), null))
         }
         if (plugin.hasPlayer(plugin.adapter!!.getOfflinePlayer(playerName))) {
             val exists = plugin.getQQByPlayer(plugin.adapter!!.getOfflinePlayer(playerName))
-            return AFormatter.pluginToChat(plugin.getMessageManager().get("game.already_exists",
-                mutableMapOf("userId" to userId, "playerName" to playerName, "anotherUserId" to exists.toString())))
+            return AFormatter.pluginToChat(plugin.messageManager.get("game.already_exists",
+                mutableMapOf("userId" to userId, "playerName" to playerName, "anotherUserId" to exists.toString()), null))
         }
         plugin.addPlayer(userId.toLong(), plugin.adapter!!.getOfflinePlayer(playerName))
         plugin.debugModule?.debugLogger?.log("(in game) ${sender.getName()} bind $userId to account $playerName")
-        return AFormatter.pluginToChat(plugin.getMessageManager().get("game.successfully_bind"))
+        return AFormatter.pluginToChat(plugin.messageManager.get("game.successfully_bind", null))
     }
 
     fun removeBind(sender: ASender, mode: String, data: String): String {
         if (mode.contains("qq")) {
             if (!plugin.hasQQ(data.toLong())) {
-                return AFormatter.pluginToChat(plugin.getMessageManager().get("game.invalid_arguments"))
+                return AFormatter.pluginToChat(plugin.messageManager.get("game.invalid_arguments", null))
             }
             plugin.removePlayer(data.toLong())
             plugin.debugModule?.debugLogger?.log("(in game) ${sender.getName()} unbind $data (qq)")
         } else {
             if (!plugin.hasPlayer(plugin.adapter!!.getOfflinePlayer(data))) {
-                return AFormatter.pluginToChat(plugin.getMessageManager().get("game.invalid_arguments"))
+                return AFormatter.pluginToChat(plugin.messageManager.get("game.invalid_arguments", null))
             }
             plugin.removePlayer(plugin.adapter!!.getOfflinePlayer(data))
             plugin.debugModule?.debugLogger?.log("(in game) ${sender.getName()} unbind $data (player)")
@@ -51,11 +51,11 @@ class ACommandImpl(val plugin: AQQBot) {
         plugin.submit {
             plugin.adapter!!.getPlayerList().forEach {
                 if (!plugin.hasPlayer(plugin.adapter!!.getOfflinePlayer(it.getName()))) {
-                    it.kick(plugin.getMessageManager().get("game.kick_when_unbind"))
+                    it.kick(plugin.messageManager.get("game.kick_when_unbind", null))
                 }
             }
         }
-        return AFormatter.pluginToChat(plugin.getMessageManager().get("game.successfully_unbind"))
+        return AFormatter.pluginToChat(plugin.messageManager.get("game.successfully_unbind", null))
     }
 
     fun query(mode: String, data: String): String {
@@ -68,12 +68,12 @@ class ACommandImpl(val plugin: AQQBot) {
             playerName = data
             userId = plugin.getQQByPlayer(plugin.adapter!!.getOfflinePlayer(data)).toString()
         }
-        return AFormatter.pluginToChat(plugin.getMessageManager()
-            .getList("game.query_result", mutableMapOf("userId" to userId, "playerName" to playerName)))
+        return AFormatter.pluginToChat(plugin.messageManager
+            .getList("game.query_result", mutableMapOf("userId" to userId, "playerName" to playerName), null))
     }
 
     fun status(sender: ASender) {
-        sender.sendMessage(AFormatter.pluginToChat(plugin.getMessageManager().get("game.getting_status_data")))
+        sender.sendMessage(AFormatter.pluginToChat(plugin.messageManager.get("game.getting_status_data", null)))
         plugin.submitAsync {
             val pluginInfo = APluginInformation(plugin)
             val version = pluginInfo.getVersion()
@@ -85,7 +85,7 @@ class ACommandImpl(val plugin: AQQBot) {
             val pluginConfigVersion = pluginInfo.getPluginConfigVersion()
             val latestConfigVersion = pluginInfo.getLatestConfigVersion()
             val websocketStatus = pluginInfo.getWebsocketStatus()
-            sender.sendMessage(AFormatter.pluginToChat(plugin.getMessageManager().getList("game.status_result", mutableMapOf(
+            sender.sendMessage(AFormatter.pluginToChat(plugin.messageManager.getList("game.status_result", mutableMapOf(
                 "author" to author,
                 "version" to version,
                 "website" to website,
@@ -95,20 +95,20 @@ class ACommandImpl(val plugin: AQQBot) {
                 "plugin_config_version" to pluginConfigVersion,
                 "latest_config_version" to latestConfigVersion,
                 "websocket_status" to websocketStatus
-            ))))
+            ), null)))
         }
     }
 
     fun reset(sender: ASender, mode: String, data: String): String {
         if (mode.contains("qq")) {
             if (!plugin.hasQQ(data.toLong())) {
-                return AFormatter.pluginToChat(plugin.getMessageManager().get("game.invalid_arguments"))
+                return AFormatter.pluginToChat(plugin.messageManager.get("game.invalid_arguments", null))
             }
             plugin.removePlayer(data.toLong())
             plugin.debugModule?.debugLogger?.log("(in game) ${sender.getName()} reset $data (qq)")
         } else {
             if (!plugin.hasPlayer(plugin.adapter!!.getOfflinePlayer(data))) {
-                return AFormatter.pluginToChat(plugin.getMessageManager().get("game.invalid_arguments"))
+                return AFormatter.pluginToChat(plugin.messageManager.get("game.invalid_arguments", null))
             }
             val qq = plugin.getQQByPlayer(plugin.adapter!!.getOfflinePlayer(data))
             plugin.removePlayer(qq!!.toLong())
@@ -117,10 +117,10 @@ class ACommandImpl(val plugin: AQQBot) {
         plugin.submit {
             plugin.adapter!!.getPlayerList().forEach {
                 if (!plugin.hasPlayer(plugin.adapter!!.getOfflinePlayer(it.getName()))) {
-                    it.kick(plugin.getMessageManager().get("game.kick_when_unbind"))
+                    it.kick(plugin.messageManager.get("game.kick_when_unbind", null))
                 }
             }
         }
-        return AFormatter.pluginToChat(plugin.getMessageManager().get("game.successfully_reset"))
+        return AFormatter.pluginToChat(plugin.messageManager.get("game.successfully_reset", null))
     }
 }

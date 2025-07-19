@@ -12,6 +12,7 @@ interface ConfigProvider {
 
     var enableGroups: MutableMap<String, FileConfiguration?>
     val customCommands: MutableList<ACustom>
+    var messageManager: MessageManager
 
     var generalConfig: GroupConfiguration
     var messageConfig: FileConfiguration
@@ -24,11 +25,11 @@ interface ConfigProvider {
         loadMessageConfig()
         loadCustomConfig()
         Files.createDirectories(plugin.getDataFolder().resolve("images").toPath())
-        setEnableGroups()
+        setEnableGroups(plugin)
         updateGeneralConfig()
     }
 
-    fun setEnableGroups() {
+    fun setEnableGroups(plugin: AQQBot) {
         enableGroups = mutableMapOf()
         botConfig.getStringList("groups")?.forEach {
             val file = File(getDataFolder(), "subconfig/$it.yml")
@@ -36,6 +37,15 @@ interface ConfigProvider {
                 enableGroups[it] = YamlConfiguration.loadConfiguration(file)
             } else {
                 enableGroups[it] = null
+            }
+        }
+        messageManager = MessageManager(plugin)
+        botConfig.getStringList("groups")?.forEach {
+            val file = File(getDataFolder(), "submessages/$it.yml")
+            if (file.exists()) {
+                messageManager.enableGroups[it] = YamlConfiguration.loadConfiguration(file)
+            } else {
+                messageManager.enableGroups[it] = null
             }
         }
     }

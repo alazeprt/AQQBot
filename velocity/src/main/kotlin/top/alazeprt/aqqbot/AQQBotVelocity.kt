@@ -20,6 +20,7 @@ import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aconfiguration.file.YamlConfiguration
 import top.alazeprt.aqqbot.adapter.*
 import top.alazeprt.aqqbot.command.ACommand
+import top.alazeprt.aqqbot.config.MessageManager
 import top.alazeprt.aqqbot.data.DataProvider
 import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.event.AChatEvent
@@ -60,6 +61,8 @@ class AQQBotVelocity : AQQBot {
     override lateinit var messageConfig: FileConfiguration
     override lateinit var botConfig: FileConfiguration
     override lateinit var customConfig: FileConfiguration
+
+    override lateinit var messageManager: MessageManager
 
     private val executor = Executors.newFixedThreadPool(16)
 

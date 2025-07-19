@@ -16,7 +16,7 @@ class WhitelistHandler(val plugin: AQQBot) {
         val playerName: String
         if (plugin.getPlayerByQQ(userId.toLong()).size >= config.getLong("whitelist.max_bind_count", groupId)) {
             BotProvider.getBot()?.action(
-                SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.already_bind"), true))
+                SendGroupMessage(groupId, plugin.messageManager.get("qq.whitelist.already_bind", groupId), true))
             return false
         }
         if (config.getString("whitelist.verify_method", groupId).uppercase() == "VERIFY_CODE") {
@@ -28,23 +28,23 @@ class WhitelistHandler(val plugin: AQQBot) {
                 }
             }
             if (name == null) {
-                BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.verify_code_not_exist"), true))
+                BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.whitelist.verify_code_not_exist", groupId), true))
                 return false
             }
             playerName = name!!
         } else {
             playerName = data
             if (!validateName(plugin, playerName, groupId)) {
-                BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.invalid_name"), true))
+                BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.whitelist.invalid_name", groupId), true))
                 return false
             }
         }
         if (plugin.hasPlayer(plugin.adapter!!.getOfflinePlayer(playerName))) {
-            BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.already_exist"), true))
+            BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.whitelist.already_exist", groupId), true))
             return false
         }
         plugin.addPlayer(userId.toLong(), plugin.adapter!!.getOfflinePlayer(playerName))
-        BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.bind_successful"), true))
+        BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.whitelist.bind_successful", groupId), true))
         plugin.debugModule?.debugLogger?.log("$userId bind $userId to account $playerName")
         if (config.getString("whitelist.verify_method", groupId)?.uppercase() == "VERIFY_CODE") {
             plugin.verifyCodeMap.remove(playerName)
@@ -63,21 +63,21 @@ class WhitelistHandler(val plugin: AQQBot) {
     
     private fun unbind(userId: String, groupId: Long, playerName: String): Boolean {
         if (!plugin.hasQQ(userId.toLong())) {
-            BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.not_bind"), true))
+            BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.whitelist.not_bind", groupId), true))
             return false
         }
         if (!plugin.getPlayerByQQ(userId.toLong()).map { it.getName() }.toList().contains(playerName)) {
-            BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.bind_by_other", mutableMapOf(Pair("name",
-                plugin.getPlayerByQQ(userId.toLong()).joinToString(", ") { it.getName() }))), true))
+            BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.whitelist.bind_by_other", mutableMapOf(Pair("name",
+                plugin.getPlayerByQQ(userId.toLong()).joinToString(", ") { it.getName() })), groupId), true))
             return false
         }
         plugin.removePlayer(userId.toLong(), plugin.adapter!!.getOfflinePlayer(playerName))
-        BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.unbind_successful"), true))
+        BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.whitelist.unbind_successful", groupId), true))
         plugin.debugModule?.debugLogger?.log("$userId unbind $userId to account $playerName")
         plugin.submit {
             plugin.adapter!!.getPlayerList().forEach {
                 if (it.getName() == playerName) {
-                    it.kick(plugin.getMessageManager().get("game.kick_when_unbind"))
+                    it.kick(plugin.messageManager.get("game.kick_when_unbind", groupId))
                 }
             }
         }
@@ -94,8 +94,8 @@ class WhitelistHandler(val plugin: AQQBot) {
                 val playerName = message.split(" ")[1]
                 if (plugin.bindCooldownMap.containsKey(playerName)) {
                     BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
-                        plugin.getMessageManager().get("qq.whitelist.in_cooldown",
-                            mutableMapOf("name" to playerName, "cooldown_time" to plugin.bindCooldownMap[playerName]!!.toString()))))
+                        plugin.messageManager.get("qq.whitelist.in_cooldown",
+                            mutableMapOf("name" to playerName, "cooldown_time" to plugin.bindCooldownMap[playerName]!!.toString()), event.groupId)))
                 } else {
                     plugin.bindCooldownMap[playerName] = config.getLong("whitelist.cooldown.bind", event.groupId)
                     bind(event.senderId.toString(), event.groupId, playerName)
@@ -108,8 +108,8 @@ class WhitelistHandler(val plugin: AQQBot) {
                 val playerName = message.substring(it.length + 1)
                 if (plugin.unbindCooldownMap.containsKey(playerName)) {
                     BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
-                        plugin.getMessageManager().get("qq.whitelist.in_cooldown",
-                            mutableMapOf("name" to playerName, "cooldown_time" to plugin.unbindCooldownMap[playerName]!!.toString()))))
+                        plugin.messageManager.get("qq.whitelist.in_cooldown",
+                            mutableMapOf("name" to playerName, "cooldown_time" to plugin.unbindCooldownMap[playerName]!!.toString()), event.groupId)))
                 } else {
                     plugin.unbindCooldownMap[playerName] = config.getLong("whitelist.cooldown.unbind", event.groupId)
                     unbind(event.senderId.toString(), event.groupId, playerName)

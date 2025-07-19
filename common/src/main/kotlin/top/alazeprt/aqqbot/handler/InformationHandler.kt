@@ -12,7 +12,7 @@ class InformationHandler(val plugin: AQQBot) {
     private fun getTPS(groupId: Long) {
         if (!plugin.spark) {
             BotProvider.getBot()?.action(SendGroupMessage(groupId,
-                plugin.getMessageManager().get("qq.information.tps.not_installed_dependency"), true))
+                plugin.messageManager.get("qq.information.tps.not_installed_dependency", groupId), true))
             return
         } else {
             val tps = SparkProvider.get().tps()
@@ -21,13 +21,13 @@ class InformationHandler(val plugin: AQQBot) {
             val tps1Min = roundTPS(tps?.poll(StatisticWindow.TicksPerSecond.MINUTES_1)?: -1.0)
             val tps5Min = roundTPS(tps?.poll(StatisticWindow.TicksPerSecond.MINUTES_5)?: -1.0)
             val tps15Min = roundTPS(tps?.poll(StatisticWindow.TicksPerSecond.MINUTES_15)?: -1.0)
-            BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.information.tps.result", mutableMapOf(
+            BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.information.tps.result", mutableMapOf(
                 Pair("tps_5_seconds", tps5Secs),
                 Pair("tps_10_seconds", tps10Secs),
                 Pair("tps_1_minute", tps1Min),
                 Pair("tps_5_minutes", tps5Min),
                 Pair("tps_15_minutes", tps15Min)
-            )), true))
+            ), groupId), true))
         }
     }
 
@@ -35,18 +35,18 @@ class InformationHandler(val plugin: AQQBot) {
     private fun getMSPT(groupId: Long) {
         if (!plugin.spark) {
             BotProvider.getBot()?.action(SendGroupMessage(groupId,
-                plugin.getMessageManager().get("qq.information.mspt.not_installed_dependency"), true))
+                plugin.messageManager.get("qq.information.mspt.not_installed_dependency", groupId), true))
             return
         } else {
             val mspt = SparkProvider.get().mspt()
             val mspt10Secs = roundMSPT(mspt?.poll(StatisticWindow.MillisPerTick.SECONDS_10)?.median()?: -1.0)
             val mspt1Min = roundMSPT(mspt?.poll(StatisticWindow.MillisPerTick.MINUTES_1)?.median()?: -1.0)
             val mspt5Min = roundMSPT(mspt?.poll(StatisticWindow.MillisPerTick.MINUTES_5)?.median()?: -1.0)
-            BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.information.mspt.result", mutableMapOf(
+            BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.information.mspt.result", mutableMapOf(
                 Pair("mspt_10_seconds", mspt10Secs),
                 Pair("mspt_1_minute", mspt1Min),
                 Pair("mspt_5_minutes", mspt5Min)
-            )), true))
+            ), groupId), true))
         }
     }
 
@@ -69,28 +69,28 @@ class InformationHandler(val plugin: AQQBot) {
     private fun getPlayerList(groupId: Long) {
         val playerList = plugin.adapter!!.getPlayerList().map { it.getName() }.toList()
         BotProvider.getBot()?.action(
-            SendGroupMessage(groupId, plugin.getMessageManager().get("qq.information.player_list.result", mutableMapOf(
+            SendGroupMessage(groupId, plugin.messageManager.get("qq.information.player_list.result", mutableMapOf(
                 Pair("count", playerList.size.toString()),
                 Pair("player_list", playerList.joinToString { it })
-            )), true))
+            ), groupId), true))
     }
 
     @Deprecated(message = "This feature was replaced by custom commands")
     private fun getCPUInfo(groupId: Long) {
         if (!plugin.spark) {
             BotProvider.getBot()?.action(SendGroupMessage(groupId,
-                plugin.getMessageManager().get("qq.information.cpu.not_installed_dependency"), true))
+                plugin.messageManager.get("qq.information.cpu.not_installed_dependency", groupId), true))
             return
         } else {
             val cpu = SparkProvider.get().cpuSystem()
             val cpu10Secs = roundCPU(cpu?.poll(StatisticWindow.CpuUsage.SECONDS_10)?: -1.0)
             val cpu1Min = roundCPU(cpu?.poll(StatisticWindow.CpuUsage.MINUTES_1)?: -1.0)
             val cpu15Min = roundCPU(cpu?.poll(StatisticWindow.CpuUsage.MINUTES_15)?: -1.0)
-            BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.information.cpu.result", mutableMapOf(
+            BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.information.cpu.result", mutableMapOf(
                 Pair("cpu_10_seconds", cpu10Secs),
                 Pair("cpu_1_minute", cpu1Min),
                 Pair("cpu_15_minutes", cpu15Min)
-            )), true))
+            ), groupId), true))
         }
     }
 

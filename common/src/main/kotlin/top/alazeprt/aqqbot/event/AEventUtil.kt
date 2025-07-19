@@ -13,11 +13,11 @@ object AEventUtil {
         if (!plugin.generalConfig.getBoolean("whitelist.enable", null) || !plugin.generalConfig.getBoolean("whitelist.need_bind_to_login", null)) return false
         if (!plugin.hasPlayer(plugin.adapter!!.getOfflinePlayer(playerName))) {
             if (plugin.generalConfig.getString("whitelist.verify_method", null).uppercase() == "GROUP_NAME") {
-                kickMethod.accept(AFormatter.pluginToChat(plugin.getMessageManager().get("game.not_bind", mutableMapOf(Pair("command", plugin.generalConfig.getStringList("whitelist.prefix.bind", null)[0])))))
+                kickMethod.accept(AFormatter.pluginToChat(plugin.messageManager.get("game.not_bind", mutableMapOf(Pair("command", plugin.generalConfig.getStringList("whitelist.prefix.bind", null)[0])), null)))
                 return true
             } else if (plugin.generalConfig.getString("whitelist.verify_method", null).uppercase() == "VERIFY_CODE") {
                 val verifyCode = if (plugin.verifyCodeMap.containsKey(playerName)) plugin.verifyCodeMap.get(playerName)!!.first else UUID.randomUUID().toString().substring(0, 6)
-                kickMethod.accept(AFormatter.pluginToChat(AFormatter.pluginToChat(plugin.getMessageManager().get("game.not_verified", mutableMapOf(Pair("command", plugin.generalConfig.getStringList("whitelist.prefix.bind", null)[0]), Pair("code", verifyCode))))))
+                kickMethod.accept(AFormatter.pluginToChat(AFormatter.pluginToChat(plugin.messageManager.get("game.not_verified", mutableMapOf(Pair("command", plugin.generalConfig.getStringList("whitelist.prefix.bind", null)[0]), Pair("code", verifyCode)), null))))
                 if (!plugin.verifyCodeMap.containsKey(playerName)) {
                     plugin.verifyCodeMap.put(playerName, Pair(verifyCode, System.currentTimeMillis()))
                 }

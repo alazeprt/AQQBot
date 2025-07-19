@@ -201,10 +201,6 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
 
     fun log(level: LogLevel, message: String)
 
-    fun getMessageManager(): MessageManager {
-        return MessageManager(this)
-    }
-
     fun setSender()
 
     override fun loadData(type: DataStorageType) {

@@ -46,21 +46,21 @@ class CommandHandler(val plugin: AQQBot) {
                 }
                 if (!hasPermission) {
                     BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
-                        plugin.getMessageManager().get("qq.no_permission")))
+                        plugin.messageManager.get("qq.no_permission", null)))
                 } else {
                     val commandList = message.split(" ").toMutableList()
                     commandList.removeAt(0)
                     val command = commandList.joinToString(" ")
                     plugin.debugModule?.debugLogger?.log("${event.senderId} remotely executed command: $command")
-                    BotProvider.getBot()?.action(SendGroupMessage(event.groupId, plugin.getMessageManager().get("qq.executing_command")))
+                    BotProvider.getBot()?.action(SendGroupMessage(event.groupId, plugin.messageManager.get("qq.executing_command", null)))
                     plugin.submit {
                         plugin.submitCommand(command, event.groupId).thenAccept {
                             if (config.getBoolean("command_execution.format", event.groupId)) {
                                 BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
-                                    it.getFormattedString(event.groupId).ifEmpty { plugin.getMessageManager().get("qq.execution_finished") }))
+                                    it.getFormattedString(event.groupId).ifEmpty { plugin.messageManager.get("qq.execution_finished", null) }))
                             } else {
                                 BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
-                                    it.getRawString().ifEmpty { plugin.getMessageManager().get("qq.execution_finished") }))
+                                    it.getRawString().ifEmpty { plugin.messageManager.get("qq.execution_finished", null) }))
                             }
                         }
                     }

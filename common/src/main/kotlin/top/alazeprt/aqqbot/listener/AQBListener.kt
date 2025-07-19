@@ -71,13 +71,13 @@ class AQBListener(val plugin: AQQBot) : Listener {
                 plugin.debugModule?.debugLogger?.log("forward message to server: $newMessage")
                 plugin.adapter!!.broadcastMessage(
                     AFormatter.pluginToChat(
-                        plugin.getMessageManager().get(
+                        plugin.messageManager.get(
                             "game.chat_from_qq", mutableMapOf(
                                 "groupId" to event.groupId.toString(),
                                 "userName" to if (member!!.card.isNullOrBlank()) member!!.member.nickname else member!!.card,
                                 "message" to newMessage
                             )
-                        )
+                        , event.groupId)
                     )
                 )
             }
@@ -96,7 +96,7 @@ class AQBListener(val plugin: AQQBot) : Listener {
         plugin.submit {
             plugin.adapter!!.getPlayerList().forEach {
                 if (nameList.contains(it.getName())) {
-                    it.kick(plugin.getMessageManager().get("game.kick_when_unbind"))
+                    it.kick(plugin.messageManager.get("game.kick_when_unbind", event.groupId))
                 }
             }
         }

@@ -14,8 +14,8 @@ class AChatEvent(val plugin: AQQBot, private val player: APlayer, private val me
             plugin.enableGroups.forEach {
                 val message = canForwardMessage(plugin, message, it.key.toLong())?: return@forEach
                 BotProvider.getBot()?.action(SendGroupMessage(
-                    it.key.toLong(), plugin.getMessageManager().
-                    get("qq.chat_from_game", mutableMapOf("player" to player.getName(), "message" to message))))
+                    it.key.toLong(), plugin.messageManager.
+                    get("qq.chat_from_game", mutableMapOf("player" to player.getName(), "message" to message), it.key.toLong())))
             }
         }
     }
