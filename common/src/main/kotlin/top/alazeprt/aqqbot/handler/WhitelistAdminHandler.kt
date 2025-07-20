@@ -5,6 +5,13 @@ import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aonebot.result.GroupMemberList
 import top.alazeprt.aonebot.util.GroupRole
 import top.alazeprt.aqqbot.AQQBot
+import top.alazeprt.aqqbot.api.AQQBotAPI
+import top.alazeprt.aqqbot.api.event.qq.PostBindEvent
+import top.alazeprt.aqqbot.api.event.qq.PostUnbindEvent
+import top.alazeprt.aqqbot.api.event.qq.PreBindEvent
+import top.alazeprt.aqqbot.api.event.qq.PreUnbindEvent
+import top.alazeprt.aqqbot.api.event.qq.reason.BindCancelReason
+import top.alazeprt.aqqbot.api.event.qq.reason.UnbindCancelReason
 import top.alazeprt.aqqbot.bot.BotProvider
 import top.alazeprt.aqqbot.util.AFormatter.Companion.validateName
 
@@ -17,7 +24,15 @@ class WhitelistAdminHandler(val plugin: AQQBot) {
             plugin.removePlayer(userId.toLong())
         }
         if (!validateName(plugin, playerName, groupId)) {
+            AQQBotAPI.fireEvent(PostBindEvent(groupId, operatorId.toLong(), userId.toLong(), playerName, true, BindCancelReason.INVALID_NAME))
             BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.whitelist.invalid_name", groupId), true))
+            return false
+        }
+        val event = PreBindEvent(groupId, operatorId.toLong(), userId.toLong(), playerName)
+        AQQBotAPI.fireEvent(event)
+        if (event.isCanceled()) {
+            AQQBotAPI.fireEvent(PostBindEvent(groupId, operatorId.toLong(), userId.toLong(), playerName, true, BindCancelReason.CANCEL_BY_PLUGIN))
+            BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.cancel_by_plugin", groupId), true))
             return false
         }
         if (plugin.hasPlayer(plugin.adapter!!.getOfflinePlayer(playerName))) {
@@ -26,17 +41,27 @@ class WhitelistAdminHandler(val plugin: AQQBot) {
         plugin.addPlayer(userId.toLong(), plugin.adapter!!.getOfflinePlayer(playerName))
         BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.whitelist.bind_successful", groupId), true))
         plugin.debugModule?.debugLogger?.log("$operatorId bind $userId to account $playerName")
+        AQQBotAPI.fireEvent(PostBindEvent(groupId, operatorId.toLong(), userId.toLong(), playerName, false, null))
         return true
     }
 
     private fun unbind(operatorId: String, userId: String, groupId: Long, playerName: String): Boolean {
         if (!plugin.hasQQ(userId.toLong())) {
             BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.whitelist.admin.not_bind", mutableMapOf(Pair("userId", userId)), groupId), true))
+            AQQBotAPI.fireEvent(PostUnbindEvent(groupId, operatorId.toLong(), userId.toLong(), playerName, true, UnbindCancelReason.NOT_BIND))
             return false
         }
         if ((plugin.getQQByPlayer(plugin.adapter!!.getOfflinePlayer(playerName))?: -1L) != userId.toLong()) {
             BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.whitelist.admin.bind_by_other", mutableMapOf(Pair("name",
                 plugin.getPlayerByQQ(userId.toLong()).joinToString(", ") { it.getName() })), groupId), true))
+            AQQBotAPI.fireEvent(PostUnbindEvent(groupId, operatorId.toLong(), userId.toLong(), playerName, true, UnbindCancelReason.BIND_BY_OTHER))
+            return false
+        }
+        val event = PreUnbindEvent(groupId, operatorId.toLong(), userId.toLong(), playerName)
+        AQQBotAPI.fireEvent(event)
+        if (event.isCanceled()) {
+            BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.cancel_by_plugin", groupId), true))
+            AQQBotAPI.fireEvent(PostUnbindEvent(groupId, operatorId.toLong(), userId.toLong(), playerName, true, UnbindCancelReason.CANCEL_BY_PLUGIN))
             return false
         }
         plugin.removePlayer(userId.toLong(), plugin.adapter!!.getOfflinePlayer(playerName))
@@ -49,6 +74,7 @@ class WhitelistAdminHandler(val plugin: AQQBot) {
                 }
             }
         }
+        AQQBotAPI.fireEvent(PostUnbindEvent(groupId, operatorId.toLong(), userId.toLong(), playerName, false, null))
         return true
 
     }

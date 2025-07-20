@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit
 class AQQBotBukkit : JavaPlugin(), AQQBot {
     override var debugModule: ADebug? = null
 
-    override var adapter: AQQBotAdapter? = BukkitAdapter
+    override var adapter: AQQBotAdapter = BukkitAdapter
 
     override val verifyCodeMap: MutableMap<String, Pair<String, Long>> = ConcurrentHashMap()
 
@@ -82,7 +82,7 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     override fun onDisable() {
         log(LogLevel.INFO , "Canceling task")
         taskList.forEach {
-            it.cancel(true)
+            it.cancel()
         }
         this.disable()
         this.disable()

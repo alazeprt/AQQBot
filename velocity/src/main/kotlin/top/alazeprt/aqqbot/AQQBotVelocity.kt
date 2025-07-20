@@ -39,7 +39,7 @@ import java.util.concurrent.Executors
 class AQQBotVelocity : AQQBot {
     override var debugModule: ADebug? = null
 
-    override var adapter: AQQBotAdapter? = VelocityAdapter(this)
+    override var adapter: AQQBotAdapter = VelocityAdapter(this)
 
     override val verifyCodeMap: MutableMap<String, Pair<String, Long>> = ConcurrentHashMap()
 

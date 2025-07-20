@@ -6,6 +6,10 @@ import top.alazeprt.aonebot.result.GroupMember
 import top.alazeprt.aonebot.result.GroupMemberList
 import top.alazeprt.aonebot.util.GroupRole
 import top.alazeprt.aqqbot.AQQBot
+import top.alazeprt.aqqbot.api.AQQBotAPI
+import top.alazeprt.aqqbot.api.event.qq.PostRemoteCommandEvent
+import top.alazeprt.aqqbot.api.event.qq.PreRemoteCommandEvent
+import top.alazeprt.aqqbot.api.event.qq.reason.RemoteCommandCancelEvent
 import top.alazeprt.aqqbot.bot.BotProvider
 
 class CommandHandler(val plugin: AQQBot) {
@@ -14,6 +18,7 @@ class CommandHandler(val plugin: AQQBot) {
     
     fun handle(message: String, event: GroupMessageEvent, memberList: GroupMemberList): Boolean {
         if (!config.getBoolean("command_execution.enable", event.groupId)) {
+            AQQBotAPI.fireEvent(PostRemoteCommandEvent(event.groupId, event.senderId, message, true, RemoteCommandCancelEvent.NOT_ENABLE))
             return false
         }
         if (message.split(" ").size < 2) return false
@@ -45,16 +50,26 @@ class CommandHandler(val plugin: AQQBot) {
                     }
                 }
                 if (!hasPermission) {
+                    AQQBotAPI.fireEvent(PostRemoteCommandEvent(event.groupId, event.senderId, message, true, RemoteCommandCancelEvent.NO_PERMISSION))
                     BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
                         plugin.messageManager.get("qq.no_permission", null)))
                 } else {
                     val commandList = message.split(" ").toMutableList()
                     commandList.removeAt(0)
                     val command = commandList.joinToString(" ")
+                    val apiEvent = PreRemoteCommandEvent(event.groupId, event.senderId, command)
+                    AQQBotAPI.fireEvent(apiEvent)
+                    if (apiEvent.isCanceled()) {
+                        BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
+                            plugin.messageManager.get("qq.cancel_by_plugin", event.groupId)))
+                        AQQBotAPI.fireEvent(PostRemoteCommandEvent(event.groupId, event.senderId, command, true, RemoteCommandCancelEvent.CANCEL_BY_PLUGIN))
+                        return false
+                    }
                     plugin.debugModule?.debugLogger?.log("${event.senderId} remotely executed command: $command")
                     BotProvider.getBot()?.action(SendGroupMessage(event.groupId, plugin.messageManager.get("qq.executing_command", null)))
                     plugin.submit {
                         plugin.submitCommand(command, event.groupId).thenAccept {
+                            AQQBotAPI.fireEvent(PostRemoteCommandEvent(event.groupId, event.senderId, command, false, null))
                             if (config.getBoolean("command_execution.format", event.groupId)) {
                                 BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
                                     it.getFormattedString(event.groupId).ifEmpty { plugin.messageManager.get("qq.execution_finished", null) }))

@@ -9,7 +9,6 @@ import top.alazeprt.aqqbot.bot.BotProvider.loadBot
 import top.alazeprt.aqqbot.bot.BotProvider.unloadBot
 import top.alazeprt.aqqbot.command.CommandProvider
 import top.alazeprt.aqqbot.config.ConfigProvider
-import top.alazeprt.aqqbot.config.MessageManager
 import top.alazeprt.aqqbot.data.*
 import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.hook.HookProvider
@@ -27,7 +26,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
 
     var debugModule: ADebug?
 
-    var adapter: AQQBotAdapter?
+    var adapter: AQQBotAdapter
 
     val verifyCodeMap: MutableMap<String, Pair<String, Long>>  // <name, <code, time>>
 

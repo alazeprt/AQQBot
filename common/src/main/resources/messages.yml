@@ -4,6 +4,7 @@
 
 # 此部分为发送到Q群的消息
 qq:
+  cancel_by_plugin: "该操作已被其它插件取消!"
   whitelist:
     in_cooldown: "你仍在绑定的冷却时间内, 请等待 ${cooldown_time} 秒后重试!"
     already_bind: "你已经绑定过了"

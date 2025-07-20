@@ -7,6 +7,8 @@ import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aonebot.event.notice.GroupMemberDecreaseEvent
 import top.alazeprt.aonebot.result.GroupMember
 import top.alazeprt.aqqbot.AQQBot
+import top.alazeprt.aqqbot.api.AQQBotAPI
+import top.alazeprt.aqqbot.api.event.qq.ReceiveMessageEvent
 import top.alazeprt.aqqbot.bot.BotProvider
 import top.alazeprt.aqqbot.handler.CommandHandler
 import top.alazeprt.aqqbot.handler.InformationHandler
@@ -20,6 +22,7 @@ class AQBListener(val plugin: AQQBot) : Listener {
         if (!plugin.enableGroups.keys.contains(event.groupId.toString())) {
             return
         }
+        AQQBotAPI.fireEvent(ReceiveMessageEvent(event))
         var message = ""
         val oneBotClient = BotProvider.getBot()
         synchronized(oneBotClient!!) {
@@ -69,7 +72,7 @@ class AQBListener(val plugin: AQQBot) : Listener {
                 }
                 val newMessage: String = canForwardMessage(message, event.groupId) ?: return@action
                 plugin.debugModule?.debugLogger?.log("forward message to server: $newMessage")
-                plugin.adapter!!.broadcastMessage(
+                plugin.adapter.broadcastMessage(
                     AFormatter.pluginToChat(
                         plugin.messageManager.get(
                             "game.chat_from_qq", mutableMapOf(
