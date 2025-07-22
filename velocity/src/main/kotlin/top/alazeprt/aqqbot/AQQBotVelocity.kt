@@ -19,6 +19,7 @@ import org.slf4j.Logger
 import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aconfiguration.file.YamlConfiguration
 import top.alazeprt.aqqbot.adapter.*
+import top.alazeprt.aqqbot.api.webhook.AQQBotWebhookServer
 import top.alazeprt.aqqbot.command.ACommand
 import top.alazeprt.aqqbot.config.MessageManager
 import top.alazeprt.aqqbot.data.DataProvider
@@ -26,11 +27,13 @@ import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.event.AChatEvent
 import top.alazeprt.aqqbot.event.AJoinEvent
 import top.alazeprt.aqqbot.event.AQuitEvent
+import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.*
 import java.io.File
 import java.nio.file.Path
 import java.time.Duration
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 
@@ -63,6 +66,10 @@ class AQQBotVelocity : AQQBot {
     override lateinit var customConfig: FileConfiguration
 
     override lateinit var messageManager: MessageManager
+
+    override var webhookServer: AQQBotWebhookServer? = null
+
+    override lateinit var serverUUID: UUID
 
     private val executor = Executors.newFixedThreadPool(16)
 
@@ -187,7 +194,7 @@ class AQQBotVelocity : AQQBot {
                 val choose_account = if (customConfig.getInt("$it.choose_account") == 0) 1
                 else customConfig.getInt("$it.choose_account")
                 customCommands.add(AVelocityCustom(
-                    this, command, execute, unbind_execute, output, unbind_output, image, unbind_image, format, choose_account))
+                    this, it, command, execute, unbind_execute, output, unbind_output, image, unbind_image, format, choose_account))
             }
         }
     }
@@ -221,6 +228,10 @@ class AQQBotVelocity : AQQBot {
                 return handler.onComplete(args.toList()).toMutableList()
             }
         })
+    }
+
+    override fun getAllData(): Map<Long, List<AOfflinePlayer>> {
+        return dataProvider.getAllData()
     }
 
     override fun submit(task: Runnable): Cancelable {
@@ -264,6 +275,14 @@ class AQQBotVelocity : AQQBot {
         enableGroups.forEach { group, _ ->
             this.sender[group.toLong()] = VelocityConsoleSender::class.java
         }
+    }
+
+    override fun getBrandName(): String {
+        return server.version.name
+    }
+
+    override fun getServerVersion(): String {
+        return server.version.version
     }
 
     @Subscribe

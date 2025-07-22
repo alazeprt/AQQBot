@@ -79,7 +79,7 @@ class APluginInformation(val plugin: AQQBot) {
         }
     }
 
-    fun getCurrentConfigVersion(plugin: AQQBot): String {
+    fun getCurrentConfigVersion(): String {
         return plugin.generalConfig.getInt("version", null).toString()
     }
 

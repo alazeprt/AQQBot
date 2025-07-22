@@ -5,9 +5,9 @@ import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.bot.BotProvider
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 
-abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execute: List<String>, val unbind_execute: List<String>,
-                       val output: List<String>, val unbind_output: List<String>, val image: AImage?,
-                       val unbind_image: AImage?, val format: Boolean, val account: Int) {
+abstract class ACustom(val plugin: AQQBot, val name: String, var command: List<String>, var execute: List<String>, var unbind_execute: List<String>,
+                       var output: List<String>, var unbind_output: List<String>, var image: AImage?,
+                       var unbind_image: AImage?, var format: Boolean, var account: Int) {
     fun handle(input: String, userId: String, groupId: String): Boolean {
         val map = matches(input)?: return false
         val player: List<String> = plugin.getPlayerByQQ(userId.toLong()).map { it.getName() }

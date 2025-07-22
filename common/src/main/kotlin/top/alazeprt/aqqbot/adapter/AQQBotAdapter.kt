@@ -3,6 +3,7 @@ package top.alazeprt.aqqbot.adapter
 import net.kyori.adventure.text.Component
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.profile.APlayer
+import java.net.InetSocketAddress
 
 interface AQQBotAdapter {
     fun getOfflinePlayer(name: String): AOfflinePlayer

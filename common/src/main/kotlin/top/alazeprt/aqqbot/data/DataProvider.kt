@@ -24,4 +24,6 @@ interface DataProvider {
     fun getQQByPlayer(player: AOfflinePlayer): Long?
 
     fun getPlayerByQQ(qq: Long): List<AOfflinePlayer>
+
+    fun getAllData(): Map<Long, List<AOfflinePlayer>>
 }

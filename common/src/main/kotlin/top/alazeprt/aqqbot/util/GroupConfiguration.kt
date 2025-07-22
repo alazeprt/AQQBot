@@ -1,10 +1,65 @@
 package top.alazeprt.aqqbot.util
 
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
+import com.google.gson.JsonPrimitive
 import top.alazeprt.aconfiguration.ConfigurationSection
 import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aqqbot.AQQBot
 
 class GroupConfiguration(val plugin: AQQBot, val generalConfig: FileConfiguration) {
+    fun getIntoJson(node: String, group: Long?): JsonElement? {
+        val generalConfig: FileConfiguration = if (group == null || !plugin.enableGroups.containsKey(group.toString()) ||
+            plugin.enableGroups[group.toString()]?.isConfigurationSection(node) != true) {
+            this.generalConfig
+        } else {
+            plugin.enableGroups[group.toString()]!!
+        }
+        return if (generalConfig.isString(node)) {
+            JsonPrimitive(generalConfig.getString(node))
+        } else if (generalConfig.isInt(node)) {
+            JsonPrimitive(generalConfig.getInt(node))
+        } else if (generalConfig.isLong(node)) {
+            JsonPrimitive(generalConfig.getLong(node))
+        } else if (generalConfig.isDouble(node)) {
+            JsonPrimitive(generalConfig.getDouble(node))
+        } else if (generalConfig.isBoolean(node)) {
+            JsonPrimitive(generalConfig.getBoolean(node))
+        } else if (generalConfig.isList(node)) {
+            val jsonArray = JsonArray()
+            for (value in generalConfig.getList(node)) {
+                when (value) {
+                    is String -> {
+                        jsonArray.add(value)
+                    }
+                    is Long -> {
+                        jsonArray.add(value)
+                    }
+                    is Double -> {
+                        jsonArray.add(value)
+                    }
+                }
+            }
+            jsonArray
+        } else if (generalConfig.isConfigurationSection(node)) {
+            val jsonObject = JsonObject()
+            for (key in generalConfig.getConfigurationSection(node).getKeys(false)) {
+                jsonObject.add(key, getIntoJson("$node.$key", group))
+            }
+            jsonObject
+        } else null
+    }
+
+    fun get(node: String, group: Long?): Any? {
+        return if (group == null || !plugin.enableGroups.containsKey(group.toString()) ||
+            plugin.enableGroups[group.toString()]?.isConfigurationSection(node) != true) {
+            generalConfig.get(node)
+        } else {
+            plugin.enableGroups[group.toString()]!!.get(node)
+        }
+    }
+
     fun getString(node: String, group: Long?): String {
         return if (group == null || !plugin.enableGroups.containsKey(group.toString()) ||
             plugin.enableGroups[group.toString()]?.isString(node) != true
@@ -81,6 +136,8 @@ class GroupConfiguration(val plugin: AQQBot, val generalConfig: FileConfiguratio
         if (config != null) {
             config.set(node, value)
             plugin.enableGroups[group.toString()] = config
+        } else {
+            generalConfig.set(node, value)
         }
     }
 

@@ -13,6 +13,7 @@ import top.alazeprt.aqqbot.api.event.qq.PreUnbindEvent
 import top.alazeprt.aqqbot.api.event.qq.reason.BindCancelReason
 import top.alazeprt.aqqbot.api.event.qq.reason.UnbindCancelReason
 import top.alazeprt.aqqbot.bot.BotProvider
+import top.alazeprt.aqqbot.util.AFormatter
 import top.alazeprt.aqqbot.util.AFormatter.Companion.validateName
 
 class WhitelistAdminHandler(val plugin: AQQBot) {
@@ -20,12 +21,20 @@ class WhitelistAdminHandler(val plugin: AQQBot) {
     private val config = plugin.generalConfig
 
     private fun bind(operatorId: String, userId: String, groupId: Long, playerName: String): Boolean {
-        if (plugin.hasQQ(userId.toLong())) {
-            plugin.removePlayer(userId.toLong())
+        if (plugin.getPlayerByQQ(userId.toLong()).size >= plugin.generalConfig.getLong("whitelist.max_bind_count", null)) {
+            BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.whitelist.admin.already_bind",
+                mutableMapOf("userId" to userId, "playerName" to playerName), null)))
+            return false
         }
         if (!validateName(plugin, playerName, groupId)) {
             AQQBotAPI.fireEvent(PostBindEvent(groupId, operatorId.toLong(), userId.toLong(), playerName, true, BindCancelReason.INVALID_NAME))
             BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.whitelist.invalid_name", groupId), true))
+            return false
+        }
+        if (plugin.hasPlayer(plugin.adapter.getOfflinePlayer(playerName))) {
+            val exists = plugin.getQQByPlayer(plugin.adapter.getOfflinePlayer(playerName))
+            BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.whitelist.admin.bind_by_other",
+                mutableMapOf("userId" to userId, "playerName" to playerName, "anotherUserId" to exists.toString()), null)))
             return false
         }
         val event = PreBindEvent(groupId, operatorId.toLong(), userId.toLong(), playerName)
@@ -35,10 +44,7 @@ class WhitelistAdminHandler(val plugin: AQQBot) {
             BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.cancel_by_plugin", groupId), true))
             return false
         }
-        if (plugin.hasPlayer(plugin.adapter!!.getOfflinePlayer(playerName))) {
-            plugin.removePlayer(plugin.adapter!!.getOfflinePlayer(playerName))
-        }
-        plugin.addPlayer(userId.toLong(), plugin.adapter!!.getOfflinePlayer(playerName))
+        plugin.addPlayer(userId.toLong(), plugin.adapter.getOfflinePlayer(playerName))
         BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.whitelist.bind_successful", groupId), true))
         plugin.debugModule?.debugLogger?.log("$operatorId bind $userId to account $playerName")
         AQQBotAPI.fireEvent(PostBindEvent(groupId, operatorId.toLong(), userId.toLong(), playerName, false, null))
@@ -68,7 +74,7 @@ class WhitelistAdminHandler(val plugin: AQQBot) {
         BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.messageManager.get("qq.whitelist.unbind_successful", groupId), true))
         plugin.debugModule?.debugLogger?.log("$operatorId unbind $userId to account $playerName")
         plugin.submit {
-            plugin.adapter!!.getPlayerList().forEach {
+            plugin.adapter.getPlayerList().forEach {
                 if (it.getName() == playerName) {
                     it.kick(plugin.messageManager.get("game.kick_when_unbind", groupId))
                 }

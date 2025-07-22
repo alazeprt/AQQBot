@@ -11,14 +11,17 @@ import org.bukkit.plugin.java.JavaPlugin
 import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aconfiguration.file.YamlConfiguration
 import top.alazeprt.aqqbot.adapter.*
+import top.alazeprt.aqqbot.api.webhook.AQQBotWebhookServer
 import top.alazeprt.aqqbot.command.ACommand
 import top.alazeprt.aqqbot.config.MessageManager
 import top.alazeprt.aqqbot.data.DataProvider
 import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.event.BukkitEventHandler
+import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.*
 import java.io.File
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
@@ -54,6 +57,10 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
 
     private val pluginId = 24071
 
+    override var webhookServer: AQQBotWebhookServer? = null
+
+    override lateinit var serverUUID: UUID
+
     override var spark: Boolean = false
     override var floodgateApi: Boolean = false
 
@@ -84,7 +91,6 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
         taskList.forEach {
             it.cancel()
         }
-        this.disable()
         this.disable()
         audience.close()
     }
@@ -122,6 +128,10 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
         getCommand(command)?.setTabCompleter { _, _, _, strings ->
             handler.onComplete(strings.toList())
         }
+    }
+
+    override fun getAllData(): Map<Long, List<AOfflinePlayer>> {
+        return dataProvider.getAllData()
     }
 
     override fun submit(task: Runnable): Cancelable {
@@ -242,7 +252,7 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
                 val format = customConfig.getBoolean("$it.format")
                 val choose_account = if (customConfig.getInt("$it.choose_account") == 0) 1
                 else customConfig.getInt("$it.choose_account")
-                customCommands.add(ABukkitCustom(this, command, execute, unbind_execute, output, unbind_output, image,
+                customCommands.add(ABukkitCustom(this, it, command, execute, unbind_execute, output, unbind_output, image,
                     unbind_image, format, choose_account))
             }
         }
@@ -337,5 +347,13 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
                 }
             }
         }
+    }
+
+    override fun getBrandName(): String {
+        return Bukkit.getServer().name
+    }
+
+    override fun getServerVersion(): String {
+        return Bukkit.getServer().version
     }
 }

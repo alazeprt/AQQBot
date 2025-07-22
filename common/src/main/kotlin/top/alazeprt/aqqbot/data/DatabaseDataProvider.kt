@@ -155,4 +155,15 @@ abstract class DatabaseDataProvider(val plugin: AQQBot): DataProvider {
         return list.map { plugin.adapter!!.getOfflinePlayer(it) }
     }
 
+    override fun getAllData(): Map<Long, List<AOfflinePlayer>> {
+        val map = mutableMapOf<Long, List<AOfflinePlayer>>()
+        table.select(dataSource) {
+            rows("userId", "name")
+        }.map {
+            map[getString("userId").toLong()] = getString("name").split(", ").toMutableList()
+                .map { plugin.adapter.getOfflinePlayer(it) }
+        }
+        return map
+    }
+
 }

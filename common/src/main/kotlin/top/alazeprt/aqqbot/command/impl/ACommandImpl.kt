@@ -81,7 +81,7 @@ class ACommandImpl(val plugin: AQQBot) {
             val website = pluginInfo.getWebsite()
             val latestVersion = pluginInfo.getLatestVersion()
             val latestCommit = pluginInfo.getLatestCommit()
-            val currentConfigVersion = pluginInfo.getCurrentConfigVersion(plugin)
+            val currentConfigVersion = pluginInfo.getCurrentConfigVersion()
             val pluginConfigVersion = pluginInfo.getPluginConfigVersion()
             val latestConfigVersion = pluginInfo.getLatestConfigVersion()
             val websocketStatus = pluginInfo.getWebsocketStatus()

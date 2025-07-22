@@ -4,6 +4,7 @@ import com.alessiodp.libby.LibraryManager
 import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.adapter.AQQBotAdapter
+import top.alazeprt.aqqbot.api.webhook.AQQBotWebhookServer
 import top.alazeprt.aqqbot.bot.BotProvider.getBot
 import top.alazeprt.aqqbot.bot.BotProvider.loadBot
 import top.alazeprt.aqqbot.bot.BotProvider.unloadBot
@@ -18,7 +19,10 @@ import top.alazeprt.aqqbot.util.AExecution
 import top.alazeprt.aqqbot.util.AFormatter
 import top.alazeprt.aqqbot.util.GroupConfiguration
 import top.alazeprt.aqqbot.util.LogLevel
+import java.io.File
+import java.net.InetSocketAddress
 import java.net.URI
+import java.util.UUID
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 
@@ -41,6 +45,10 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
     var sender: MutableMap<Long, Class<out AExecution>>
 
     var libraryManager: LibraryManager
+
+    var webhookServer: AQQBotWebhookServer?
+
+    var serverUUID: UUID
 
     override var generalConfig: GroupConfiguration
     override var messageConfig: FileConfiguration
@@ -71,6 +79,20 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
             toGameFormatter[group.toLong()]?.initialUrl(generalConfig.getStringList("chat.group_to_server.filter", group.toLong()))
         }
         adapter = loadAdapter()
+        if (generalConfig.getBoolean("webhook.enable", null)) {
+            log(LogLevel.INFO, "Loading webhook server...")
+            webhookServer = AQQBotWebhookServer(this, InetSocketAddress(
+                generalConfig.getString("webhook.host", null),
+                generalConfig.getInt("webhook.port", null)))
+            webhookServer!!.start()
+            try {
+                serverUUID = UUID.fromString(generalConfig.getString("webhook.server_uuid", null))
+            } catch (e: Exception) {
+                serverUUID = UUID.randomUUID()
+                generalConfig.set("webhook.server_uuid", serverUUID.toString())
+                generalConfig.generalConfig.save(File(getDataFolder(), "config.yml"))
+            }
+        }
         log(LogLevel.INFO, "Connecting to the bot...")
         if (botConfig.getString("access_token").isNullOrBlank()) {
             loadBot(
@@ -160,6 +182,8 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         unloadBot()
         log(LogLevel.INFO, "Saving data...")
         saveData(DataStorageType.valueOf(generalConfig.getString("storage.type", null).uppercase()))
+        log(LogLevel.INFO, "Closing webhook server...")
+        webhookServer?.stop()
         log(LogLevel.INFO, "Unloading debug system...")
         unloadDebug()
     }
@@ -178,6 +202,20 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
                 URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")),
                 botConfig.getString("access_token")
             )
+        }
+        webhookServer?.stop()
+        if (generalConfig.getBoolean("webhook.enable", null)) {
+            webhookServer = AQQBotWebhookServer(this, InetSocketAddress(
+                generalConfig.getString("webhook.host", null),
+                generalConfig.getInt("webhook.port", null)))
+            webhookServer!!.start()
+            try {
+                serverUUID = UUID.fromString(generalConfig.getString("webhook.server_uuid", null))
+            } catch (e: Exception) {
+                serverUUID = UUID.randomUUID()
+                generalConfig.set("webhook.server_uuid", serverUUID.toString())
+                generalConfig.generalConfig.save(File(getDataFolder(), "config.yml"))
+            }
         }
         reloadDebug()
     }
@@ -201,6 +239,10 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
     fun log(level: LogLevel, message: String)
 
     fun setSender()
+
+    fun getBrandName(): String
+
+    fun getServerVersion(): String
 
     override fun loadData(type: DataStorageType) {
         dataProvider = when (type) {

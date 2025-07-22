@@ -3,11 +3,16 @@ package top.alazeprt.aqqbot.adapter
 import com.velocitypowered.api.proxy.Player
 import net.kyori.adventure.text.Component
 import top.alazeprt.aqqbot.profile.APlayer
+import java.net.InetSocketAddress
 import java.util.*
 
 class VelocityPlayer(val player: Player) : APlayer {
     override fun kick(reason: String) {
         player.disconnect(Component.text(reason))
+    }
+
+    override fun getIP(): InetSocketAddress? {
+        return player.remoteAddress
     }
 
     override fun getName(): String {

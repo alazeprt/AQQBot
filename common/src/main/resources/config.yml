@@ -2,7 +2,7 @@
 # 可使用 /aqqbot reload 重载
 
 ## 配置文件版本, 请勿修改!!!
-version: 18
+version: 19
 
 # 存储相关配置 (重启后生效)
 storage:
@@ -272,6 +272,29 @@ command_execution:
   # 等待输出结果多长时间
   # 单位: 秒
   delay: 2
+
+# Webhook 相关功能 (远程 WebSocket 服务器) (暂不可用)
+webhook:
+  # 是否启用该功能
+  enable: false
+
+  # 远程 WebSocket 服务器地址
+  host: "0.0.0.0"
+
+  # 远程 WebSocket 服务器端口
+  port: 8080
+
+  # 远程 WebSocket 服务器 Token
+  # ! 务必修改, 切忌泄露
+  token: "type_your_token_here"
+
+  # 服务器的名称
+  # 请自行修改
+  name: "A Minecraft Server"
+
+  # 服务器的 UUID (唯一标识符)
+  # 会自动生成, 切忌修改!
+  server_uuid: ""
 
 # 调试选项
 debug:

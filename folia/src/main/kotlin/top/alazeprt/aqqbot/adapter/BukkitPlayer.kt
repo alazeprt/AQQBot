@@ -4,11 +4,16 @@ import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import top.alazeprt.aqqbot.AQQBotBukkit
 import top.alazeprt.aqqbot.profile.APlayer
+import java.net.InetSocketAddress
 import java.util.*
 
 class BukkitPlayer(val player: Player) : APlayer {
     override fun kick(reason: String) {
         player.kickPlayer(reason)
+    }
+
+    override fun getIP(): InetSocketAddress? {
+        return player.address
     }
 
     override fun getName(): String {

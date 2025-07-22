@@ -91,4 +91,12 @@ class FileDataProvider(val plugin: AQQBot) : DataProvider {
         if (!hasQQ(qq)) return emptyList()
         return dataMap[qq.toString()]!!.map { plugin.adapter!!.getOfflinePlayer(it) }
     }
+
+    override fun getAllData(): Map<Long, List<AOfflinePlayer>> {
+        val map = mutableMapOf<Long, List<AOfflinePlayer>>()
+        dataMap.forEach {
+            map[it.key.toLong()] = it.value.map { plugin.adapter.getOfflinePlayer(it) }
+        }
+        return map
+    }
 }

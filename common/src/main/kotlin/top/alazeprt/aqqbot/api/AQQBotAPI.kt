@@ -10,7 +10,7 @@ import top.alazeprt.aqqbot.util.GroupConfiguration
 
 object AQQBotAPI {
     private lateinit var plugin: AQQBot
-    private lateinit var events: MutableList<Class<Any>>
+    private var events: MutableList<Class<Any>> = mutableListOf()
 
     fun getAdapter(): AQQBotAdapter {
         return plugin.adapter
