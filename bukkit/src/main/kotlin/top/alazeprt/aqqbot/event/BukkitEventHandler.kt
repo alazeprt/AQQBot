@@ -12,6 +12,9 @@ import top.alazeprt.aqqbot.adapter.BukkitPlayer
 class BukkitEventHandler(val plugin: AQQBotBukkit) : Listener {
     @EventHandler
     fun onChat(event: AsyncPlayerChatEvent) {
+        if (event.isCancelled) {
+            return  
+        }
         AChatEvent(plugin, BukkitPlayer(event.player), event.message).handle()
     }
 
