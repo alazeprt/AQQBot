@@ -1,0 +1,50 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 8
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Build
+        run: ./gradlew build shadowJar
+
+      - name: Rename if beta/alpha
+        run: |
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+
+          for dir in bukkit folia velocity; do
+            for file in "$dir"/build/libs/*-all.jar; do
+              filename=$(basename "$file")
+              if [[ "$filename" =~ [Bb][Ee][Tt][Aa] || "$filename" =~ [Aa][Ll][Pp][Hh][Aa] ]]; then
+                base="${filename%.jar}"
+                newname="${base}-${COMMIT_HASH}.jar"
+                mv "$file" "$dir/build/libs/$newname"
+              fi
+            done
+          done
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            bukkit/build/libs/*-all*.jar
+            folia/build/libs/*-all*.jar
+            velocity/build/libs/*-all*.jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
