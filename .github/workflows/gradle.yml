@@ -28,14 +28,14 @@ jobs:
         run: chmod +x ./gradlew
       - name: Build
         run: ./gradlew build shadowJar
-      - name: Rename JARs if beta or alpha
+      - name: Rename JARs if alpha
         run: |
           COMMIT_HASH=$(git rev-parse --short HEAD)
 
           for dir in bukkit folia velocity; do
             for file in "$dir"/build/libs/*.jar; do
               filename=$(basename "$file")
-              if [[ "$filename" =~ [Bb][Ee][Tt][Aa] || "$filename" =~ [Aa][Ll][Pp][Hh][Aa] ]]; then
+              if [[ "$filename" =~ [Aa][Ll][Pp][Hh][Aa] ]]; then
                 base="${filename%.jar}"
                 newname="${base}-${COMMIT_HASH}.jar"
                 mv "$file" "$dir/build/libs/$newname"
