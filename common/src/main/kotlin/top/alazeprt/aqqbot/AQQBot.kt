@@ -22,7 +22,7 @@ import top.alazeprt.aqqbot.util.LogLevel
 import java.io.File
 import java.net.InetSocketAddress
 import java.net.URI
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 

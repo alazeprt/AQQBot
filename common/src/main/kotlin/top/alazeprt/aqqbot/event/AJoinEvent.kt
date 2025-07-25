@@ -1,6 +1,5 @@
 package top.alazeprt.aqqbot.event
 
-import org.geysermc.floodgate.api.FloodgateApi
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.event.AEventUtil.playerStatusHandler
 import top.alazeprt.aqqbot.event.AEventUtil.whitelistHandler

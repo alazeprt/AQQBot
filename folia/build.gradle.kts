@@ -28,7 +28,6 @@ dependencies {
     compileOnly("dev.folia:folia-api:1.20.1-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("me.lucko:spark-api:0.1-SNAPSHOT")
-    compileOnly("org.geysermc.floodgate:api:2.1.0-SNAPSHOT")
 }
 
 tasks.jar {

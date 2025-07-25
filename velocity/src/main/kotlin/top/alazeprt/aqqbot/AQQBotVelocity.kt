@@ -76,7 +76,6 @@ class AQQBotVelocity : AQQBot {
     private val pluginId = 24071
 
     override var loadSparkCount: Int = 0
-    override var loadFloodgateCount: Int = 0
 
     lateinit var server: ProxyServer
     lateinit var logger: Logger
@@ -84,7 +83,6 @@ class AQQBotVelocity : AQQBot {
     lateinit var metricsFactory: Metrics.Factory
 
     override var spark: Boolean = false
-    override var floodgateApi: Boolean = false
 
     @Inject
     fun AQQBotVelocity(server: ProxyServer?, logger: Logger?, @DataDirectory dataDirectory: Path,

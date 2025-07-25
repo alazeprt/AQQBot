@@ -13,7 +13,6 @@ import top.alazeprt.aqqbot.api.event.qq.PreUnbindEvent
 import top.alazeprt.aqqbot.api.event.qq.reason.BindCancelReason
 import top.alazeprt.aqqbot.api.event.qq.reason.UnbindCancelReason
 import top.alazeprt.aqqbot.bot.BotProvider
-import top.alazeprt.aqqbot.util.AFormatter
 import top.alazeprt.aqqbot.util.AFormatter.Companion.validateName
 
 class WhitelistAdminHandler(val plugin: AQQBot) {

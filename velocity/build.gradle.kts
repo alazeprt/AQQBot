@@ -24,7 +24,6 @@ dependencies {
     implementation("org.bstats:bstats-velocity:3.0.2")
     compileOnly("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
     annotationProcessor("com.velocitypowered:velocity-api:3.3.0-SNAPSHOT")
-    compileOnly("org.geysermc.floodgate:api:2.1.0-SNAPSHOT")
     compileOnly("me.lucko:spark-api:0.1-SNAPSHOT")
     compileOnly(fileTree("libs"))
 }

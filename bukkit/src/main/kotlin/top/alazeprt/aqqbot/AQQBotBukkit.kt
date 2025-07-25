@@ -62,10 +62,8 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     override lateinit var serverUUID: UUID
 
     override var spark: Boolean = false
-    override var floodgateApi: Boolean = false
 
     override var loadSparkCount: Int = 0
-    override var loadFloodgateCount: Int = 0
 
     val taskList: MutableList<BukkitTaskCancelable> = mutableListOf()
 
