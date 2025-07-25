@@ -44,8 +44,8 @@ whitelist:
   max_bind_count: 1
 
   # 名称验证规则
-  # 可以修改规则以适应一些插件的特殊字符 (如-)
-  name_rule: "[a-zA-Z0-9_]+"
+  # 默认规则为支持任意字符
+  name_rule: "[\\S]*"
 
   # 功能指令前缀
   prefix:

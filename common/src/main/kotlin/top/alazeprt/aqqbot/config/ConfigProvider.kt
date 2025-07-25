@@ -64,7 +64,7 @@ interface ConfigProvider {
             generalConfig.setIfNotExists("command_execution.rcon.host", "127.0.0.1")
             generalConfig.setIfNotExists("command_execution.rcon.port", "25575")
             generalConfig.setIfNotExists("command_execution.rcon.password", "password")
-            generalConfig.setIfNotExists("whitelist.name_rule", "[a-zA-Z0-9_]+")
+            generalConfig.setIfNotExists("whitelist.name_rule", """[\S]*""")
         }
     }
 

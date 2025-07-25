@@ -10,30 +10,15 @@ import java.util.function.Consumer
 class AJoinEvent(val plugin: AQQBot, private val player: APlayer, val kickMethod: Consumer<String>) : AEvent {
     override fun handle() {
         plugin.debugModule?.debugLogger?.log("${player.getName()} joined the game")
-        var handle2 = false
         var kickMessage = ""
-        val handle1 = whitelistHandler(plugin, player.getName()) { it ->
-            if (plugin.floodgateApi && FloodgateApi.getInstance()?.isFloodgatePlayer(player.getUUID()) == true) {
-                plugin.debugModule?.debugLogger?.log("${player.getName()} is bedrock player")
-                if (FloodgateApi.getInstance()?.getPlayer(player.getUUID())?.username.isNullOrBlank()) {
-                    plugin.debugModule?.debugLogger?.log("kick ${player.getName()} because floodgate username is null")
-                    kickMessage = it
-                    return@whitelistHandler
-                }
-                handle2 = whitelistHandler(plugin,
-                    FloodgateApi.getInstance()?.getPlayer(player.getUUID())?.username!!) {
-                    plugin.debugModule?.debugLogger?.log("kick ${player.getName()} because unbind")
-                    kickMessage = it
-                }
-            } else {
-                plugin.debugModule?.debugLogger?.log("kick ${player.getName()} because unbind")
-                kickMessage = it
-            }
+        val handle1 = whitelistHandler(plugin, player.getName()) {
+            plugin.debugModule?.debugLogger?.log("kick ${player.getName()} because unbind")
+            kickMessage = it
         }
-        if (handle1 || handle2) {
+        if (handle1) {
             kickMethod.accept(kickMessage)
         }
-        if (!handle1 || !handle2) {
+        if (!handle1) {
             playerStatusHandler(plugin, player, true)
             if (plugin.configNeedUpdate() && player.hasPermission("aqqbot.admin")) {
                 plugin.submitLater(20) {
