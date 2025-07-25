@@ -54,12 +54,12 @@ interface ConfigProvider {
         if (generalConfig.getInt("chat.max_forward_length", null) <= 0) {
             generalConfig.setIfNotExists("chat.max_forward_length", 200)
         }
-        if (generalConfig.getInt("version", null) != 17) {
+        if (generalConfig.getInt("version", null) < 17) {
             generalConfig.setIfNotExists("version", 17)
             generalConfig.setIfNotExists("whitelist.cooldown.bind", 60)
             generalConfig.setIfNotExists("whitelist.cooldown.unbind", 86400)
         }
-        if (generalConfig.getInt("version", null) != 18) {
+        if (generalConfig.getInt("version", null) < 18) {
             generalConfig.setIfNotExists("command_execution.sort", listOf("NATIVE", "DEDICATED_SERVER", "MINECRAFT_SERVER", "SIMULATE_CONSOLE"))
             generalConfig.setIfNotExists("command_execution.rcon.host", "127.0.0.1")
             generalConfig.setIfNotExists("command_execution.rcon.port", "25575")
