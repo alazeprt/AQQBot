@@ -23,7 +23,7 @@ class MessageManager(plugin: AQQBot) {
             result ?: if (messageConfig.getStringList(key).isEmpty()) messageConfig.getString(key) ?: ""
             else messageConfig.getStringList(key).random() ?: ""
 
-        return content.
+        return content
     }
 
     fun get(key: String, map: Map<String, String>, group: Long?): String
