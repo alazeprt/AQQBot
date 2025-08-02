@@ -7,7 +7,26 @@ class MessageManager(plugin: AQQBot) {
     private val messageConfig = plugin.messageConfig
     val enableGroups = mutableMapOf<String, FileConfiguration?>()
 
-    fun get(key: String, group: Long?, map: Map<String, String> = mapOf()): String
+    fun get(key: String, group: Long?): String
+    {
+        val result =
+            enableGroups[group.toString()]?.let {
+                if (it.isString(key) || it.isList(key))
+                {
+                    if (it.getStringList(key).isEmpty()) return@let it.getString(key) ?: ""
+                    else return@let it.getStringList(key).random() ?: ""
+                }
+                else return@let null
+            }
+
+        val content =
+            result ?: if (messageConfig.getStringList(key).isEmpty()) messageConfig.getString(key) ?: ""
+            else messageConfig.getStringList(key).random() ?: ""
+
+        return content.
+    }
+
+    fun get(key: String, map: Map<String, String>, group: Long?): String
     {
         val result =
             enableGroups[group.toString()]?.let {
