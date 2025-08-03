@@ -67,8 +67,6 @@ class AQQBotVelocity : AQQBot {
 
     override lateinit var messageManager: MessageManager
 
-    override var webhookServer: AQQBotWebhookServer? = null
-
     override lateinit var serverUUID: UUID
 
     private val executor = Executors.newFixedThreadPool(16)

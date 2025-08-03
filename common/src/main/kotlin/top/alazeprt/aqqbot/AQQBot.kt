@@ -5,6 +5,7 @@ import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.adapter.AQQBotAdapter
 import top.alazeprt.aqqbot.api.webhook.AQQBotWebhookServer
+import top.alazeprt.aqqbot.api.webhook.WebhookProvider
 import top.alazeprt.aqqbot.bot.BotProvider.getBot
 import top.alazeprt.aqqbot.bot.BotProvider.loadBot
 import top.alazeprt.aqqbot.bot.BotProvider.unloadBot
@@ -46,8 +47,6 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
 
     var libraryManager: LibraryManager
 
-    var webhookServer: AQQBotWebhookServer?
-
     var serverUUID: UUID
 
     override var generalConfig: GroupConfiguration
@@ -81,10 +80,10 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         adapter = loadAdapter()
         if (generalConfig.getBoolean("webhook.enable", null)) {
             log(LogLevel.INFO, "Loading webhook server...")
-            webhookServer = AQQBotWebhookServer(this, InetSocketAddress(
+            WebhookProvider.create(this, InetSocketAddress(
                 generalConfig.getString("webhook.host", null),
                 generalConfig.getInt("webhook.port", null)))
-            webhookServer!!.start()
+            WebhookProvider.start()
             try {
                 serverUUID = UUID.fromString(generalConfig.getString("webhook.server_uuid", null))
             } catch (e: Exception) {
@@ -183,7 +182,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         log(LogLevel.INFO, "Saving data...")
         saveData(DataStorageType.valueOf(generalConfig.getString("storage.type", null).uppercase()))
         log(LogLevel.INFO, "Closing webhook server...")
-        webhookServer?.stop()
+        WebhookProvider.stop()
         log(LogLevel.INFO, "Unloading debug system...")
         unloadDebug()
     }
@@ -203,12 +202,12 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
                 botConfig.getString("access_token")
             )
         }
-        webhookServer?.stop()
+        WebhookProvider.stop()
         if (generalConfig.getBoolean("webhook.enable", null)) {
-            webhookServer = AQQBotWebhookServer(this, InetSocketAddress(
+            WebhookProvider.create(this, InetSocketAddress(
                 generalConfig.getString("webhook.host", null),
                 generalConfig.getInt("webhook.port", null)))
-            webhookServer!!.start()
+            WebhookProvider.start()
             try {
                 serverUUID = UUID.fromString(generalConfig.getString("webhook.server_uuid", null))
             } catch (e: Exception) {

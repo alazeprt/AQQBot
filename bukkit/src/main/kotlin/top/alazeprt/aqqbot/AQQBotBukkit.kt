@@ -57,8 +57,6 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
 
     private val pluginId = 24071
 
-    override var webhookServer: AQQBotWebhookServer? = null
-
     override lateinit var serverUUID: UUID
 
     override var spark: Boolean = false
