@@ -7,31 +7,46 @@ class MessageManager(plugin: AQQBot) {
     private val messageConfig = plugin.messageConfig
     val enableGroups = mutableMapOf<String, FileConfiguration?>()
 
-    fun get(key: String, group: Long?): String {
-        if (!enableGroups.containsKey(group.toString()) || enableGroups[group.toString()] == null ||
-            (enableGroups[group.toString()]?.isString(key) != true && enableGroups[group.toString()]?.isList(key) != true)) {
-            return if (messageConfig.getStringList(key).isEmpty()) messageConfig.getString(key)?: "" else
-                messageConfig.getStringList(key).random()?: ""
-        } else {
-            return if (enableGroups[group.toString()]!!.getStringList(key).isEmpty()) enableGroups[group.toString()]!!.getString(key)?: "" else
-                enableGroups[group.toString()]!!.getStringList(key).random()?: ""
-        }
+    fun get(key: String, group: Long?): String
+    {
+        val result =
+            enableGroups[group.toString()]?.let {
+                if (it.isString(key) || it.isList(key))
+                {
+                    if (it.getStringList(key).isEmpty()) return@let it.getString(key) ?: ""
+                    else return@let it.getStringList(key).random() ?: ""
+                }
+                else return@let null
+            }
+
+        val content =
+            result ?: if (messageConfig.getStringList(key).isEmpty()) messageConfig.getString(key) ?: ""
+            else messageConfig.getStringList(key).random() ?: ""
+
+        return content
     }
 
-    fun get(key: String, map: Map<String, String>, group: Long?): String {
-        var content: String
-        if (!enableGroups.containsKey(group.toString()) || enableGroups[group.toString()] == null ||
-            (enableGroups[group.toString()]?.isString(key) != true && enableGroups[group.toString()]?.isList(key) != true)) {
-            content = if (messageConfig.getStringList(key).isEmpty()) messageConfig.getString(key)?: "" else
-                messageConfig.getStringList(key).random()?: ""
-        } else {
-            content = if (enableGroups[group.toString()]!!.getStringList(key).isEmpty()) enableGroups[group.toString()]!!.getString(key)?: "" else
-                enableGroups[group.toString()]!!.getStringList(key).random()?: ""
+    fun get(key: String, map: Map<String, String>, group: Long?): String
+    {
+        val result =
+            enableGroups[group.toString()]?.let {
+                if (it.isString(key) || it.isList(key))
+                {
+                    if (it.getStringList(key).isEmpty()) return@let it.getString(key) ?: ""
+                    else return@let it.getStringList(key).random() ?: ""
+                }
+                else return@let null
+            }
+
+        val content =
+            result ?: if (messageConfig.getStringList(key).isEmpty()) messageConfig.getString(key) ?: ""
+            else messageConfig.getStringList(key).random() ?: ""
+
+        return content.apply {
+            map.forEach {
+                this.replace("\${$it.key}", it.value)
+            }
         }
-        for ((k, v) in map) {
-            content = content.replace("\${$k}", v)
-        }
-        return content
     }
 
     fun getList(key: String, group: Long?): String {
