@@ -38,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 
 
-@Plugin(id = "aqqbot", name = "AQQBot", version = "2.0-alpha.11", url = "https://aqqbot.alazeprt.top", authors = ["alazeprt"])
+@Plugin(id = "aqqbot", name = "AQQBot", version = "2.0-beta.11", url = "https://aqqbot.alazeprt.top", authors = ["alazeprt"])
 class AQQBotVelocity : AQQBot {
     override var debugModule: ADebug? = null
 
@@ -138,7 +138,7 @@ class AQQBotVelocity : AQQBot {
                 val unbind_output = customConfig.getStringList("$it.unbind_output")
                 var image: AImage? = null
                 if (customConfig.contains("$it.image")) {
-                    val path = customConfig.getString("$it.image")
+                    val path = customConfig.getString("$it.image.path")
                     val elements = mutableListOf<AImageElement>()
                     customConfig.getConfigurationSection("$it.image.elements").getKeys(false).forEach { k ->
                         val type = customConfig.getString("$it.image.elements.$k.type")

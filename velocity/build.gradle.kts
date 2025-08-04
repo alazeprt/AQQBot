@@ -11,6 +11,7 @@ version = properties["version"] as String
 repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://jitpack.io")
+    maven("https://repo.lucko.me/")
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
     maven("https://oss.sonatype.org/content/repositories/snapshots")
     maven("https://repo.opencollab.dev/main/")

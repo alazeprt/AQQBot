@@ -11,6 +11,7 @@ version = properties["version"] as String
 repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://jitpack.io")
+    maven("https://repo.lucko.me/")
     maven("https://oss.sonatype.org/content/repositories/snapshots")
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
     maven("https://repo.extendedclip.com/releases/")
@@ -24,7 +25,6 @@ dependencies {
     compileOnly("com.github.alazeprt:AConfiguration:1.2")
     implementation("com.alessiodp.libby:libby-bukkit:2.0.0-SNAPSHOT")
     implementation("org.bstats:bstats-bukkit:3.0.2")
-    implementation("org.glavo:rcon-java:3.0")
     compileOnly("dev.folia:folia-api:1.20.1-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("me.lucko:spark-api:0.1-SNAPSHOT")

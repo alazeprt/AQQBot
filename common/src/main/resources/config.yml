@@ -234,24 +234,11 @@ command_execution:
   # - DECIDATED_SERVER: 通过 Bukkit 内部 API 获取 DecidatedServer 实例并以其执行命令 (适用于较高版本/非混合端)
   # - MINECRAFT_SERVER: 通过 Bukkit 内部 API 获取 MinecraftServer 实例并创建 RCON 实例以其执行命令 (适用于较低版本/部分混合端)
   # - SIMULATE_CONSOLE: 创建一个基于 Bukkit 外部 API 的 CommandConsoleSender 终端实例并执行命令 (适用于全版本/混合端)
-  # - RCON: 通过外部调用 RCON 接口执行命令 (适用于全版本/混合端, 需要配置下面的 rcon 选项)
   sort:
     - "NATIVE"
     - "DECIDATED_SERVER"
     - "MINECRAFT_SERVER"
     - "SIMULATE_CONSOLE"
-
-  # RCON 选项
-  # 在使用该功能前, 请先确保配置好服务器 server.properties 的 enable-rcon (改为true), rcon.port 与 rcon.password 配置项
-  rcon:
-    # RCON 服务器地址
-    host: "127.0.0.1"
-
-    # RCON 服务器端口 (rcon.port 项, 注意不要和 server-port 及服务器内已被占用端口 重复)
-    port: 25575
-
-    # RCON 服务器密码 (rcon.password 项)
-    password: "password"
 
   # 是否格式化消息 (将颜色符号去除)
   # 默认包含 §0, §1 , ... , §9, §a, ..., §f, §k, §l, §m, §n, §o, §r

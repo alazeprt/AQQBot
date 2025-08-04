@@ -197,7 +197,7 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
                 val unbind_output = customConfig.getStringList("$it.unbind_output")
                 var image: AImage? = null
                 if (customConfig.contains("$it.image")) {
-                    val path = customConfig.getString("$it.image")
+                    val path = customConfig.getString("$it.image.path")
                     val elements = mutableListOf<AImageElement>()
                     customConfig.getConfigurationSection("$it.image.elements").getKeys(false).forEach { k ->
                         val type = customConfig.getString("$it.image.elements.$k.type")
@@ -326,15 +326,6 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
                     "MINECRAFT_SERVER" -> if (MinecraftServerSender(this).check()) {
                         sender[group.toLong()] = MinecraftServerSender::class.java
                         return@out
-                    }
-                    "RCON" -> {
-                        val instance = RCONSender(this)
-                        val pass = instance.check(group.toLong())
-                        if (pass) {
-                            sender[group.toLong()] = RCONSender::class.java
-                            instance.close()
-                            return@out
-                        }
                     }
                     "SIMULATE_CONSOLE" -> {
                         sender[group.toLong()] = BukkitConsoleSender::class.java

@@ -189,6 +189,8 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
 
     fun reload() {
         loadConfig(this)
+        sender.clear()
+        setSender()
         unloadBot()
         if (botConfig.getString("access_token").isNullOrBlank()) {
             loadBot(
@@ -294,8 +296,12 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
 
     override fun submitCommand(command: String, groupId: Long): CompletableFuture<AExecution> {
         val senderInstance: AExecution = sender[groupId]!!.constructors[0].newInstance(this) as AExecution
-        if (senderInstance.javaClass.methods.map { it.name }.contains("check")) {
-            senderInstance.javaClass.getMethod("check").invoke(senderInstance)
+        for (method in senderInstance.javaClass.methods) {
+            if (method.name.contains("check") && method.parameterCount == 0) {
+                method.invoke(senderInstance)
+            } else if (method.name.contains("check")) {
+                method.invoke(senderInstance, groupId)
+            }
         }
         return senderInstance.execute(command, groupId)
     }

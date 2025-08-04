@@ -9,6 +9,7 @@ version = properties["version"] as String
 
 repositories {
     maven("https://jitpack.io")
+    maven("https://repo.lucko.me/")
     maven("https://repo.extendedclip.com/releases/")
     maven("https://oss.sonatype.org/content/repositories/snapshots")
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")

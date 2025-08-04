@@ -61,9 +61,6 @@ interface ConfigProvider {
         }
         if (generalConfig.getInt("version", null) < 18) {
             generalConfig.setIfNotExists("command_execution.sort", listOf("NATIVE", "DEDICATED_SERVER", "MINECRAFT_SERVER", "SIMULATE_CONSOLE"))
-            generalConfig.setIfNotExists("command_execution.rcon.host", "127.0.0.1")
-            generalConfig.setIfNotExists("command_execution.rcon.port", "25575")
-            generalConfig.setIfNotExists("command_execution.rcon.password", "password")
             generalConfig.setIfNotExists("whitelist.name_rule", """[\S]*""")
         }
     }
@@ -97,7 +94,7 @@ interface ConfigProvider {
     fun getDataFolder(): File
 
     fun configNeedUpdate(): Boolean {
-        if (generalConfig.getInt("version", null) != 18) {
+        if (generalConfig.getInt("version", null) != 19) {
             val file = File(getDataFolder(), "config_new.yml")
             this.javaClass.getResource("/config.yml")?.let { file.writeText(it.readText()) }
             return true
