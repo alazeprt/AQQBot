@@ -8,8 +8,6 @@
 
 ## 其它说明
 
-- 所有 `GET` 操作均需要 `Content-Type: application/json` 请求头
-- 所有 `POST` 操作均需要 `Content-Type: application/x-www-form-urlencoded` 请求头
 - 你可以在请求数据中添加 `echo`, 在返回时会附带相同的 `echo` 参数值
 - 你需要将请求的接口放到请求的数据内 (键为 `action`)
 - 所有接口请求/返回值均为 `JSON` 格式
