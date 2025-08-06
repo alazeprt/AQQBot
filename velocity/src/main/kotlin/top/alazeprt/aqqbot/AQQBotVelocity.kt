@@ -38,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 
 
-@Plugin(id = "aqqbot", name = "AQQBot", version = "2.0-beta.11", url = "https://aqqbot.alazeprt.top", authors = ["alazeprt"])
+@Plugin(id = "aqqbot", name = "AQQBot", version = "2.0-alpha.12", url = "https://aqqbot.alazeprt.top", authors = ["alazeprt"])
 class AQQBotVelocity : AQQBot {
     override var debugModule: ADebug? = null
 

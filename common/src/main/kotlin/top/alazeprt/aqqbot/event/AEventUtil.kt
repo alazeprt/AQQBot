@@ -33,7 +33,6 @@ object AEventUtil {
             val qq: Long = plugin.getQQByPlayer(plugin.adapter!!.getOfflinePlayer(playerName))?: -1L
             plugin.submitAsync {
                 plugin.enableGroups.forEach {
-                    if (!plugin.generalConfig.getBoolean("notify.player_status.group_enable", it.key.toLong())) return@submitAsync
                     val messagePath = "notify.player_status.${if (isJoin) "join" else "leave"}"
                     plugin.debugModule?.debugLogger?.log("send the $playerName's ${if (isJoin) "join" else "leave"} message to group ${it.key}")
                     val message = if (plugin.generalConfig.getStringList(messagePath, it.key.toLong()).isEmpty())
