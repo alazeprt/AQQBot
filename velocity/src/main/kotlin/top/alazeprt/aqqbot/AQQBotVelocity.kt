@@ -345,4 +345,8 @@ class AQQBotVelocity : AQQBot {
         libraryManager.addJitPack()
         libraryManager.loadLibraries(guavaLib, hikaricpLib, sqliteLib, mysqlLib, aconfigurationLib, databaseLib, aonebotLib)
     }
+
+    override fun handleImage(url: String): Boolean {
+        return false
+    }
 }

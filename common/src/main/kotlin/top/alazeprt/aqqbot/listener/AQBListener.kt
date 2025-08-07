@@ -1,5 +1,11 @@
 package top.alazeprt.aqqbot.listener
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.ComponentBuilder
+import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.format.TextDecoration
 import top.alazeprt.aonebot.action.GetGroupMemberList
 import top.alazeprt.aonebot.event.Listener
 import top.alazeprt.aonebot.event.SubscribeBotEvent
@@ -32,6 +38,7 @@ class AQBListener(val plugin: AQQBot) : Listener {
                     if (jsonObject.get("type").asString == "text") {
                         message += jsonObject.get("data").asJsonObject.get("text").asString
                     } else if (jsonObject.get("type").asString == "image") {
+//                        plugin.handleImage(jsonObject.get("data").asJsonObject.get("file").asString)
                         message += "[图片]"
                     } else if (jsonObject.get("type").asString == "at") {
                         memberList.forEach { member ->
@@ -40,7 +47,7 @@ class AQBListener(val plugin: AQQBot) : Listener {
                             }
                         }
                     } else if (jsonObject.get("type").asString == "face") {
-                        message += "[表情包-"
+                        message += "表情包-"
                     }
                 }
                 plugin.debugModule?.debugLogger?.log("receive message from ${event.groupId} which is sent by ${event.senderId}: $message")

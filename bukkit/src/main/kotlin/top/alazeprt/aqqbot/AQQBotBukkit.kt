@@ -3,8 +3,12 @@ package top.alazeprt.aqqbot
 import com.alessiodp.libby.BukkitLibraryManager
 import com.alessiodp.libby.Library
 import com.alessiodp.libby.LibraryManager
+import io.wdsj.imagepreviewer.api.ImagePreviewerAPI
+import io.wdsj.imagepreviewer.image.ImageLoader
 import me.clip.placeholderapi.PlaceholderAPI
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.event.ClickEvent
 import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
@@ -290,7 +294,7 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
         val adventureBukkitLib = Library.builder()
             .groupId("net{}kyori")
             .artifactId("adventure-platform-bukkit")
-            .version("4.3.4")
+            .version("4.4.1")
             .resolveTransitiveDependencies(true)
             .build()
         val databaseLib = Library.builder()
@@ -341,5 +345,17 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
         libraryManager.addMavenCentral()
         libraryManager.addJitPack()
         libraryManager.loadLibraries(adventureBukkitLib, guavaLib, hikaricpLib, sqliteLib, mysqlLib, aconfigurationLib, databaseLib, aonebotLib)
+    }
+
+    override fun handleImage(url: String): Boolean {
+        if (url.startsWith("http") && server.pluginManager.isPluginEnabled("ImagePreviewer")) {
+            val component = Component.text("[图片]")
+                .clickEvent(ClickEvent.runCommand("preview preview $url"))
+                .hoverEvent(Component.text("点击预览图片"))
+            audience.all().sendMessage(component)
+            return true
+        } else {
+            return false
+        }
     }
 }

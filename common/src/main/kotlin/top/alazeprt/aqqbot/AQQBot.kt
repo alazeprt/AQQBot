@@ -305,4 +305,6 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         }
         return senderInstance.execute(command, groupId)
     }
+
+    fun handleImage(url: String): Boolean
 }
