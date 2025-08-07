@@ -161,6 +161,7 @@ abstract class DatabaseDataProvider(val plugin: AQQBot): DataProvider {
             rows("userId", "name")
         }.map {
             map[getString("userId").toLong()] = getString("name").split(", ").toMutableList()
+                .filter { it.isNotBlank() }
                 .map { plugin.adapter.getOfflinePlayer(it) }
         }
         return map
