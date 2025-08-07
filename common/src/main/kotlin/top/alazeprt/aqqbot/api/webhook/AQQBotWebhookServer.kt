@@ -217,9 +217,22 @@ class AQQBotWebhookServer(val plugin: AQQBot, private val ip: InetSocketAddress)
                     return
                 }
                 "/api/v1/users" -> {
+                    val requestQQ = content.get("qq")
+                    val list = mutableListOf<String>()
+                    if (requestQQ != null && requestQQ.isJsonArray) {
+                        val jsonArray = requestQQ.asJsonArray
+                        jsonArray.forEach {
+                            list.add(it.asString)
+                        }
+                    } else if (requestQQ != null && requestQQ.isJsonPrimitive) {
+                        list.add(requestQQ.asJsonPrimitive.asString)
+                    }
                     val users = plugin.dataProvider.getAllData()
                     val jsonObject = JsonObject()
                     users.forEach { (qq, players) ->
+                        if (!list.isEmpty() && !list.contains(qq.toString())) {
+                            return@forEach
+                        }
                         val jsonArray = JsonArray()
                         players.forEach {
                             jsonArray.add(it.getName())
