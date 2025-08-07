@@ -80,6 +80,8 @@ class AQQBotVelocity : AQQBot {
     lateinit var dataFolder: Path
     lateinit var metricsFactory: Metrics.Factory
 
+    override var fakePlayer: Boolean = false
+
     override var spark: Boolean = false
 
     @Inject

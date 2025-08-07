@@ -61,6 +61,8 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
 
     override lateinit var serverUUID: UUID
 
+    override var fakePlayer: Boolean = false
+
     override var spark: Boolean = false
 
     override var loadSparkCount: Int = 0

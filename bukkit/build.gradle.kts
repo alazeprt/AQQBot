@@ -23,7 +23,7 @@ dependencies {
     implementation(project(":common"))
     compileOnly("net.kyori:adventure-platform-bukkit:4.4.1")
     compileOnly(fileTree("libs") {
-        include("*.jar", "*.aar") // 可扩展其他文件类型
+        include("*.jar")
     })
     compileOnly("com.github.alazeprt:AConfiguration:1.2")
     implementation("com.alessiodp.libby:libby-bukkit:2.0.0-SNAPSHOT")

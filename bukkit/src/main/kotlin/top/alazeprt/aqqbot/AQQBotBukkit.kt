@@ -59,6 +59,8 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
 
     override lateinit var messageManager: MessageManager
 
+    override var fakePlayer: Boolean = false
+
     private val pluginId = 24071
 
     override lateinit var serverUUID: UUID
