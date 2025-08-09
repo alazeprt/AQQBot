@@ -2,6 +2,7 @@ package top.alazeprt.aqqbot.util
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import net.kyori.adventure.text.Component
 import top.alazeprt.aqqbot.AQQBot
 import java.io.BufferedReader
 import java.io.InputStreamReader

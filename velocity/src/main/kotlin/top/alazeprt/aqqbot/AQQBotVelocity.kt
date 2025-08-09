@@ -14,6 +14,8 @@ import com.velocitypowered.api.event.proxy.ProxyShutdownEvent
 import com.velocitypowered.api.plugin.Plugin
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
+import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bstats.velocity.Metrics
 import org.slf4j.Logger
 import top.alazeprt.aconfiguration.file.FileConfiguration
@@ -348,7 +350,7 @@ class AQQBotVelocity : AQQBot {
         libraryManager.loadLibraries(guavaLib, hikaricpLib, sqliteLib, mysqlLib, aconfigurationLib, databaseLib, aonebotLib)
     }
 
-    override fun handleImage(url: String): Boolean {
-        return false
+    override fun handleImage(url: String): TextComponent? {
+        return null
     }
 }

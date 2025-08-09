@@ -2,6 +2,7 @@ package top.alazeprt.aqqbot.adapter
 
 import com.velocitypowered.api.util.GameProfile
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import top.alazeprt.aqqbot.AQQBotVelocity
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.profile.APlayer
@@ -26,7 +27,7 @@ class VelocityAdapter(val plugin: AQQBotVelocity) : AQQBotAdapter {
         }
     }
 
-    override fun broadcastMessage(message: Component) {
+    override fun broadcastMessage(message: TextComponent) {
         plugin.server.allServers.forEach {
             it.sendMessage(message)
         }

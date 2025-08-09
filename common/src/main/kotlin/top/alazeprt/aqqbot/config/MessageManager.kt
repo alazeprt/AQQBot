@@ -1,5 +1,8 @@
 package top.alazeprt.aqqbot.config
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aqqbot.AQQBot
 
@@ -32,6 +35,22 @@ class MessageManager(plugin: AQQBot) {
             content = content.replace("\${$k}", v)
         }
         return content
+    }
+
+    fun getAndFormat(key: String, map: Map<String, Component>, group: Long?): Component {
+        var content = if (!enableGroups.containsKey(group.toString()) || enableGroups[group.toString()] == null ||
+            (enableGroups[group.toString()]?.isString(key) != true && enableGroups[group.toString()]?.isList(key) != true)) {
+            if (messageConfig.getStringList(key).isEmpty()) messageConfig.getString(key)?: "" else
+                messageConfig.getStringList(key).random()?: ""
+        } else {
+            if (enableGroups[group.toString()]!!.getStringList(key).isEmpty()) enableGroups[group.toString()]!!.getString(key)?: "" else
+                enableGroups[group.toString()]!!.getStringList(key).random()?: ""
+        }
+        var component = LegacyComponentSerializer.legacy('&').deserialize(content)
+        for ((k, v) in map) {
+            component = component.replaceText { builder -> builder.matchLiteral("\${$k}").replacement(v) } as TextComponent
+        }
+        return component
     }
 
     fun getList(key: String, group: Long?): String {

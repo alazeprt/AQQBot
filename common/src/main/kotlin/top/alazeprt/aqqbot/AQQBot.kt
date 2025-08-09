@@ -1,6 +1,7 @@
 package top.alazeprt.aqqbot
 
 import com.alessiodp.libby.LibraryManager
+import net.kyori.adventure.text.TextComponent
 import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.adapter.AQQBotAdapter
@@ -306,5 +307,5 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         return senderInstance.execute(command, groupId)
     }
 
-    fun handleImage(url: String): Boolean
+    fun handleImage(url: String): TextComponent?
 }

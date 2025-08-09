@@ -85,7 +85,6 @@ object AImageUtil {
     }
 
     fun getImageBase64(imageFile: File): String {
-        println(imageFile.absolutePath)
         val image = ImageIO.read(imageFile)
         val outputStream = ByteArrayOutputStream()
         ImageIO.write(image, "PNG", outputStream)

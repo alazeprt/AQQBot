@@ -1,11 +1,7 @@
 package top.alazeprt.aqqbot.listener
 
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.ComponentBuilder
 import net.kyori.adventure.text.TextComponent
-import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextColor
-import net.kyori.adventure.text.format.TextDecoration
 import top.alazeprt.aonebot.action.GetGroupMemberList
 import top.alazeprt.aonebot.event.Listener
 import top.alazeprt.aonebot.event.SubscribeBotEvent
@@ -31,6 +27,7 @@ class AQBListener(val plugin: AQQBot) : Listener {
         AQQBotAPI.fireEvent(ReceiveMessageEvent(event))
         var message = ""
         val oneBotClient = BotProvider.getBot()
+        var component: Component? = null
         synchronized(oneBotClient!!) {
             oneBotClient.action(GetGroupMemberList(event.groupId)) { memberList ->
                 event.jsonMessage.forEach {
@@ -38,7 +35,7 @@ class AQBListener(val plugin: AQQBot) : Listener {
                     if (jsonObject.get("type").asString == "text") {
                         message += jsonObject.get("data").asJsonObject.get("text").asString
                     } else if (jsonObject.get("type").asString == "image") {
-//                        plugin.handleImage(jsonObject.get("data").asJsonObject.get("file").asString)
+                        component = plugin.handleImage(jsonObject.get("data").asJsonObject.get("file").asString)
                         message += "[图片]"
                     } else if (jsonObject.get("type").asString == "at") {
                         memberList.forEach { member ->
@@ -79,17 +76,38 @@ class AQBListener(val plugin: AQQBot) : Listener {
                 }
                 val newMessage: String = canForwardMessage(message, event.groupId) ?: return@action
                 plugin.debugModule?.debugLogger?.log("forward message to server: $newMessage")
-                plugin.adapter.broadcastMessage(
-                    AFormatter.pluginToChat(
-                        plugin.messageManager.get(
-                            "game.chat_from_qq", mutableMapOf(
-                                "groupId" to event.groupId.toString(),
-                                "userName" to if (member!!.card.isNullOrBlank()) member!!.member.nickname else member!!.card,
-                                "message" to newMessage
-                            )
-                        , event.groupId)
+                if (component == null) {
+                    plugin.adapter.broadcastMessage(
+                        AFormatter.pluginToChat(
+                            plugin.messageManager.get(
+                                "game.chat_from_qq", mutableMapOf(
+                                    "groupId" to event.groupId.toString(),
+                                    "userName" to if (member!!.card.isNullOrBlank()) member!!.member.nickname else member!!.card,
+                                    "message" to newMessage
+                                )
+                            , event.groupId)
+                        )
                     )
-                )
+                } else {
+                    var originComponent: Component = Component.text(newMessage)
+                    println(originComponent)
+                    originComponent = originComponent.replaceText { builder ->
+                        builder.matchLiteral("[图片]").replacement(component)
+                    }
+                    println("\n\n\n\n\n")
+                    println(originComponent)
+                    println("\n\n\n\n\n")
+                    plugin.adapter.broadcastMessage(
+                        plugin.messageManager.getAndFormat(
+                            "game.chat_from_qq", mutableMapOf(
+                                "groupId" to Component.text(event.groupId),
+                                "userName" to Component.text(if (member!!.card.isNullOrBlank()) member!!.member.nickname else member!!.card),
+                                "message" to originComponent
+                            )
+                        , event.groupId) as TextComponent
+                    )
+                }
+
             }
         }
     }

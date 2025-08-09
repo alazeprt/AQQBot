@@ -22,6 +22,7 @@ dependencies {
     compileOnly("com.github.alazeprt:AOneBot:1.0.16-beta")
     compileOnly("com.google.code.gson:gson:2.11.0")
     compileOnly("net.kyori:adventure-api:4.18.0")
+    compileOnly("net.kyori:adventure-text-serializer-legacy:4.24.0")
     compileOnly("com.github.alazeprt:AConfiguration:1.2")
     compileOnly("com.github.alazeprt:taboolib-database:1.0.4")
     compileOnly("me.lucko:spark-api:0.1-SNAPSHOT")

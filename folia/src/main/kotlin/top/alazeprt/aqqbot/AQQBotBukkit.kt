@@ -6,6 +6,7 @@ import com.alessiodp.libby.LibraryManager
 import me.clip.placeholderapi.PlaceholderAPI
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.event.ClickEvent
 import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
@@ -308,11 +309,17 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
             .relocate("com{}google{}code{}gson", "top{}alazeprt{}aonebot{}lib{}com{}google")
             .resolveTransitiveDependencies(true)
             .build()
+        val adventureOldLib = Library.builder()
+            .groupId("net{}kyori")
+            .artifactId("adventure-text-serializer-legacy")
+            .version("4.24.0")
+            .resolveTransitiveDependencies(true)
+            .build()
 
         libraryManager.addRepository("https://maven.aliyun.com/repository/public")
         libraryManager.addMavenCentral()
         libraryManager.addJitPack()
-        libraryManager.loadLibraries(adventureBukkitLib, guavaLib, hikaricpLib, sqliteLib, mysqlLib, aconfigurationLib, databaseLib, aonebotLib)
+        libraryManager.loadLibraries(adventureOldLib, adventureBukkitLib, guavaLib, hikaricpLib, sqliteLib, mysqlLib, aconfigurationLib, databaseLib, aonebotLib)
     }
 
     override fun setSender() {
@@ -321,6 +328,10 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
                 when (it.uppercase()) {
                     "NATIVE" -> if (NativeServerSender(this).check()) {
                         sender[group.toLong()] = NativeServerSender::class.java
+                        return@out
+                    }
+                    "DEDICATED_SERVER" -> if (DecidatedServerSender(this).check()) {
+                        sender[group.toLong()] = DecidatedServerSender::class.java
                         return@out
                     }
                     "DECIDATED_SERVER" -> if (DecidatedServerSender(this).check()) {
@@ -348,15 +359,14 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
         return Bukkit.getServer().version
     }
 
-    override fun handleImage(url: String): Boolean {
+    override fun handleImage(url: String): TextComponent? {
         if (url.startsWith("http") && server.pluginManager.isPluginEnabled("ImagePreviewer")) {
             val component = Component.text("[图片]")
                 .clickEvent(ClickEvent.clickEvent(ClickEvent.Action.RUN_COMMAND, "imagepreviewer preview $url"))
                 .hoverEvent(Component.text("点击预览图片"))
-            audience.all().sendMessage(component)
-            return true
+            return component
         } else {
-            return false
+            return null
         }
     }
 }

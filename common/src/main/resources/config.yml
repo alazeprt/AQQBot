@@ -231,12 +231,12 @@ command_execution:
   # 越前的越优先测试 若无法使用则会继续进行下一个测试 直到成功或全部测试失败
   # 可用方案:
   # - NATIVE: 通过 Bukkit 内部 API 内部方法创建 CommandSender 执行命令 (适用于高版本/非混合端)
-  # - DECIDATED_SERVER: 通过 Bukkit 内部 API 获取 DecidatedServer 实例并以其执行命令 (适用于较高版本/非混合端)
+  # - DEDICATED_SERVER: 通过 Bukkit 内部 API 获取 DedicatedServer 实例并以其执行命令 (适用于较高版本/非混合端)
   # - MINECRAFT_SERVER: 通过 Bukkit 内部 API 获取 MinecraftServer 实例并创建 RCON 实例以其执行命令 (适用于较低版本/部分混合端)
   # - SIMULATE_CONSOLE: 创建一个基于 Bukkit 外部 API 的 CommandConsoleSender 终端实例并执行命令 (适用于全版本/混合端)
   sort:
     - "NATIVE"
-    - "DECIDATED_SERVER"
+    - "DEDICATED_SERVER"
     - "MINECRAFT_SERVER"
     - "SIMULATE_CONSOLE"
 
