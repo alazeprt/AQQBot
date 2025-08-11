@@ -1,6 +1,7 @@
 package top.alazeprt.aqqbot.adapter
 
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import org.bukkit.entity.Player
 import top.alazeprt.aqqbot.AQQBotBukkit
 import top.alazeprt.aqqbot.profile.APlayer
@@ -28,7 +29,7 @@ class BukkitPlayer(val player: Player) : APlayer {
         player.sendMessage(message)
     }
 
-    override fun sendMessage(message: Component) {
+    override fun sendMessage(message: TextComponent) {
         AQQBotBukkit.audience.player(player).sendMessage(message)
     }
 

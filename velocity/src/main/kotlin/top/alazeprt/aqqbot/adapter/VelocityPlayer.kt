@@ -2,6 +2,7 @@ package top.alazeprt.aqqbot.adapter
 
 import com.velocitypowered.api.proxy.Player
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import top.alazeprt.aqqbot.profile.APlayer
 import java.net.InetSocketAddress
 import java.util.*
@@ -27,7 +28,7 @@ class VelocityPlayer(val player: Player) : APlayer {
         player.sendMessage(Component.text(message))
     }
 
-    override fun sendMessage(message: Component) {
+    override fun sendMessage(message: TextComponent) {
         player.sendMessage(message)
     }
 

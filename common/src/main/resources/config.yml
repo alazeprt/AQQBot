@@ -260,7 +260,7 @@ command_execution:
   # 单位: 秒
   delay: 2
 
-# Webhook 相关功能 (远程 WebSocket 服务器) (暂不可用)
+# Webhook 相关功能 (远程 WebSocket 服务器)
 webhook:
   # 是否启用该功能
   enable: false

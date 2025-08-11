@@ -27,39 +27,26 @@ jobs:
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
       - name: Build
-        run: ./gradlew build shadowJar
+        run: ./gradlew package --stacktrace --info
       - name: Rename JARs if alpha
         run: |
           COMMIT_HASH=$(git rev-parse --short HEAD)
 
-          for dir in bukkit folia velocity; do
-            for file in "$dir"/build/libs/*.jar; do
-              filename=$(basename "$file")
-              if [[ "$filename" =~ [Aa][Ll][Pp][Hh][Aa] ]]; then
-                base="${filename%.jar}"
-                newname="${base}-${COMMIT_HASH}.jar"
-                mv "$file" "$dir/build/libs/$newname"
-                echo "Renamed $filename to $newname"
-              else
-                echo "No beta/alpha in $filename, skipping."
-              fi
-            done
+          for file in outputs/*.jar; do
+            filename=$(basename "$file")
+            if [[ "$filename" =~ [Aa][Ll][Pp][Hh][Aa] ]]; then
+              base="${filename%.jar}"
+              newname="${base}-${COMMIT_HASH}.jar"
+              mv "$file" "outputs/$newname"
+              echo "Renamed $filename to $newname"
+            else
+              echo "No beta/alpha in $filename, skipping."
+            fi
           done
-      - name: capture build artifacts (spigot)
+
+      - name: capture build artifacts
         uses: actions/upload-artifact@v4.6.0
         with:
-          name: AQQBot for Spigot
+          name: AQQBot
           path: |
-            bukkit/build/libs/
-      - name: capture build artifacts (folia)
-        uses: actions/upload-artifact@v4.6.0
-        with:
-          name: AQQBot for Folia
-          path: |
-            folia/build/libs/
-      - name: capture build artifacts (velocity)
-        uses: actions/upload-artifact@v4.6.0
-        with:
-          name: AQQBot for Velocity
-          path: |
-            velocity/build/libs/
+            outputs/*.jar

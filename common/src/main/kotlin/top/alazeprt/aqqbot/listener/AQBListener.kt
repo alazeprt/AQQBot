@@ -38,6 +38,10 @@ class AQBListener(val plugin: AQQBot) : Listener {
                         component = plugin.handleImage(jsonObject.get("data").asJsonObject.get("file").asString)
                         message += "[图片]"
                     } else if (jsonObject.get("type").asString == "at") {
+                        if (jsonObject.get("data").asJsonObject.get("qq").asString == "all") {
+                            message += "@全体成员"
+                            return@forEach
+                        }
                         memberList.forEach { member ->
                             if (member.member.userId == jsonObject.get("data").asJsonObject.get("qq").asLong) {
                                 message += "@${member.member.nickname}"

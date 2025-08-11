@@ -11,7 +11,9 @@ class AParentCommand(val plugin: AQQBot) : ACommand {
             SubHelp(plugin).onCommand(command, sender, args)
         } else when (args[0]) {
             "status" -> SubStatus(plugin).onCommand(command, sender, args)
-            "whitelist" -> when (args[1]) {
+            "whitelist" -> if (args.size == 1) {
+                SubHelp(plugin).onCommand(command, sender, args)
+            } else when (args[1]) {
                 "bind" -> SubBind(plugin).onCommand(command, sender, args)
                 "unbind" -> SubUnbind(plugin).onCommand(command, sender, args)
                 "query" -> SubQuery(plugin).onCommand(command, sender, args)

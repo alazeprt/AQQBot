@@ -232,68 +232,67 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
         customCommands = mutableListOf()
         customConfig = YamlConfiguration.loadConfiguration(file)
         customConfig.getKeys(false).forEach {
-            if (customConfig.getBoolean("$it.enable")) {
-                val command = customConfig.getStringList("$it.command")
-                val execute = customConfig.getStringList("$it.execute")
-                val unbind_execute = customConfig.getStringList("$it.unbind_execute")
-                val output = customConfig.getStringList("$it.output")
-                val unbind_output = customConfig.getStringList("$it.unbind_output")
-                var image: AImage? = null
-                if (customConfig.contains("$it.image")) {
-                    val path = customConfig.getString("$it.image.path")
-                    val elements = mutableListOf<AImageElement>()
-                    customConfig.getConfigurationSection("$it.image.elements").getKeys(false).forEach { k ->
-                        val type = customConfig.getString("$it.image.elements.$k.type")
-                        val data = customConfig.get("$it.image.elements.$k.data")
-                        val x = customConfig.getDouble("$it.image.elements.$k.x")
-                        val y = customConfig.getDouble("$it.image.elements.$k.y")
-                        when (type) {
-                            "text" -> {
-                                val size = customConfig.getInt("$it.image.elements.$k.size")
-                                val font = customConfig.getString("$it.image.elements.$k.font")
-                                val color = customConfig.getString("$it.image.elements.$k.color")
-                                val bold = customConfig.getBoolean("$it.image.elements.$k.bold")
-                                val italic = customConfig.getBoolean("$it.image.elements.$k.italic")
-                                elements.add(AImageText(data.toString(), x, y, size, font, color, bold, italic))
-                            }
-                            else -> {
-                                log(LogLevel.WARN, "Unknown image element type $type (in custom configuration)")
-                            }
+            val enable = customConfig.getBoolean("$it.enable")
+            val command = customConfig.getStringList("$it.command")
+            val execute = customConfig.getStringList("$it.execute")
+            val unbind_execute = customConfig.getStringList("$it.unbind_execute")
+            val output = customConfig.getStringList("$it.output")
+            val unbind_output = customConfig.getStringList("$it.unbind_output")
+            var image: AImage? = null
+            if (customConfig.contains("$it.image")) {
+                val path = customConfig.getString("$it.image.path")
+                val elements = mutableListOf<AImageElement>()
+                customConfig.getConfigurationSection("$it.image.elements").getKeys(false).forEach { k ->
+                    val type = customConfig.getString("$it.image.elements.$k.type")
+                    val data = customConfig.get("$it.image.elements.$k.data")
+                    val x = customConfig.getDouble("$it.image.elements.$k.x")
+                    val y = customConfig.getDouble("$it.image.elements.$k.y")
+                    when (type) {
+                        "text" -> {
+                            val size = customConfig.getInt("$it.image.elements.$k.size")
+                            val font = customConfig.getString("$it.image.elements.$k.font")
+                            val color = customConfig.getString("$it.image.elements.$k.color")
+                            val bold = customConfig.getBoolean("$it.image.elements.$k.bold")
+                            val italic = customConfig.getBoolean("$it.image.elements.$k.italic")
+                            elements.add(AImageText(data.toString(), x, y, size, font, color, bold, italic))
+                        }
+                        else -> {
+                            log(LogLevel.WARN, "Unknown image element type $type (in custom configuration)")
                         }
                     }
-                    image = AImage(File(dataFolder.resolve("images"), path), elements)
                 }
-                var unbind_image: AImage? = null
-                if (customConfig.contains("$it.unbind_image")) {
-                    val path = customConfig.getString("$it.unbind_image.path")
-                    val elements = mutableListOf<AImageElement>()
-                    customConfig.getConfigurationSection("$it.unbind_image.elements").getKeys(false).forEach { k ->
-                        val type = customConfig.getString("$it.unbind_image.elements.$k.type")
-                        val data = customConfig.get("$it.unbind_image.elements.$k.data")
-                        val x = customConfig.getDouble("$it.unbind_image.elements.$k.x")
-                        val y = customConfig.getDouble("$it.unbind_image.elements.$k.y")
-                        when (type) {
-                            "text" -> {
-                                val size = customConfig.getInt("$it.unbind_image.elements.$k.size")
-                                val font = customConfig.getString("$it.unbind_image.elements.$k.font")
-                                val color = customConfig.getString("$it.unbind_image.elements.$k.color")
-                                val bold = customConfig.getBoolean("$it.unbind_image.elements.$k.bold")
-                                val italic = customConfig.getBoolean("$it.unbind_image.elements.$k.italic")
-                                elements.add(AImageText(data.toString(), x, y, size, font, color, bold, italic))
-                            }
-                            else -> {
-                                log(LogLevel.WARN, "Unknown image element type $type (in custom configuration)")
-                            }
-                        }
-                    }
-                    unbind_image = AImage(File(dataFolder.resolve("images"), path), elements)
-                }
-                val format = customConfig.getBoolean("$it.format")
-                val choose_account = if (customConfig.getInt("$it.choose_account") == 0) 1
-                else customConfig.getInt("$it.choose_account")
-                customCommands.add(ABukkitCustom(this, it, command, execute, unbind_execute, output, unbind_output, image,
-                    unbind_image, format, choose_account))
+                image = AImage(File(dataFolder.resolve("images"), path), elements)
             }
+            var unbind_image: AImage? = null
+            if (customConfig.contains("$it.unbind_image")) {
+                val path = customConfig.getString("$it.unbind_image.path")
+                val elements = mutableListOf<AImageElement>()
+                customConfig.getConfigurationSection("$it.unbind_image.elements").getKeys(false).forEach { k ->
+                    val type = customConfig.getString("$it.unbind_image.elements.$k.type")
+                    val data = customConfig.get("$it.unbind_image.elements.$k.data")
+                    val x = customConfig.getDouble("$it.unbind_image.elements.$k.x")
+                    val y = customConfig.getDouble("$it.unbind_image.elements.$k.y")
+                    when (type) {
+                        "text" -> {
+                            val size = customConfig.getInt("$it.unbind_image.elements.$k.size")
+                            val font = customConfig.getString("$it.unbind_image.elements.$k.font")
+                            val color = customConfig.getString("$it.unbind_image.elements.$k.color")
+                            val bold = customConfig.getBoolean("$it.unbind_image.elements.$k.bold")
+                            val italic = customConfig.getBoolean("$it.unbind_image.elements.$k.italic")
+                            elements.add(AImageText(data.toString(), x, y, size, font, color, bold, italic))
+                        }
+                        else -> {
+                            log(LogLevel.WARN, "Unknown image element type $type (in custom configuration)")
+                        }
+                    }
+                }
+                unbind_image = AImage(File(dataFolder.resolve("images"), path), elements)
+            }
+            val format = customConfig.getBoolean("$it.format")
+            val choose_account = if (customConfig.getInt("$it.choose_account") == 0) 1
+            else customConfig.getInt("$it.choose_account")
+            customCommands.add(ABukkitCustom(this, it, command, execute, unbind_execute, output, unbind_output, image,
+                unbind_image, format, choose_account, enable))
         }
     }
 

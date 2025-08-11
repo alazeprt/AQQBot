@@ -447,6 +447,36 @@ class AQQBotWebhookServer(val plugin: AQQBot, private val ip: InetSocketAddress)
                     return
                 }
                 "/api/v1/custom/get" -> {
+                    if (content.get("key") == null) {
+                        val customCommands = JsonObject()
+                        plugin.customCommands.forEach {
+                            val command = JsonArray()
+                            val execute = JsonArray()
+                            val unbindExecute = JsonArray()
+                            val output = JsonArray()
+                            val unbindOutput = JsonArray()
+                            it.command.forEach { a -> command.add(a) }
+                            it.execute.forEach { b -> command.add(b) }
+                            it.unbind_execute.forEach { b -> command.add(b) }
+                            it.output.forEach { c -> output.add(c) }
+                            it.unbind_output.forEach { c -> unbindOutput.add(c) }
+                            customCommands.add(it.name, JsonObject().apply {
+                                addProperty("enable", it.enable)
+                                add("command", command)
+                                add("execute", execute)
+                                add("unbind_execute", unbindExecute)
+                                addProperty("choose_account", it.account)
+                                add("output", output)
+                                add("unbind_output", unbindOutput)
+                                addProperty("format", it.format)
+                            })
+                        }
+                        p0?.send(Gson().toJson(JsonObject().apply {
+                            add("custom_commands", customCommands)
+                            addProperty("echo", echo)
+                        }))
+                        return
+                    }
                     val key = content.get("key").asString
                     var gotten = false
                     plugin.customCommands.forEach {
@@ -463,7 +493,7 @@ class AQQBotWebhookServer(val plugin: AQQBot, private val ip: InetSocketAddress)
                             it.output.forEach { c -> output.add(c) }
                             it.unbind_output.forEach { c -> unbindOutput.add(c) }
                             p0?.send(Gson().toJson(JsonObject().apply {
-                                addProperty("enable", true)
+                                addProperty("enable", it.enable)
                                 add("command", command)
                                 add("execute", execute)
                                 add("unbind_execute", unbindExecute)
