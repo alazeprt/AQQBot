@@ -81,14 +81,19 @@ abstract class ACustom(val plugin: AQQBot, val name: String, var command: List<S
                 BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), outputString))
             }
             imageMap.replaceAll { _, value ->
-                var processedValue = setPlaceholders(null, value)
+                var processedValue = setPlaceholders(plugin.adapter!!.getOfflinePlayer(playerName), value)
                 if (format) {
                     processedValue = AFormatter.chatClear(processedValue)
                     processedValue = AFormatter.pluginClear(processedValue)
                 }
                 processedValue
             }
-            web?.sendToGroup(groupId.toLong(), plugin)
+            val map = mutableMapOf<String, String>()
+            web?.placeholders?.forEach { key, value ->
+                val valueStr = setPlaceholders(plugin.adapter!!.getOfflinePlayer(playerName), value)
+                map[key] = valueStr
+            }
+            web?.sendToGroup(plugin.adapter!!.getOfflinePlayer(playerName), groupId.toLong(), plugin, map)
             var base64 = AImageUtil.getImageBase64(image?.path?: return@submitAsync)
             imageMap.forEach { t, u ->
                 if (t is AImageText) {
@@ -165,7 +170,12 @@ abstract class ACustom(val plugin: AQQBot, val name: String, var command: List<S
                 }
                 processedValue
             }
-            unbind_web?.sendToGroup(groupId.toLong(), plugin)
+            val map = mutableMapOf<String, String>()
+            unbind_web?.placeholders?.forEach { key, value ->
+                val valueStr = setPlaceholders(null, value)
+                map[key] = valueStr
+            }
+            unbind_web?.sendToGroup(null, groupId.toLong(), plugin, map)
             var base64 = AImageUtil.getImageBase64(unbind_image?.path?: return@submitAsync)
             imageMap.forEach { t, u ->
                 if (t is AImageText) {

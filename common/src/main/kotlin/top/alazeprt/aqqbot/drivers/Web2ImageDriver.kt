@@ -9,7 +9,6 @@ import com.microsoft.playwright.options.LoadState
 import com.microsoft.playwright.options.ScreenshotType
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.util.ACompressUtil
-import top.alazeprt.aqqbot.util.AWeb.Companion.copyRecursivelyTo
 import top.alazeprt.aqqbot.util.LogLevel
 import java.io.File
 import java.nio.file.Files
@@ -39,7 +38,7 @@ class Web2ImageDriver(val plugin: AQQBot) {
             val tmpFolder = Files.createTempDirectory("aqqbot-driver")
             ACompressUtil.unzipJar(driverFile, tmpFolder.toFile())
             val decompressedDriverFolder = tmpFolder.resolve("driver").resolve(platformDir())
-            decompressedDriverFolder.copyRecursivelyTo(driverFolder.toPath())
+            decompressedDriverFolder.toFile().copyRecursively(driverFolder)
             plugin.log(LogLevel.INFO, "Decompressed drivers to: ${driverFolder.absolutePath}")
         }
         plugin.log(LogLevel.INFO, "Testing the driver ...")
