@@ -27,6 +27,7 @@ dependencies {
     compileOnly("com.github.alazeprt:taboolib-database:1.0.4")
     compileOnly("me.lucko:spark-api:0.1-SNAPSHOT")
     compileOnly("org.java-websocket:Java-WebSocket:1.5.7")
+    compileOnly("com.microsoft.playwright:playwright:1.53.0")
 }
 
 tasks.withType<JavaCompile> {

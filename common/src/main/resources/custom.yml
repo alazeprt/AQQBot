@@ -115,3 +115,26 @@ memory:
         color: "#FFFFFF"
         bold: false
         italic: false
+
+# 例 5
+# 仅供测试
+test:
+  enable: true
+  command: ["/test", "test"]
+  execute: [""]
+  unbind_execute: [""]
+  choose_account: 1
+  web:
+    path: "test"
+    width: 1920
+    height: 1080
+    delay: 1000
+    placeholders:
+      ee: "测试" # 表示方法: ${ee}
+  unbind_web:
+    path: "test2"
+    width: 1920
+    height: 1080
+    delay: 1000
+    placeholders:
+      ee: "测试" # 表示方法: ${eee}

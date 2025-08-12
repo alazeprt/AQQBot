@@ -7,16 +7,16 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerQuitEvent
-import top.alazeprt.aqqbot.AQQBotBukkit
-import top.alazeprt.aqqbot.adapter.BukkitPlayer
+import top.alazeprt.aqqbot.AQQBotFolia
+import top.alazeprt.aqqbot.adapter.FoliaPlayer
 
-class BukkitEventHandler(val plugin: AQQBotBukkit) : Listener {
+class FoliaEventHandler(val plugin: AQQBotFolia) : Listener {
     @EventHandler
     fun onChat(event: AsyncPlayerChatEvent) {
         if (event.isCancelled) {
             return
         }
-        AChatEvent(plugin, BukkitPlayer(event.player), event.message).handle()
+        AChatEvent(plugin, FoliaPlayer(event.player), event.message).handle()
     }
 
     @EventHandler
@@ -27,7 +27,7 @@ class BukkitEventHandler(val plugin: AQQBotBukkit) : Listener {
                 return
             }
         }
-        AJoinEvent(plugin, BukkitPlayer(event.player)) {
+        AJoinEvent(plugin, FoliaPlayer(event.player)) {
             event.result = PlayerLoginEvent.Result.KICK_WHITELIST
             event.kickMessage = it
         }.handle()
@@ -41,6 +41,6 @@ class BukkitEventHandler(val plugin: AQQBotBukkit) : Listener {
                 return
             }
         }
-        AQuitEvent(plugin, BukkitPlayer(event.player)).handle()
+        AQuitEvent(plugin, FoliaPlayer(event.player)).handle()
     }
 }

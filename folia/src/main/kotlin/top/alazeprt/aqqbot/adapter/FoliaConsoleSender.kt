@@ -11,13 +11,13 @@ import org.bukkit.permissions.Permission
 import org.bukkit.permissions.PermissionAttachment
 import org.bukkit.permissions.PermissionAttachmentInfo
 import org.bukkit.plugin.Plugin
-import top.alazeprt.aqqbot.AQQBotBukkit
+import top.alazeprt.aqqbot.AQQBotFolia
 import top.alazeprt.aqqbot.util.AExecution
 import top.alazeprt.aqqbot.util.AFormatter
 import java.util.*
 import java.util.concurrent.CompletableFuture
 
-class BukkitConsoleSender(val plugin: AQQBotBukkit) : ConsoleCommandSender, AExecution {
+class FoliaConsoleSender(val plugin: AQQBotFolia) : ConsoleCommandSender, AExecution {
     private val messageList = mutableListOf<String>()
 
     override fun isOp(): Boolean {

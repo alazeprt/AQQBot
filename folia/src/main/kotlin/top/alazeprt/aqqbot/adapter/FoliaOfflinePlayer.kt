@@ -4,7 +4,7 @@ import org.bukkit.OfflinePlayer
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import java.util.*
 
-class BukkitOfflinePlayer(val player: OfflinePlayer) : AOfflinePlayer {
+class FoliaOfflinePlayer(val player: OfflinePlayer) : AOfflinePlayer {
     override fun getName(): String {
         return player.name?: ""
     }

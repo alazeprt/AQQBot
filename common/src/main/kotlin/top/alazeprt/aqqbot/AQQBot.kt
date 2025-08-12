@@ -14,6 +14,7 @@ import top.alazeprt.aqqbot.command.CommandProvider
 import top.alazeprt.aqqbot.config.ConfigProvider
 import top.alazeprt.aqqbot.data.*
 import top.alazeprt.aqqbot.debug.ADebug
+import top.alazeprt.aqqbot.drivers.Web2ImageDriver
 import top.alazeprt.aqqbot.hook.HookProvider
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.task.TaskProvider
@@ -49,6 +50,8 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
     var libraryManager: LibraryManager
 
     var serverUUID: UUID
+
+    var webDriver: Web2ImageDriver
 
     override var generalConfig: GroupConfiguration
     override var messageConfig: FileConfiguration

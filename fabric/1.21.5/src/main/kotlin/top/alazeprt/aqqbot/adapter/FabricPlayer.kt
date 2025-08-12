@@ -15,8 +15,8 @@ class FabricPlayer(val player: ServerPlayerEntity): APlayer {
     }
 
     override fun getIP(): InetSocketAddress? {
-        val handler = player.networkHandler as? ServerCommonNetworkHandlerMixin
-        return handler?.connection?.address as? InetSocketAddress
+        val handler = player.networkHandler as ServerCommonNetworkHandlerMixin
+        return handler.connection.address as InetSocketAddress?
     }
 
     override fun getName(): String {

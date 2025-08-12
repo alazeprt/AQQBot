@@ -23,6 +23,7 @@ import top.alazeprt.aqqbot.command.ACommand
 import top.alazeprt.aqqbot.config.MessageManager
 import top.alazeprt.aqqbot.data.DataProvider
 import top.alazeprt.aqqbot.debug.ADebug
+import top.alazeprt.aqqbot.drivers.Web2ImageDriver
 import top.alazeprt.aqqbot.event.AJoinEvent
 import top.alazeprt.aqqbot.event.AQuitEvent
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
@@ -84,6 +85,8 @@ class AQQBotFabric : ModInitializer, AQQBot {
     override lateinit var customConfig: FileConfiguration
 
     override lateinit var messageManager: MessageManager
+
+    override lateinit var webDriver: Web2ImageDriver
 
     override var fakePlayer: Boolean = false
 
@@ -323,11 +326,42 @@ class AQQBotFabric : ModInitializer, AQQBot {
                 }
                 unbind_image = AImage(File(getDataFolder().resolve("images"), path), elements)
             }
+            var web: AWeb? = null
+            if (customConfig.contains("$it.web")) {
+                val path = customConfig.getString("$it.web.path")
+                val width = customConfig.getInt("$it.web.width")
+                val height = customConfig.getInt("$it.web.height")
+                val delay = customConfig.getLong("$it.web.delay")
+                val placeholders = customConfig.getConfigurationSection("$it.web.placeholders")
+                val placeholdersMap = mutableMapOf<String, String>()
+                placeholders.getKeys(false).forEach { k ->
+                    placeholdersMap[k] = placeholders.get(k).toString()
+                }
+                web = AWeb(File(getDataFolder().resolve("web"), path), width, height, delay, placeholdersMap)
+            }
+            var unbind_web: AWeb? = null
+            if (customConfig.contains("$it.unbind_web")) {
+                val path = customConfig.getString("$it.unbind_web.path")
+                val width = customConfig.getInt("$it.unbind_web.width")
+                val height = customConfig.getInt("$it.unbind_web.height")
+                val delay = customConfig.getLong("$it.unbind_web.delay")
+                val placeholders = customConfig.getConfigurationSection("$it.unbind_web.placeholders")
+                val placeholdersMap = mutableMapOf<String, String>()
+                placeholders.getKeys(false).forEach { k ->
+                    placeholdersMap[k] = placeholders.get(k).toString()
+                }
+                unbind_web = AWeb(File(getDataFolder().resolve("web"), path), width, height, delay, placeholdersMap)
+            }
+            if (web != null || unbind_web != null) {
+                webDriver = Web2ImageDriver(this)
+                webDriver.loadDependencies()
+                webDriver.downloadDrivers()
+            }
             val format = customConfig.getBoolean("$it.format")
             val choose_account = if (customConfig.getInt("$it.choose_account") == 0) 1
             else customConfig.getInt("$it.choose_account")
             customCommands.add(AFabricCustom(
-                this, it, command, execute, unbind_execute, output, unbind_output, image, unbind_image, format, choose_account, enable))
+                this, it, command, execute, unbind_execute, output, unbind_output, image, unbind_image, format, web, unbind_web, choose_account, enable))
         }
     }
 

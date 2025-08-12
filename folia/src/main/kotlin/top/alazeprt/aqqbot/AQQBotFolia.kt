@@ -14,12 +14,12 @@ import org.bukkit.plugin.java.JavaPlugin
 import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aconfiguration.file.YamlConfiguration
 import top.alazeprt.aqqbot.adapter.*
-import top.alazeprt.aqqbot.api.webhook.AQQBotWebhookServer
 import top.alazeprt.aqqbot.command.ACommand
 import top.alazeprt.aqqbot.config.MessageManager
 import top.alazeprt.aqqbot.data.DataProvider
 import top.alazeprt.aqqbot.debug.ADebug
-import top.alazeprt.aqqbot.event.BukkitEventHandler
+import top.alazeprt.aqqbot.drivers.Web2ImageDriver
+import top.alazeprt.aqqbot.event.FoliaEventHandler
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.*
@@ -29,10 +29,10 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
 
-class AQQBotBukkit : JavaPlugin(), AQQBot {
+class AQQBotFolia : JavaPlugin(), AQQBot {
     override var debugModule: ADebug? = null
 
-    override var adapter: AQQBotAdapter = BukkitAdapter
+    override var adapter: AQQBotAdapter = FoliaAdapter
 
     override val verifyCodeMap: MutableMap<String, Pair<String, Long>> = ConcurrentHashMap()
 
@@ -58,6 +58,8 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
 
     override lateinit var messageManager: MessageManager
 
+    override lateinit var webDriver: Web2ImageDriver
+
     private val pluginId = 24071
 
     override lateinit var serverUUID: UUID
@@ -68,7 +70,7 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
 
     override var loadSparkCount: Int = 0
 
-    val taskList: MutableList<BukkitTaskCancelable> = mutableListOf()
+    val taskList: MutableList<FoliaTaskCancelable> = mutableListOf()
 
     companion object {
         lateinit var audience: BukkitAudiences
@@ -83,7 +85,7 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
             log(LogLevel.WARN, "You don't install soft dependency PlaceholderAPI! You cannot use placeholder in anywhere!")
         }
         audience = BukkitAudiences.create(this);
-        server.pluginManager.registerEvents(BukkitEventHandler(this), this)
+        server.pluginManager.registerEvents(FoliaEventHandler(this), this)
         val metrics = Metrics(this, pluginId)
     }
 
@@ -99,8 +101,8 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     override fun setPlaceholders(player: APlayer, message: String): String {
         try {
             Class.forName("me.clip.placeholderapi.PlaceholderAPI")
-            val bukkitPlayer = player as BukkitPlayer
-            return PlaceholderAPI.setPlaceholders(bukkitPlayer.player, message)
+            val foliaPlayer = player as FoliaPlayer
+            return PlaceholderAPI.setPlaceholders(foliaPlayer.player, message)
         } catch (e: ClassNotFoundException) {
             return message
         }
@@ -123,7 +125,7 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
 
     override fun registerCommand(command: String, handler: ACommand) {
         getCommand(command)?.setExecutor { commandSender, _, s, strings ->
-            handler.onCommand(s, BukkitSender(commandSender), strings.toList())
+            handler.onCommand(s, FoliaSender(commandSender), strings.toList())
             false
         }
         getCommand(command)?.setTabCompleter { _, _, _, strings ->
@@ -139,7 +141,7 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
         server.globalRegionScheduler.run(this) {
             task.run()
         }
-        val cancelable = BukkitTaskCancelable(this)
+        val cancelable = FoliaTaskCancelable(this)
         taskList.add(cancelable)
         return cancelable
     }
@@ -148,28 +150,28 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
         server.asyncScheduler.runNow(this) {
             task.run()
         }
-        val cancelable = BukkitTaskCancelable(this)
+        val cancelable = FoliaTaskCancelable(this)
         taskList.add(cancelable)
         return cancelable
     }
 
     override fun submitLater(delay: Long, task: Runnable): Cancelable {
         server.globalRegionScheduler.runDelayed(this, { task.run() }, delay)
-        val cancelable = BukkitTaskCancelable(this)
+        val cancelable = FoliaTaskCancelable(this)
         taskList.add(cancelable)
         return cancelable
     }
 
     override fun submitLaterAsync(delay: Long, task: Runnable): Cancelable {
         server.asyncScheduler.runDelayed(this, { task.run() }, delay * 50L, TimeUnit.MILLISECONDS)
-        val cancelable = BukkitTaskCancelable(this)
+        val cancelable = FoliaTaskCancelable(this)
         taskList.add(cancelable)
         return cancelable
     }
 
     override fun submitTimer(delay: Long, period: Long, task: Runnable): Cancelable {
         server.globalRegionScheduler.runAtFixedRate(this, { task.run() }, delay, period)
-        val cancelable = BukkitTaskCancelable(this)
+        val cancelable = FoliaTaskCancelable(this)
         taskList.add(cancelable)
         return cancelable
     }
@@ -177,7 +179,7 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     override fun submitTimerAsync(delay: Long, period: Long, task: Runnable): Cancelable {
         server.asyncScheduler.runAtFixedRate(this, { task.run() }, delay * 50L, period * 50L,
             TimeUnit.MILLISECONDS)
-        val cancelable = BukkitTaskCancelable(this)
+        val cancelable = FoliaTaskCancelable(this)
         taskList.add(cancelable)
         return cancelable
     }
@@ -250,11 +252,42 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
                 }
                 unbind_image = AImage(File(dataFolder.resolve("images"), path), elements)
             }
+            var web: AWeb? = null
+            if (customConfig.contains("$it.web")) {
+                val path = customConfig.getString("$it.web.path")
+                val width = customConfig.getInt("$it.web.width")
+                val height = customConfig.getInt("$it.web.height")
+                val delay = customConfig.getLong("$it.web.delay")
+                val placeholders = customConfig.getConfigurationSection("$it.web.placeholders")
+                val placeholdersMap = mutableMapOf<String, String>()
+                placeholders.getKeys(false).forEach { k ->
+                    placeholdersMap[k] = placeholders.get(k).toString()
+                }
+                web = AWeb(File(dataFolder.resolve("web"), path), width, height, delay, placeholdersMap)
+            }
+            var unbind_web: AWeb? = null
+            if (customConfig.contains("$it.unbind_web")) {
+                val path = customConfig.getString("$it.unbind_web.path")
+                val width = customConfig.getInt("$it.unbind_web.width")
+                val height = customConfig.getInt("$it.unbind_web.height")
+                val delay = customConfig.getLong("$it.unbind_web.delay")
+                val placeholders = customConfig.getConfigurationSection("$it.unbind_web.placeholders")
+                val placeholdersMap = mutableMapOf<String, String>()
+                placeholders.getKeys(false).forEach { k ->
+                    placeholdersMap[k] = placeholders.get(k).toString()
+                }
+                unbind_web = AWeb(File(dataFolder.resolve("web"), path), width, height, delay, placeholdersMap)
+            }
+            if (web != null || unbind_web != null) {
+                webDriver = Web2ImageDriver(this)
+                webDriver.loadDependencies()
+                webDriver.downloadDrivers()
+            }
             val format = customConfig.getBoolean("$it.format")
             val choose_account = if (customConfig.getInt("$it.choose_account") == 0) 1
             else customConfig.getInt("$it.choose_account")
-            customCommands.add(ABukkitCustom(this, it, command, execute, unbind_execute, output, unbind_output, image,
-                unbind_image, format, choose_account, enable))
+            customCommands.add(AFoliaCustom(this, it, command, execute, unbind_execute, output, unbind_output, image,
+                unbind_image, format, web, unbind_web, choose_account, enable))
         }
     }
 
@@ -314,7 +347,6 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
             .version("4.24.0")
             .resolveTransitiveDependencies(true)
             .build()
-
         libraryManager.addRepository("https://maven.aliyun.com/repository/public")
         libraryManager.addMavenCentral()
         libraryManager.addJitPack()
@@ -342,7 +374,7 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
                         return@out
                     }
                     "SIMULATE_CONSOLE" -> {
-                        sender[group.toLong()] = BukkitConsoleSender::class.java
+                        sender[group.toLong()] = FoliaConsoleSender::class.java
                         return@out
                     }
                 }

@@ -2,30 +2,33 @@ package top.alazeprt.aqqbot.adapter
 
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
-import org.bukkit.Bukkit
-import top.alazeprt.aqqbot.AQQBotBukkit
+import top.alazeprt.aqqbot.AQQBotFabric
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.profile.APlayer
 
-object BukkitAdapter : AQQBotAdapter {
+object FabricAdapter : AQQBotAdapter {
     override fun getOfflinePlayer(name: String): AOfflinePlayer {
-        return BukkitOfflinePlayer(Bukkit.getOfflinePlayer(name))
+        return FabricOfflinePlayer.from(name)
     }
 
     override fun getOnlinePlayer(name: String): APlayer? {
-        return BukkitPlayer(Bukkit.getPlayer(name)?: return null)
+        AQQBotFabric.server.playerManager.playerList.forEach {
+            if (it.name.string == name) {
+                return FabricPlayer(it)
+            }
+        }
+        return null
     }
 
     override fun getPlayerList(): List<APlayer> {
-        return Bukkit.getOnlinePlayers().map { BukkitPlayer(it) }
+        return AQQBotFabric.server.playerManager.playerList.map { FabricPlayer(it) }
     }
 
     override fun broadcastMessage(message: String) {
-        Bukkit.broadcastMessage(message)
+        AQQBotFabric.audience.all().sendMessage(Component.text(message))
     }
 
     override fun broadcastMessage(message: TextComponent) {
-        AQQBotBukkit.audience.all().sendMessage(message)
+        AQQBotFabric.audience.all().sendMessage(message)
     }
-
 }

@@ -15,17 +15,16 @@ import com.velocitypowered.api.plugin.Plugin
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
 import net.kyori.adventure.text.TextComponent
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bstats.velocity.Metrics
 import org.slf4j.Logger
 import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aconfiguration.file.YamlConfiguration
 import top.alazeprt.aqqbot.adapter.*
-import top.alazeprt.aqqbot.api.webhook.AQQBotWebhookServer
 import top.alazeprt.aqqbot.command.ACommand
 import top.alazeprt.aqqbot.config.MessageManager
 import top.alazeprt.aqqbot.data.DataProvider
 import top.alazeprt.aqqbot.debug.ADebug
+import top.alazeprt.aqqbot.drivers.Web2ImageDriver
 import top.alazeprt.aqqbot.event.AChatEvent
 import top.alazeprt.aqqbot.event.AJoinEvent
 import top.alazeprt.aqqbot.event.AQuitEvent
@@ -38,6 +37,7 @@ import java.time.Duration
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
+import kotlin.io.resolve
 
 
 @Plugin(id = "aqqbot", name = "AQQBot", version = "2.0-alpha.12", url = "https://aqqbot.alazeprt.top", authors = ["alazeprt"])
@@ -72,6 +72,8 @@ class AQQBotVelocity : AQQBot {
     override lateinit var serverUUID: UUID
 
     private val executor = Executors.newFixedThreadPool(16)
+
+    override lateinit var webDriver: Web2ImageDriver
 
     private val pluginId = 24071
 
@@ -190,11 +192,42 @@ class AQQBotVelocity : AQQBot {
                 }
                 unbind_image = AImage(File(dataFolder.toFile().resolve("images"), path), elements)
             }
+            var web: AWeb? = null
+            if (customConfig.contains("$it.web")) {
+                val path = customConfig.getString("$it.web.path")
+                val width = customConfig.getInt("$it.web.width")
+                val height = customConfig.getInt("$it.web.height")
+                val delay = customConfig.getLong("$it.web.delay")
+                val placeholders = customConfig.getConfigurationSection("$it.web.placeholders")
+                val placeholdersMap = mutableMapOf<String, String>()
+                placeholders.getKeys(false).forEach { k ->
+                    placeholdersMap[k] = placeholders.get(k).toString()
+                }
+                web = AWeb(File(dataFolder.resolve("web").toFile(), path), width, height, delay, placeholdersMap)
+            }
+            var unbind_web: AWeb? = null
+            if (customConfig.contains("$it.unbind_web")) {
+                val path = customConfig.getString("$it.unbind_web.path")
+                val width = customConfig.getInt("$it.unbind_web.width")
+                val height = customConfig.getInt("$it.unbind_web.height")
+                val delay = customConfig.getLong("$it.unbind_web.delay")
+                val placeholders = customConfig.getConfigurationSection("$it.unbind_web.placeholders")
+                val placeholdersMap = mutableMapOf<String, String>()
+                placeholders.getKeys(false).forEach { k ->
+                    placeholdersMap[k] = placeholders.get(k).toString()
+                }
+                unbind_web = AWeb(File(dataFolder.resolve("web").toFile(), path), width, height, delay, placeholdersMap)
+            }
+            if (web != null || unbind_web != null) {
+                webDriver = Web2ImageDriver(this)
+                webDriver.loadDependencies()
+                webDriver.downloadDrivers()
+            }
             val format = customConfig.getBoolean("$it.format")
             val choose_account = if (customConfig.getInt("$it.choose_account") == 0) 1
             else customConfig.getInt("$it.choose_account")
             customCommands.add(AVelocityCustom(
-                this, it, command, execute, unbind_execute, output, unbind_output, image, unbind_image, format, choose_account, enable))
+                this, it, command, execute, unbind_execute, output, unbind_output, image, unbind_image, format, web, unbind_web, choose_account, enable))
         }
     }
 

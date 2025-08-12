@@ -3,8 +3,6 @@ package top.alazeprt.aqqbot
 import com.alessiodp.libby.BukkitLibraryManager
 import com.alessiodp.libby.Library
 import com.alessiodp.libby.LibraryManager
-import io.wdsj.imagepreviewer.api.ImagePreviewerAPI
-import io.wdsj.imagepreviewer.image.ImageLoader
 import me.clip.placeholderapi.PlaceholderAPI
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import net.kyori.adventure.text.Component
@@ -16,11 +14,11 @@ import org.bukkit.plugin.java.JavaPlugin
 import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aconfiguration.file.YamlConfiguration
 import top.alazeprt.aqqbot.adapter.*
-import top.alazeprt.aqqbot.api.webhook.AQQBotWebhookServer
 import top.alazeprt.aqqbot.command.ACommand
 import top.alazeprt.aqqbot.config.MessageManager
 import top.alazeprt.aqqbot.data.DataProvider
 import top.alazeprt.aqqbot.debug.ADebug
+import top.alazeprt.aqqbot.drivers.Web2ImageDriver
 import top.alazeprt.aqqbot.event.BukkitEventHandler
 import top.alazeprt.aqqbot.hook.AQQBotExpansion
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
@@ -61,6 +59,8 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     override lateinit var messageManager: MessageManager
 
     override var fakePlayer: Boolean = false
+
+    override lateinit var webDriver: Web2ImageDriver
 
     private val pluginId = 24071
 
@@ -288,11 +288,42 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
                 }
                 unbind_image = AImage(File(dataFolder.resolve("images"), path), elements)
             }
+            var web: AWeb? = null
+            if (customConfig.contains("$it.web")) {
+                val path = customConfig.getString("$it.web.path")
+                val width = customConfig.getInt("$it.web.width")
+                val height = customConfig.getInt("$it.web.height")
+                val delay = customConfig.getLong("$it.web.delay")
+                val placeholders = customConfig.getConfigurationSection("$it.web.placeholders")
+                val placeholdersMap = mutableMapOf<String, String>()
+                placeholders.getKeys(false).forEach { k ->
+                    placeholdersMap[k] = placeholders.get(k).toString()
+                }
+                web = AWeb(File(dataFolder.resolve("web"), path), width, height, delay, placeholdersMap)
+            }
+            var unbind_web: AWeb? = null
+            if (customConfig.contains("$it.unbind_web")) {
+                val path = customConfig.getString("$it.unbind_web.path")
+                val width = customConfig.getInt("$it.unbind_web.width")
+                val height = customConfig.getInt("$it.unbind_web.height")
+                val delay = customConfig.getLong("$it.unbind_web.delay")
+                val placeholders = customConfig.getConfigurationSection("$it.unbind_web.placeholders")
+                val placeholdersMap = mutableMapOf<String, String>()
+                placeholders.getKeys(false).forEach { k ->
+                    placeholdersMap[k] = placeholders.get(k).toString()
+                }
+                unbind_web = AWeb(File(dataFolder.resolve("web"), path), width, height, delay, placeholdersMap)
+            }
+            if (web != null || unbind_web != null) {
+                webDriver = Web2ImageDriver(this)
+                webDriver.loadDependencies()
+                webDriver.downloadDrivers()
+            }
             val format = customConfig.getBoolean("$it.format")
             val choose_account = if (customConfig.getInt("$it.choose_account") == 0) 1
             else customConfig.getInt("$it.choose_account")
             customCommands.add(ABukkitCustom(this, it, command, execute, unbind_execute, output, unbind_output, image,
-                unbind_image, format, choose_account, enable))
+                unbind_image, web, unbind_web, format, choose_account, enable))
         }
     }
 

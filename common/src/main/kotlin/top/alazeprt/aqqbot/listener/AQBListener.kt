@@ -94,13 +94,9 @@ class AQBListener(val plugin: AQQBot) : Listener {
                     )
                 } else {
                     var originComponent: Component = Component.text(newMessage)
-                    println(originComponent)
                     originComponent = originComponent.replaceText { builder ->
                         builder.matchLiteral("[图片]").replacement(component)
                     }
-                    println("\n\n\n\n\n")
-                    println(originComponent)
-                    println("\n\n\n\n\n")
                     plugin.adapter.broadcastMessage(
                         plugin.messageManager.getAndFormat(
                             "game.chat_from_qq", mutableMapOf(

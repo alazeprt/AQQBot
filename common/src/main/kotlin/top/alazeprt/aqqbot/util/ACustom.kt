@@ -5,165 +5,175 @@ import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.bot.BotProvider
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 
-abstract class ACustom(val plugin: AQQBot, val name: String, var command: List<String>, var execute: List<String>, var unbind_execute: List<String>,
-                       var output: List<String>, var unbind_output: List<String>, var image: AImage?,
-                       var unbind_image: AImage?, var format: Boolean, var account: Int, var enable: Boolean) {
+abstract class ACustom(val plugin: AQQBot, val name: String, var command: List<String>, var execute: List<String>,
+                       var unbind_execute: List<String>, var output: List<String>, var unbind_output: List<String>,
+                       var image: AImage?, var unbind_image: AImage?, var web: AWeb?, var unbind_web: AWeb?,
+                       var format: Boolean, var account: Int, var enable: Boolean) {
     fun handle(input: String, userId: String, groupId: String): Boolean {
         if (!enable) return false
         val map = matches(input)?: return false
         val player: List<String> = plugin.getPlayerByQQ(userId.toLong()).map { it.getName() }
-        var outputString: String
         if (player.isEmpty()) {
-            outputString = mapFormat(unbind_output.joinToString("\n"), map)
-            val imageMap = mutableMapOf<AImageElement, String>()
-            unbind_image?.elements?.forEach {
-                if (it is AImageText) {
-                    imageMap[it] = mapFormat(it.data, map)
-                }
-            }
-            val executeMap = mutableMapOf<Int, String?>()
-            matchesCommand(outputString).forEach {
-                executeMap[it] = null
-            }
-            matchesCommand(imageMap.values.joinToString("\n")).forEach {
-                executeMap[it] = null
-            }
-            var finished = true
-            if (unbind_execute.isNotEmpty() && unbind_execute[0].isNotEmpty()) {
-                finished = false
-                plugin.submit {
-                    for (i in unbind_execute.indices) {
-                        var str = unbind_execute[i]
-                        if (plugin.getPlayerByQQ(userId.toLong()).isNotEmpty()) {
-                            str = str.replace("\$player", plugin.getPlayerByQQ(userId.toLong())[0].getName())
-                        }
-                        val result = plugin.submitCommand(mapFormat(str, map), groupId.toLong())
-                        if (executeMap.containsKey(i+1)) {
-                            if (format) {
-                                executeMap[i+1] = result.get().getFormattedString(groupId.toLong())
-                            } else {
-                                executeMap[i+1] = result.get().getRawString()
-                            }
-                        }
-                    }
-                    finished = true
-                }
-            }
-            plugin.submitAsync {
-                while (!finished) {
-                    Thread.sleep(500)
-                }
-                executeMap.forEach {
-                    outputString = outputString.replace("\$executes[${it.key}]", it.value?: "")
-                    imageMap.replaceAll { _, value ->
-                        value.replace("\$executes[${it.key}]", it.value?: "")
-                    }
-                }
-                outputString = setPlaceholders(null, outputString)
-                if (format) {
-                    outputString = AFormatter.pluginClear(outputString)
-                    outputString = AFormatter.chatClear(outputString)
-                }
-                if (outputString.contains("\$random\n")) {
-                    val optionsOutput: List<String> = outputString.split("\$random\n")
-                    val outputList = optionsOutput.random()
-                    BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), outputList))
-                } else if (outputString.isNotBlank()) {
-                    BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), outputString))
-                }
-                imageMap.replaceAll { _, value ->
-                    var processedValue = setPlaceholders(null, value)
-                    if (format) {
-                        processedValue = AFormatter.chatClear(processedValue)
-                        processedValue = AFormatter.pluginClear(processedValue)
-                    }
-                    processedValue
-                }
-                var base64 = AImageUtil.getImageBase64(unbind_image?.path?: return@submitAsync)
-                imageMap.forEach { t, u ->
-                    if (t is AImageText) {
-                        base64 = AImageUtil.addTextToImage(base64, u, t.x, t.y, t.size, t.font, t.color, t.bold, t.italic, plugin)
-                    }
-                }
-                BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), "[CQ:image,file=base64://$base64]"))
-            }
+            handleUnbind(userId, groupId, map)
         } else {
-            outputString = mapFormat(output.joinToString("\n"), map)
-            val imageMap = mutableMapOf<AImageElement, String>()
-            image?.elements?.forEach {
-                if (it is AImageText) {
-                    imageMap[it] = mapFormat(it.data, map)
-                }
-            }
-            val executeMap = mutableMapOf<Int, String?>()
-            matchesCommand(outputString).forEach {
-                executeMap[it] = null
-            }
-            matchesCommand(imageMap.values.joinToString("\n")).forEach {
-                executeMap[it] = null
-            }
-            var finished = true
-            if (execute.isNotEmpty() && execute[0].isNotEmpty()) {
-                finished = false
-                plugin.submit {
-                    for (i in execute.indices) {
-                        var str = execute[i]
-                        if (plugin.getPlayerByQQ(userId.toLong()).isNotEmpty()) {
-                            str = str.replace("\$player", plugin.getPlayerByQQ(userId.toLong())[0].getName())
-                        }
-                        val result = plugin.submitCommand(mapFormat(str, map), groupId.toLong())
-                        if (executeMap.containsKey(i+1)) {
-                            if (format) {
-                                executeMap[i+1] = result.get().getFormattedString(groupId.toLong())
-                            } else {
-                                executeMap[i+1] = result.get().getRawString()
-                            }
-                        }
-                    }
-                    finished = true
-                }
-            }
-            plugin.submitAsync {
-                while (!finished) {
-                    Thread.sleep(500)
-                }
-                executeMap.forEach {
-                    outputString = outputString.replace("\$executes[${it.key}]", it.value?: "")
-                    imageMap.replaceAll { _, value ->
-                        value.replace("\$executes[${it.key}]", it.value?: "")
-                    }
-                }
-                val playerName = player[if (player.size < account) 0 else account - 1]
-                outputString = setPlaceholders(plugin.adapter!!.getOfflinePlayer(playerName), outputString)
-                if (format) {
-                    outputString = AFormatter.pluginClear(outputString)
-                    outputString = AFormatter.chatClear(outputString)
-                }
-                if (outputString.contains("\$random\n")) {
-                    val optionsOutput: List<String> = outputString.split("\$random\n")
-                    val outputList = optionsOutput.random()
-                    BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), outputList))
-                } else if (outputString.isNotBlank()) {
-                    BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), outputString))
-                }
-                imageMap.replaceAll { _, value ->
-                    var processedValue = setPlaceholders(null, value)
-                    if (format) {
-                        processedValue = AFormatter.chatClear(processedValue)
-                        processedValue = AFormatter.pluginClear(processedValue)
-                    }
-                    processedValue
-                }
-                var base64 = AImageUtil.getImageBase64(image?.path?: return@submitAsync)
-                imageMap.forEach { t, u ->
-                    if (t is AImageText) {
-                        base64 = AImageUtil.addTextToImage(base64, u, t.x, t.y, t.size, t.font, t.color, t.bold, t.italic, plugin)
-                    }
-                }
-                BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), "[CQ:image,file=base64://$base64]"))
-            }
+            handleBind(userId, groupId, map, player)
         }
         return true
+    }
+
+    private fun handleBind(userId: String, groupId: String, map: Map<String, String>, player: List<String>) {
+        var outputString = mapFormat(output.joinToString("\n"), map)
+        val imageMap = mutableMapOf<AImageElement, String>()
+        image?.elements?.forEach {
+            if (it is AImageText) {
+                imageMap[it] = mapFormat(it.data, map)
+            }
+        }
+        val executeMap = mutableMapOf<Int, String?>()
+        matchesCommand(outputString).forEach {
+            executeMap[it] = null
+        }
+        matchesCommand(imageMap.values.joinToString("\n")).forEach {
+            executeMap[it] = null
+        }
+        var finished = true
+        if (execute.isNotEmpty() && execute[0].isNotEmpty()) {
+            finished = false
+            plugin.submit {
+                for (i in execute.indices) {
+                    var str = execute[i]
+                    if (plugin.getPlayerByQQ(userId.toLong()).isNotEmpty()) {
+                        str = str.replace("\$player", plugin.getPlayerByQQ(userId.toLong())[0].getName())
+                    }
+                    val result = plugin.submitCommand(mapFormat(str, map), groupId.toLong())
+                    if (executeMap.containsKey(i+1)) {
+                        if (format) {
+                            executeMap[i+1] = result.get().getFormattedString(groupId.toLong())
+                        } else {
+                            executeMap[i+1] = result.get().getRawString()
+                        }
+                    }
+                }
+                finished = true
+            }
+        }
+        plugin.submitAsync {
+            while (!finished) {
+                Thread.sleep(500)
+            }
+            executeMap.forEach {
+                outputString = outputString.replace("\$executes[${it.key}]", it.value?: "")
+                imageMap.replaceAll { _, value ->
+                    value.replace("\$executes[${it.key}]", it.value?: "")
+                }
+            }
+            val playerName = player[if (player.size < account) 0 else account - 1]
+            outputString = setPlaceholders(plugin.adapter!!.getOfflinePlayer(playerName), outputString)
+            if (format) {
+                outputString = AFormatter.pluginClear(outputString)
+                outputString = AFormatter.chatClear(outputString)
+            }
+            if (outputString.contains("\$random\n")) {
+                val optionsOutput: List<String> = outputString.split("\$random\n")
+                val outputList = optionsOutput.random()
+                BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), outputList))
+            } else if (outputString.isNotBlank()) {
+                BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), outputString))
+            }
+            imageMap.replaceAll { _, value ->
+                var processedValue = setPlaceholders(null, value)
+                if (format) {
+                    processedValue = AFormatter.chatClear(processedValue)
+                    processedValue = AFormatter.pluginClear(processedValue)
+                }
+                processedValue
+            }
+            web?.sendToGroup(groupId.toLong(), plugin)
+            var base64 = AImageUtil.getImageBase64(image?.path?: return@submitAsync)
+            imageMap.forEach { t, u ->
+                if (t is AImageText) {
+                    base64 = AImageUtil.addTextToImage(base64, u, t.x, t.y, t.size, t.font, t.color, t.bold, t.italic, plugin)
+                }
+            }
+            BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), "[CQ:image,file=base64://$base64]"))
+        }
+    }
+
+    fun handleUnbind(userId: String, groupId: String, map: Map<String, String>) {
+        var outputString = mapFormat(unbind_output.joinToString("\n"), map)
+        val imageMap = mutableMapOf<AImageElement, String>()
+        unbind_image?.elements?.forEach {
+            if (it is AImageText) {
+                imageMap[it] = mapFormat(it.data, map)
+            }
+        }
+        val executeMap = mutableMapOf<Int, String?>()
+        matchesCommand(outputString).forEach {
+            executeMap[it] = null
+        }
+        matchesCommand(imageMap.values.joinToString("\n")).forEach {
+            executeMap[it] = null
+        }
+        var finished = true
+        if (unbind_execute.isNotEmpty() && unbind_execute[0].isNotEmpty()) {
+            finished = false
+            plugin.submit {
+                for (i in unbind_execute.indices) {
+                    var str = unbind_execute[i]
+                    if (plugin.getPlayerByQQ(userId.toLong()).isNotEmpty()) {
+                        str = str.replace("\$player", plugin.getPlayerByQQ(userId.toLong())[0].getName())
+                    }
+                    val result = plugin.submitCommand(mapFormat(str, map), groupId.toLong())
+                    if (executeMap.containsKey(i+1)) {
+                        if (format) {
+                            executeMap[i+1] = result.get().getFormattedString(groupId.toLong())
+                        } else {
+                            executeMap[i+1] = result.get().getRawString()
+                        }
+                    }
+                }
+                finished = true
+            }
+        }
+        plugin.submitAsync {
+            while (!finished) {
+                Thread.sleep(500)
+            }
+            executeMap.forEach {
+                outputString = outputString.replace("\$executes[${it.key}]", it.value?: "")
+                imageMap.replaceAll { _, value ->
+                    value.replace("\$executes[${it.key}]", it.value?: "")
+                }
+            }
+            outputString = setPlaceholders(null, outputString)
+            if (format) {
+                outputString = AFormatter.pluginClear(outputString)
+                outputString = AFormatter.chatClear(outputString)
+            }
+            if (outputString.contains("\$random\n")) {
+                val optionsOutput: List<String> = outputString.split("\$random\n")
+                val outputList = optionsOutput.random()
+                BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), outputList))
+            } else if (outputString.isNotBlank()) {
+                BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), outputString))
+            }
+            imageMap.replaceAll { _, value ->
+                var processedValue = setPlaceholders(null, value)
+                if (format) {
+                    processedValue = AFormatter.chatClear(processedValue)
+                    processedValue = AFormatter.pluginClear(processedValue)
+                }
+                processedValue
+            }
+            unbind_web?.sendToGroup(groupId.toLong(), plugin)
+            var base64 = AImageUtil.getImageBase64(unbind_image?.path?: return@submitAsync)
+            imageMap.forEach { t, u ->
+                if (t is AImageText) {
+                    base64 = AImageUtil.addTextToImage(base64, u, t.x, t.y, t.size, t.font, t.color, t.bold, t.italic, plugin)
+                }
+            }
+            BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), "[CQ:image,file=base64://$base64]"))
+        }
     }
 
     private fun mapFormat(input: String, map: Map<String, String>): String {

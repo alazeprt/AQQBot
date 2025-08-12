@@ -2,6 +2,7 @@ import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    id("java")
     kotlin("jvm")
     id("fabric-loom") version "1.11-SNAPSHOT"
 }
@@ -24,6 +25,7 @@ subprojects {
     version = properties["version"] as String
 
     apply(plugin = "fabric-loom")
+    apply(plugin = "java")
     apply(plugin = "org.jetbrains.kotlin.jvm")
 
     base {

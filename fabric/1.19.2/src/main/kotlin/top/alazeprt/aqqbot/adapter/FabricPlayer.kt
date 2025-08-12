@@ -1,11 +1,10 @@
 package top.alazeprt.aqqbot.adapter
 
-import net.fabricmc.fabric.api.message.v1.ServerMessageEvents
 import net.kyori.adventure.text.TextComponent
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
 import top.alazeprt.aqqbot.AQQBotFabric
-import top.alazeprt.aqqbot.mixin.PlayNetworkMixin
+import top.alazeprt.aqqbot.mixin.ServerPlayNetworkHandlerMixin
 import top.alazeprt.aqqbot.profile.APlayer
 import java.net.InetSocketAddress
 import java.util.*
@@ -16,8 +15,8 @@ class FabricPlayer(val player: ServerPlayerEntity): APlayer {
     }
 
     override fun getIP(): InetSocketAddress? {
-        val handler = player.networkHandler as? PlayNetworkMixin
-        return handler?.connection?.address as? InetSocketAddress
+        val handler = player.networkHandler as ServerPlayNetworkHandlerMixin
+        return handler.connection.address as InetSocketAddress?
     }
 
     override fun getName(): String {
