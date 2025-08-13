@@ -46,7 +46,6 @@ class AQQBotFabric : ModInitializer, AQQBot {
             AQQBotFabric.server = server
         }
         ServerLifecycleEvents.SERVER_STOPPING.register { server ->
-            audience.close()
             FabricScheduler.cancelAllTasks()
             this.disable()
         }
