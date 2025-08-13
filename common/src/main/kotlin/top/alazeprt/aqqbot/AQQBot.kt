@@ -316,6 +316,18 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
 
     fun log(level: LogLevel, message: String)
 
+    fun log(level: Int, message: String) {
+        when (level) {
+            0 -> log(LogLevel.TRACE, message)
+            1 -> log(LogLevel.DEBUG, message)
+            2 -> log(LogLevel.INFO, message)
+            3 -> log(LogLevel.WARN, message)
+            4 -> log(LogLevel.ERROR, message)
+            5 -> log(LogLevel.FATAL, message)
+            else -> log(LogLevel.INFO, message)
+        }
+    }
+
     fun setSender()
 
     fun getBrandName(): String
@@ -339,8 +351,16 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         return dataProvider.saveData(type)
     }
 
+    override fun saveData(type: Int) {
+        return dataProvider.saveData(type)
+    }
+
     override fun hasPlayer(player: AOfflinePlayer): Boolean {
         return dataProvider.hasPlayer(player)
+    }
+
+    override fun hasPlayer(name: String): Boolean {
+        return dataProvider.hasPlayer(name)
     }
 
     override fun hasQQ(qq: Long): Boolean {
@@ -351,8 +371,16 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         return dataProvider.addPlayer(qq, player)
     }
 
+    override fun addPlayer(qq: Long, name: String) {
+        return dataProvider.addPlayer(qq, name)
+    }
+
     override fun removePlayer(player: AOfflinePlayer) {
         return dataProvider.removePlayer(player)
+    }
+
+    override fun removePlayer(name: String) {
+        return dataProvider.removePlayer(name)
     }
 
     override fun removePlayer(qq: Long) {
@@ -363,12 +391,24 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         return dataProvider.removePlayer(qq, player)
     }
 
+    override fun removePlayer(qq: Long, name: String) {
+        return dataProvider.removePlayer(qq, name)
+    }
+
     override fun getQQByPlayer(player: AOfflinePlayer): Long? {
         return dataProvider.getQQByPlayer(player)
     }
 
+    override fun getQQByPlayer(name: String): Long? {
+        return dataProvider.getQQByPlayer(name)
+    }
+
     override fun getPlayerByQQ(qq: Long): List<AOfflinePlayer> {
         return dataProvider.getPlayerByQQ(qq)
+    }
+
+    override fun getPlayerNameByQQ(qq: Long): List<String> {
+        return dataProvider.getPlayerNameByQQ(qq)
     }
 
     override fun submitCommand(command: String, groupId: Long): CompletableFuture<AExecution> {

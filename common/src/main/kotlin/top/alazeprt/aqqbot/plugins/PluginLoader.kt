@@ -35,7 +35,6 @@ class PluginLoader(val plugin: AQQBot) {
             }
         }
         expose("plugin", plugin)
-        expose("api", AQQBotAPI())
         expose("eventManager", eventManager)
         eventManager.load()
         val compilable = engine as Compilable

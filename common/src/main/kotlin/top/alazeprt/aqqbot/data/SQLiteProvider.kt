@@ -45,4 +45,8 @@ class SQLiteProvider(plugin: AQQBot) : DatabaseDataProvider(plugin) {
     override fun saveData(type: DataStorageType) {
         dataSource.connection.close()
     }
+
+    override fun saveData(type: Int) {
+        dataSource.connection.close()
+    }
 }

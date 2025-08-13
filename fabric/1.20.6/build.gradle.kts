@@ -2,16 +2,19 @@ import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 dependencies {
-    implementation(project(":fabric:1.19.2"))!!
+    implementation(project(":fabric:1.20.4"))!!
 }
 
 sourceSets {
     main {
+        java {
+            srcDir(project(":fabric:1.20.4").sourceSets.main.get().java)
+        }
         kotlin {
-            srcDir(project(":fabric:1.19.2").sourceSets.main.get().kotlin)
+            srcDir(project(":fabric:1.20.4").sourceSets.main.get().kotlin)
         }
         resources {
-            srcDir(project(":fabric:1.19.2").sourceSets.main.get().resources)
+            srcDir(project(":fabric:1.20.4").sourceSets.main.get().resources)
         }
     }
 }

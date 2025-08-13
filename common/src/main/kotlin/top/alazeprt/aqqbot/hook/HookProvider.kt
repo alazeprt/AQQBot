@@ -48,5 +48,6 @@ interface HookProvider {
 
     fun loadHook(plugin: AQQBot) {
         loadSpark(plugin)
+        loadFakeplayer(plugin)
     }
 }

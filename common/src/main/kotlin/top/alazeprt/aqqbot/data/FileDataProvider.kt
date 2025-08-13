@@ -33,9 +33,26 @@ class FileDataProvider(val plugin: AQQBot) : DataProvider {
         dataConfig.save(File(plugin.getDataFolder(), "data.yml"))
     }
 
+    override fun saveData(type: Int) {
+        when (type) {
+            0 -> saveData(DataStorageType.MYSQL)
+            1 -> saveData(DataStorageType.SQLITE)
+            2 -> saveData(DataStorageType.FILE)
+        }
+    }
+
     override fun hasPlayer(player: AOfflinePlayer): Boolean {
         dataMap.values.forEach {
             if (it.contains(player.getName())) {
+                return true
+            }
+        }
+        return false
+    }
+
+    override fun hasPlayer(name: String): Boolean {
+        dataMap.values.forEach {
+            if (it.contains(name)) {
                 return true
             }
         }
@@ -52,10 +69,25 @@ class FileDataProvider(val plugin: AQQBot) : DataProvider {
         dataMap[qq.toString()] = list
     }
 
+    override fun addPlayer(qq: Long, name: String) {
+        val list = getPlayerByQQ(qq).map { it.getName() }.toMutableList()
+        list.add(name)
+        dataMap[qq.toString()] = list
+    }
+
     override fun removePlayer(player: AOfflinePlayer) {
         dataMap.values.forEach { value ->
             if (value.contains(player.getName())) {
                 value.remove(player.getName())
+                return
+            }
+        }
+    }
+
+    override fun removePlayer(name: String) {
+        dataMap.values.forEach { value ->
+            if (value.contains(name)) {
+                value.remove(name)
                 return
             }
         }
@@ -76,6 +108,17 @@ class FileDataProvider(val plugin: AQQBot) : DataProvider {
         }
     }
 
+    override fun removePlayer(qq: Long, name: String) {
+        if (hasQQ(qq)) {
+            dataMap.get(qq.toString())!!.forEach {
+                if (it == name) {
+                    dataMap[qq.toString()]!!.remove(it)
+                    return
+                }
+            }
+        }
+    }
+
     override fun getQQByPlayer(player: AOfflinePlayer): Long? {
         dataMap.forEach {
             it.value.forEach { value ->
@@ -87,9 +130,25 @@ class FileDataProvider(val plugin: AQQBot) : DataProvider {
         return null
     }
 
+    override fun getQQByPlayer(name: String): Long? {
+        dataMap.forEach {
+            it.value.forEach { value ->
+                if (value.contains(name)) {
+                    return it.key.toLong()
+                }
+            }
+        }
+        return null
+    }
+
     override fun getPlayerByQQ(qq: Long): List<AOfflinePlayer> {
         if (!hasQQ(qq)) return emptyList()
         return dataMap[qq.toString()]!!.map { plugin.adapter!!.getOfflinePlayer(it) }
+    }
+
+    override fun getPlayerNameByQQ(qq: Long): List<String> {
+        if (!hasQQ(qq)) return emptyList()
+        return dataMap[qq.toString()]!!
     }
 
     override fun getAllData(): Map<Long, List<AOfflinePlayer>> {

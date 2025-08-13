@@ -1,6 +1,10 @@
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+dependencies {
+    implementation(project(":fabric:1.21.4"))!!
+}
+
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         jvmTarget = "21"
@@ -17,4 +21,18 @@ java {
 
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir(project(":fabric:1.21.4").sourceSets.main.get().java)
+        }
+        kotlin {
+            srcDir(project(":fabric:1.21.4").sourceSets.main.get().kotlin)
+        }
+        resources {
+            srcDir(project(":fabric:1.21.4").sourceSets.main.get().resources)
+        }
+    }
 }

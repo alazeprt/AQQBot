@@ -25,6 +25,9 @@ java {
 
 sourceSets {
     main {
+        java {
+            srcDir(project(":fabric:1.21.4").sourceSets.main.get().java)
+        }
         kotlin {
             srcDir(project(":fabric:1.21.4").sourceSets.main.get().kotlin)
         }

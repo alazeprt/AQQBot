@@ -20,4 +20,13 @@ class PreInformationEvent(val groupId: Long, val userId: Long, val type: Type): 
     fun isCanceled(): Boolean {
         return isCanceled
     }
+
+    fun getType(): String {
+        return when (type) {
+            Type.PLAYER_LIST -> "PLAYER_LIST"
+            Type.TPS -> "TPS"
+            Type.MSPT -> "MSPT"
+            Type.CPU_USAGE -> "CPU_USAGE"
+        }
+    }
 }

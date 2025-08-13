@@ -24,9 +24,17 @@ interface ConfigProvider {
         loadBotConfig()
         loadMessageConfig()
         loadCustomConfig()
+        releasePluginsDevFile()
         Files.createDirectories(plugin.getDataFolder().resolve("images").toPath())
         setEnableGroups(plugin)
         updateGeneralConfig()
+    }
+
+    fun releasePluginsDevFile() {
+        val file = File(getDataFolder().resolve("plugins"), "aqqbot.d.ts")
+        if (!file.exists()) {
+            saveResource("plugins/aqqbot.d.ts", false)
+        }
     }
 
     fun setEnableGroups(plugin: AQQBot) {
