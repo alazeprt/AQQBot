@@ -107,10 +107,6 @@ class AQQBotFabric : ModInitializer, AQQBot {
     }
 
     override fun loadDependencies() {
-        libraryManager.addRepository("https://maven.aliyun.com/repository/public")
-        libraryManager.addMavenCentral()
-        libraryManager.addJitPack()
-
         val adventurePlatformFabricLib = Library.builder()
             .groupId("net.kyori") // 注意：此依赖未提供group前缀
             .artifactId("adventure-platform-fabric")
@@ -182,51 +178,6 @@ class AQQBotFabric : ModInitializer, AQQBot {
             .build()
 
         libraryManager.loadLibraries(adventurePlatformFabricLib, adventureApiLib, adventureKeyLib, adventurePlatformApiLib, adventureTextLoggerSlf4jLib, adventureTextMinimessageLib, adventureTextSerializerGsonLib, adventureTextSerializerPlainLib, examinationApiLib, examinationStringLib)
-
-        val databaseLib = Library.builder()
-            .groupId("com{}github{}alazeprt")
-            .artifactId("taboolib-database")
-            .version("1.0.4")
-            .relocate("com{}google{}common", "top{}alazeprt{}aqqbot{}lib{}com{}google{}common")
-            .build()
-        val hikaricpLib = Library.builder()
-            .groupId("com{}zaxxer")
-            .artifactId("HikariCP")
-            .version("4.0.3")
-            .resolveTransitiveDependencies(true)
-            .build()
-        val guavaLib = Library.builder()
-            .groupId("com{}google{}guava")
-            .artifactId("guava")
-            .version("21.0")
-            .relocate("com{}google{}common", "top{}alazeprt{}aqqbot{}lib{}com{}google{}common")
-            .resolveTransitiveDependencies(true)
-            .build()
-        val sqliteLib = Library.builder()
-            .groupId("org{}xerial")
-            .artifactId("sqlite-jdbc")
-            .version("3.49.0.0")
-            .resolveTransitiveDependencies(true)
-            .build()
-        val aconfigurationLib = Library.builder()
-            .groupId("com{}github{}alazeprt")
-            .artifactId("AConfiguration")
-            .version("1.2")
-            .build()
-        val mysqlLib = Library.builder()
-            .groupId("com{}mysql")
-            .artifactId("mysql-connector-j")
-            .version("8.3.0")
-            .resolveTransitiveDependencies(true)
-            .build()
-        val aonebotLib = Library.builder()
-            .groupId("com{}github{}alazeprt")
-            .artifactId("AOneBot")
-            .version("1.0.16-beta")
-            .relocate("com{}google{}code{}gson", "top{}alazeprt{}aonebot{}lib{}com{}google")
-            .resolveTransitiveDependencies(true)
-            .build()
-        libraryManager.loadLibraries(guavaLib, hikaricpLib, sqliteLib, mysqlLib, aconfigurationLib, databaseLib, aonebotLib)
     }
 
     override fun loadAdapter(): AQQBotAdapter {

@@ -28,6 +28,7 @@ dependencies {
     compileOnly("me.lucko:spark-api:0.1-SNAPSHOT")
     compileOnly("org.java-websocket:Java-WebSocket:1.5.7")
     compileOnly("com.microsoft.playwright:playwright:1.53.0")
+    compileOnly("org.openjdk.nashorn:nashorn-core:15.6")
 }
 
 tasks.withType<JavaCompile> {

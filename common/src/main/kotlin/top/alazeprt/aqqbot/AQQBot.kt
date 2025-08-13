@@ -1,5 +1,6 @@
 package top.alazeprt.aqqbot
 
+import com.alessiodp.libby.Library
 import com.alessiodp.libby.LibraryManager
 import net.kyori.adventure.text.TextComponent
 import top.alazeprt.aconfiguration.file.FileConfiguration
@@ -59,6 +60,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
 
     fun enable() {
         log(LogLevel.INFO, "Loading libraries...")
+        loadCommonDependencies()
         loadDependencies()
         log(LogLevel.INFO, "Loading config...")
         loadConfig(this)
@@ -165,6 +167,61 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
                 ))
             }
         }
+    }
+
+    fun loadCommonDependencies() {
+        val nashorn = Library.builder()
+            .groupId("org{}openjdk{}nashorn")
+            .artifactId("nashorn-core")
+            .version("15.6")
+            .build()
+        val databaseLib = Library.builder()
+            .groupId("com{}github{}alazeprt")
+            .artifactId("taboolib-database")
+            .version("1.0.4")
+            .relocate("com{}google{}common", "top{}alazeprt{}aqqbot{}lib{}com{}google{}common")
+            .build()
+        val hikaricpLib = Library.builder()
+            .groupId("com{}zaxxer")
+            .artifactId("HikariCP")
+            .version("4.0.3")
+            .resolveTransitiveDependencies(true)
+            .build()
+        val guavaLib = Library.builder()
+            .groupId("com{}google{}guava")
+            .artifactId("guava")
+            .version("21.0")
+            .relocate("com{}google{}common", "top{}alazeprt{}aqqbot{}lib{}com{}google{}common")
+            .resolveTransitiveDependencies(true)
+            .build()
+        val sqliteLib = Library.builder()
+            .groupId("org{}xerial")
+            .artifactId("sqlite-jdbc")
+            .version("3.49.0.0")
+            .resolveTransitiveDependencies(true)
+            .build()
+        val aconfigurationLib = Library.builder()
+            .groupId("com{}github{}alazeprt")
+            .artifactId("AConfiguration")
+            .version("1.2")
+            .build()
+        val mysqlLib = Library.builder()
+            .groupId("com{}mysql")
+            .artifactId("mysql-connector-j")
+            .version("8.3.0")
+            .resolveTransitiveDependencies(true)
+            .build()
+        val aonebotLib = Library.builder()
+            .groupId("com{}github{}alazeprt")
+            .artifactId("AOneBot")
+            .version("1.0.16-beta")
+            .relocate("com{}google{}code{}gson", "top{}alazeprt{}aonebot{}lib{}com{}google")
+            .resolveTransitiveDependencies(true)
+            .build()
+        libraryManager.addRepository("https://maven.aliyun.com/repository/public")
+        libraryManager.addMavenCentral()
+        libraryManager.addJitPack()
+        libraryManager.loadLibraries(nashorn, databaseLib, hikaricpLib, guavaLib, sqliteLib, aconfigurationLib, mysqlLib, aonebotLib)
     }
 
     fun loadDependencies()
