@@ -21,6 +21,7 @@ import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.drivers.Web2ImageDriver
 import top.alazeprt.aqqbot.event.BukkitEventHandler
 import top.alazeprt.aqqbot.hook.AQQBotExpansion
+import top.alazeprt.aqqbot.plugins.PluginLoader
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.*
@@ -69,6 +70,8 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     override var spark: Boolean = false
 
     override var loadSparkCount: Int = 0
+
+    override lateinit var pluginLoader: PluginLoader
 
     val taskList: MutableList<BukkitTaskCancelable> = mutableListOf()
 

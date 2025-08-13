@@ -28,6 +28,7 @@ import top.alazeprt.aqqbot.drivers.Web2ImageDriver
 import top.alazeprt.aqqbot.event.AChatEvent
 import top.alazeprt.aqqbot.event.AJoinEvent
 import top.alazeprt.aqqbot.event.AQuitEvent
+import top.alazeprt.aqqbot.plugins.PluginLoader
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.*
@@ -100,6 +101,8 @@ class AQQBotFabric : ModInitializer, AQQBot {
     override var spark: Boolean = false
 
     override var loadSparkCount: Int = 0
+
+    override lateinit var pluginLoader: PluginLoader
 
     companion object {
         const val MOD_ID: String = "aqqbot"

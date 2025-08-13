@@ -20,6 +20,7 @@ import top.alazeprt.aqqbot.data.DataProvider
 import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.drivers.Web2ImageDriver
 import top.alazeprt.aqqbot.event.FoliaEventHandler
+import top.alazeprt.aqqbot.plugins.PluginLoader
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.*
@@ -67,6 +68,8 @@ class AQQBotFolia : JavaPlugin(), AQQBot {
     override var fakePlayer: Boolean = false
 
     override var spark: Boolean = false
+
+    override lateinit var pluginLoader: PluginLoader
 
     override var loadSparkCount: Int = 0
 

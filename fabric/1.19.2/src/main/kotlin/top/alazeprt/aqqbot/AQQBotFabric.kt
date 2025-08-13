@@ -28,6 +28,7 @@ import top.alazeprt.aqqbot.drivers.Web2ImageDriver
 import top.alazeprt.aqqbot.event.AChatEvent
 import top.alazeprt.aqqbot.event.AJoinEvent
 import top.alazeprt.aqqbot.event.AQuitEvent
+import top.alazeprt.aqqbot.plugins.PluginLoader
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.*
@@ -61,6 +62,8 @@ class AQQBotFabric : ModInitializer, AQQBot {
             AChatEvent(this, FabricPlayer(entity), message.content.string)
         }
     }
+
+    override lateinit var pluginLoader: PluginLoader
 
     override var debugModule: ADebug? = null
 

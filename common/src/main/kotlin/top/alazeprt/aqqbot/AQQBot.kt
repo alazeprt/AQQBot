@@ -6,6 +6,7 @@ import net.kyori.adventure.text.TextComponent
 import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.adapter.AQQBotAdapter
+import top.alazeprt.aqqbot.api.AQQBotAPI
 import top.alazeprt.aqqbot.api.webhook.AQQBotWebhookServer
 import top.alazeprt.aqqbot.api.webhook.WebhookProvider
 import top.alazeprt.aqqbot.bot.BotProvider.getBot
@@ -17,6 +18,7 @@ import top.alazeprt.aqqbot.data.*
 import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.drivers.Web2ImageDriver
 import top.alazeprt.aqqbot.hook.HookProvider
+import top.alazeprt.aqqbot.plugins.PluginLoader
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.task.TaskProvider
 import top.alazeprt.aqqbot.util.AExecution
@@ -58,7 +60,10 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
     override var messageConfig: FileConfiguration
     override var botConfig: FileConfiguration
 
+    var pluginLoader: PluginLoader
+
     fun enable() {
+        AQQBotAPI.setInstance(this)
         log(LogLevel.INFO, "Loading libraries...")
         loadCommonDependencies()
         loadDependencies()
@@ -156,6 +161,9 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
                 }
             }
         }
+        log(LogLevel.INFO, "Loading plugins...")
+        pluginLoader = PluginLoader(this)
+        pluginLoader.load()
         if (getBot() != null && getBot()!!.isConnected()) {
             enableGroups.forEach {
                 if (!generalConfig.getBoolean("notify.server_status.enable", it.key.toLong())) return@forEach
@@ -170,11 +178,18 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
     }
 
     fun loadCommonDependencies() {
-        val nashorn = Library.builder()
-            .groupId("org{}openjdk{}nashorn")
-            .artifactId("nashorn-core")
-            .version("15.6")
-            .build()
+        libraryManager.addRepository("https://maven.aliyun.com/repository/public")
+        libraryManager.addMavenCentral()
+        libraryManager.addJitPack()
+        if (System.getProperty("java.specification.version").toDouble() >= 15) {
+            val nashornLib = Library.builder()
+                .groupId("org{}openjdk{}nashorn")
+                .artifactId("nashorn-core")
+                .version("15.6")
+                .resolveTransitiveDependencies(true)
+                .build()
+            libraryManager.loadLibrary(nashornLib)
+        }
         val databaseLib = Library.builder()
             .groupId("com{}github{}alazeprt")
             .artifactId("taboolib-database")
@@ -218,15 +233,14 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
             .relocate("com{}google{}code{}gson", "top{}alazeprt{}aonebot{}lib{}com{}google")
             .resolveTransitiveDependencies(true)
             .build()
-        libraryManager.addRepository("https://maven.aliyun.com/repository/public")
-        libraryManager.addMavenCentral()
-        libraryManager.addJitPack()
-        libraryManager.loadLibraries(nashorn, databaseLib, hikaricpLib, guavaLib, sqliteLib, aconfigurationLib, mysqlLib, aonebotLib)
+        libraryManager.loadLibraries(databaseLib, hikaricpLib, guavaLib, sqliteLib, aconfigurationLib, mysqlLib, aonebotLib)
     }
 
     fun loadDependencies()
 
     fun disable() {
+        log(LogLevel.INFO, "Unloading plugins...")
+        pluginLoader.unload()
         log(LogLevel.INFO, "Disconnecting bot...")
         if (getBot() != null && getBot()!!.isConnected) {
             enableGroups.forEach {
@@ -249,6 +263,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
     }
 
     fun reload() {
+        pluginLoader.unload()
         loadConfig(this)
         sender.clear()
         setSender()
@@ -280,6 +295,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
             }
         }
         reloadDebug()
+        pluginLoader.load()
     }
 
     fun loadDebug() {
