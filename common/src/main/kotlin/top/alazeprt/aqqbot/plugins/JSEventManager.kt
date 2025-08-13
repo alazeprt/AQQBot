@@ -19,9 +19,8 @@ class JSEventManager(val plugin: AQQBot) {
     private val listeners = mutableMapOf<String, MutableList<Any>>()
 
     fun register(eventName: String, function: Any) {
-        println("Registering ...")
         listeners.getOrPut(eventName) { mutableListOf() }.add(function)
-        plugin.log(LogLevel.DEBUG, "Registered handler for $eventName")
+        plugin.log(LogLevel.INFO, "Registered handler for $eventName")
     }
 
     fun unregister(eventName: String, function: Any) {
@@ -29,8 +28,6 @@ class JSEventManager(val plugin: AQQBot) {
     }
 
     private fun callEvent(eventName: String, instance: Any) {
-
-        println("callEvent: $eventName")
 
         val handlers = listeners[eventName] ?: return
 

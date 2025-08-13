@@ -26,7 +26,6 @@ public class AQQBotAPI {
     public static void registerEvent(Object clazz) {
         for (Method method : clazz.getClass().getDeclaredMethods()) {
             if (method.isAnnotationPresent(SubscribeAQQBotEvent.class)) {
-                System.out.println(1);
                 eventMap.put(method, clazz);
             }
         }
