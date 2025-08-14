@@ -6,6 +6,7 @@ import com.alessiodp.libby.LibraryManager
 import com.mojang.brigadier.arguments.StringArgumentType
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
+import net.fabricmc.fabric.api.event.EventFactory
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.fabricmc.loader.api.FabricLoader
@@ -306,7 +307,7 @@ class AQQBotFabric : ModInitializer, AQQBot {
                 }
                 unbind_web = AWeb(File(getDataFolder().resolve("web"), path), width, height, delay, placeholdersMap)
             }
-            if (web != null || unbind_web != null) {
+            if ((web != null || unbind_web != null) && enable) {
                 webDriver = Web2ImageDriver(this)
                 webDriver.loadDependencies()
                 webDriver.downloadDrivers()

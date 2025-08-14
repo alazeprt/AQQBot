@@ -14,8 +14,6 @@ include("bukkit")
 include("velocity")
 include("folia")
 include("fabric")
-include("fabric:1.16.5")
-findProject(":fabric:1.16.5")?.name = "1.16.5"
 include("fabric:1.18.2")
 findProject(":fabric:1.18.2")?.name = "1.18.2"
 include("fabric:1.19.2")

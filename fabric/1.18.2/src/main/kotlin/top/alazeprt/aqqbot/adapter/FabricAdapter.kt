@@ -5,6 +5,7 @@ import net.kyori.adventure.text.TextComponent
 import top.alazeprt.aqqbot.AQQBotFabric
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.profile.APlayer
+import java.util.UUID
 
 object FabricAdapter : AQQBotAdapter {
     override fun getOfflinePlayer(name: String): AOfflinePlayer {
@@ -14,6 +15,15 @@ object FabricAdapter : AQQBotAdapter {
     override fun getOnlinePlayer(name: String): APlayer? {
         AQQBotFabric.server.playerManager.playerList.forEach {
             if (it.name.string == name) {
+                return FabricPlayer(it)
+            }
+        }
+        return null
+    }
+
+    fun getOnlinePlayer(uuid: UUID): APlayer? {
+        AQQBotFabric.server.playerManager.playerList.forEach {
+            if (it.uuid == uuid) {
                 return FabricPlayer(it)
             }
         }

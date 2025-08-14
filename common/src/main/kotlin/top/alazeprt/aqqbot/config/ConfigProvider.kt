@@ -33,6 +33,7 @@ interface ConfigProvider {
     fun releasePluginsDevFile() {
         val file = File(getDataFolder().resolve("plugins"), "aqqbot.d.ts")
         if (!file.exists()) {
+            file.mkdirs()
             saveResource("plugins/aqqbot.d.ts", false)
         }
     }

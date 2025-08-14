@@ -221,7 +221,7 @@ class AQQBotVelocity : AQQBot {
                 }
                 unbind_web = AWeb(File(dataFolder.resolve("web").toFile(), path), width, height, delay, placeholdersMap)
             }
-            if (web != null || unbind_web != null) {
+            if ((web != null || unbind_web != null) && enable) {
                 webDriver = Web2ImageDriver(this)
                 webDriver.loadDependencies()
                 webDriver.downloadDrivers()

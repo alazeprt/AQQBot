@@ -119,7 +119,7 @@ memory:
 # 例 5
 # 仅供测试
 test:
-  enable: true
+  enable: false
   command: ["/test", "test"]
   execute: [""]
   unbind_execute: [""]

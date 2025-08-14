@@ -308,7 +308,7 @@ class AQQBotFabric : ModInitializer, AQQBot {
                 }
                 unbind_web = AWeb(File(getDataFolder().resolve("web"), path), width, height, delay, placeholdersMap)
             }
-            if (web != null || unbind_web != null) {
+            if ((web != null || unbind_web != null) && enable) {
                 webDriver = Web2ImageDriver(this)
                 webDriver.loadDependencies()
                 webDriver.downloadDrivers()

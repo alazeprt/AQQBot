@@ -15,8 +15,5 @@
   },
   "depends": {
     "fabric-language-kotlin": ">=1.10.8+kotlin.1.9.0"
-  },
-  "mixins": [
-    "aqqbot.mixins.json"
-  ]
+  }
 }
