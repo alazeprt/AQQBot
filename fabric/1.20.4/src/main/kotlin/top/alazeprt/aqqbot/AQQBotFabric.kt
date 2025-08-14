@@ -58,7 +58,7 @@ class AQQBotFabric : ModInitializer, AQQBot {
             AQuitEvent(this, FabricPlayer(handler.player)).handle()
         }
         ServerMessageEvents.CHAT_MESSAGE.register { message, entity, parameters ->
-            AChatEvent(this, FabricPlayer(entity), message.content.string)
+            AChatEvent(this, FabricPlayer(entity), message.content.string).handle()
         }
     }
 
