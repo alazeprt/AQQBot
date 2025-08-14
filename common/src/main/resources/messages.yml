@@ -66,6 +66,7 @@ game:
     - "&b/aqqbot whitelist reset <qq|player> <数据>   &e清除玩家绑定的信息 (若为 player 则清除对应 QQ 号的所有绑定数据)"
     - "&b/aqqbot whitelist query/info <qq|player> <数据>   &e根据QQ号或游戏名查询对应的游戏名或QQ号"
     - "&b/aqqbot status   &e查看 AQQBot 插件状态"
+    - "&b/aqqbot send <群号> <消息>   &e以机器人账号身份发送消息到 QQ 群"
     - "&b/aqqbot reload   &e重载配置文件"
     - "&b/aqqbot help   &e查看此帮助页面"
   status_result:

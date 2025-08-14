@@ -339,43 +339,15 @@ class AQQBotFabric : ModInitializer, AQQBot {
             dispatcher.register(CommandManager.literal(command)
                 .executes { ctx ->
                     handler.onCommand(command, FabricSender(ctx.source), emptyList())
-                    return@executes 1
+                    1
                 }
-                .then(CommandManager.argument("arg1", StringArgumentType.greedyString())
+                .then(CommandManager.argument("args", StringArgumentType.greedyString())
                     .executes { ctx ->
-                        handler.onCommand(command, FabricSender(ctx.source), listOf(StringArgumentType.getString(ctx, "arg1")))
-                        return@executes 1
+                        val allArgs = StringArgumentType.getString(ctx, "args")
+                        val argsList = allArgs.split(" ").filter { it.isNotBlank() }
+                        handler.onCommand(command, FabricSender(ctx.source), argsList)
+                        1
                     }
-                    .then(CommandManager.argument("arg2", StringArgumentType.greedyString())
-                        .executes { ctx ->
-                            handler.onCommand(command, FabricSender(ctx.source), listOf(
-                                StringArgumentType.getString(ctx, "arg1"),
-                                StringArgumentType.getString(ctx, "arg2")
-                            ))
-                            return@executes 1
-                        }
-                        .then(CommandManager.argument("arg3", StringArgumentType.greedyString())
-                            .executes { ctx ->
-                                handler.onCommand(command, FabricSender(ctx.source), listOf(
-                                    StringArgumentType.getString(ctx, "arg1"),
-                                    StringArgumentType.getString(ctx, "arg2"),
-                                    StringArgumentType.getString(ctx, "arg3")
-                                ))
-                                return@executes 1
-                            }
-                            .then(CommandManager.argument("arg4", StringArgumentType.greedyString())
-                                .executes { ctx ->
-                                    handler.onCommand(command, FabricSender(ctx.source), listOf(
-                                        StringArgumentType.getString(ctx, "arg1"),
-                                        StringArgumentType.getString(ctx, "arg2"),
-                                        StringArgumentType.getString(ctx, "arg3"),
-                                        StringArgumentType.getString(ctx, "arg4")
-                                    ))
-                                    return@executes 1
-                                }
-                            )
-                        )
-                    )
                 )
             )
         })
