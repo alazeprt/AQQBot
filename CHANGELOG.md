@@ -36,3 +36,15 @@
     - 优化了 debug 日志的输出内容
     - 添加了全新的 Java API 接口
     - 添加了 Webhook 功能, 可以通过 WebSocket 远程控制 AQQBot
+## 2.0-beta.12
+- ### bug修复
+    - 修复了无法监听玩家加入/离开的bug
+    - 修复了可能无法正常使用 Webhook 的问题
+- ### 新功能
+    - 更新了 Webhook 的 `/api/v1/users` 接口
+    - 添加了对插件 `minecraft-fakeplayer` 的支持
+    - 更新了可能因数据库脏数据而导致 Webhook 无法使用的问题
+    - 添加了对插件 `ImagePreviewer` 的支持
+    - 添加了 Fabric 支持 (1.18.2, 1.19.2, 1.19.4, 1.20.1, 1.20.4, 1.20.6, 1.21.1)
+    - 在自定义指令配置文件中添加了对 web 的支持 (可以通过写 html 文件并由插件渲染发到群内)
+    - 添加了 JavaScript 脚本支持 (可以通过写 JavaScript 文件来实现一些复杂的功能)
