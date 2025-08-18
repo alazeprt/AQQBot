@@ -36,7 +36,7 @@
     - 优化了 debug 日志的输出内容
     - 添加了全新的 Java API 接口
     - 添加了 Webhook 功能, 可以通过 WebSocket 远程控制 AQQBot
-## 2.0-beta.12
+## 2.0-alpha.13
 - ### bug修复
     - 修复了无法监听玩家加入/离开的bug
     - 修复了可能无法正常使用 Webhook 的问题

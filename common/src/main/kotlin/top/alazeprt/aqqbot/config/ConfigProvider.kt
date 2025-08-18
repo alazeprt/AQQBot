@@ -72,6 +72,9 @@ interface ConfigProvider {
             generalConfig.setIfNotExists("command_execution.sort", listOf("NATIVE", "DEDICATED_SERVER", "MINECRAFT_SERVER", "SIMULATE_CONSOLE"))
             generalConfig.setIfNotExists("whitelist.name_rule", """[\S]*""")
         }
+        if (generalConfig.getInt("version", null) < 19) {
+            generalConfig.setIfNotExists("whitelist.bypass_permission", "aqqbot.bypass.whitelist")
+        }
     }
 
     fun loadGeneralConfig(plugin: AQQBot) {

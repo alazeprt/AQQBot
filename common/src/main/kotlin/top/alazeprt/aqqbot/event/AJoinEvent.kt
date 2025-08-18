@@ -14,8 +14,10 @@ class AJoinEvent(val plugin: AQQBot, private val player: APlayer, val kickMethod
             plugin.debugModule?.debugLogger?.log("kick ${player.getName()} because unbind")
             kickMessage = it
         }
-        if (handle1) {
+        if (handle1 && !player.hasPermission(plugin.generalConfig.getString("whitelist.bypass_permission", null))) {
             kickMethod.accept(kickMessage)
+        } else if (handle1) {
+            plugin.debugModule?.debugLogger?.log("allow ${player.getName()} to join because bypass permission")
         }
         if (!handle1) {
             playerStatusHandler(plugin, player, true)
