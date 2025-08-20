@@ -60,6 +60,7 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     override lateinit var messageManager: MessageManager
 
     override var fakePlayer: Boolean = false
+    override var luckperms: Boolean = false
 
     override lateinit var webDriver: Web2ImageDriver
 

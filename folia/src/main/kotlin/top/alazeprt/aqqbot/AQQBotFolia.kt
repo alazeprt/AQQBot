@@ -68,6 +68,7 @@ class AQQBotFolia : JavaPlugin(), AQQBot {
     override var fakePlayer: Boolean = false
 
     override var spark: Boolean = false
+    override var luckperms: Boolean = false
 
     override lateinit var pluginLoader: PluginLoader
 

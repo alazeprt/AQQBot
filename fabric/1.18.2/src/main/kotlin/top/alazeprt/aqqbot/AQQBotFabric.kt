@@ -104,6 +104,7 @@ class AQQBotFabric : ModInitializer, AQQBot {
     override lateinit var pluginLoader: PluginLoader
 
     override var spark: Boolean = false
+    override var luckperms: Boolean = false
 
     override var loadSparkCount: Int = 0
 
