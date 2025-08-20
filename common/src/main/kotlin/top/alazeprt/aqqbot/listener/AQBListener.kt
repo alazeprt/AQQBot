@@ -14,6 +14,7 @@ import top.alazeprt.aqqbot.api.event.qq.ReceiveMessageEvent
 import top.alazeprt.aqqbot.bot.BotProvider
 import top.alazeprt.aqqbot.handler.CommandHandler
 import top.alazeprt.aqqbot.handler.InformationHandler
+import top.alazeprt.aqqbot.handler.PlayerAtHandler
 import top.alazeprt.aqqbot.handler.WhitelistAdminHandler
 import top.alazeprt.aqqbot.handler.WhitelistHandler
 import top.alazeprt.aqqbot.util.AFormatter
@@ -79,6 +80,8 @@ class AQBListener(val plugin: AQQBot) : Listener {
                     return@action
                 }
                 val newMessage: String = canForwardMessage(message, event.groupId) ?: return@action
+                val atHandle = PlayerAtHandler(plugin).handle(newMessage, event)
+                plugin.debugModule?.debugLogger?.log("is handle at?: $atHandle")
                 plugin.debugModule?.debugLogger?.log("forward message to server: $newMessage")
                 if (component == null) {
                     plugin.adapter.broadcastMessage(

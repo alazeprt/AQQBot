@@ -72,13 +72,16 @@ interface ConfigProvider {
             generalConfig.setIfNotExists("command_execution.sort", listOf("NATIVE", "DEDICATED_SERVER", "MINECRAFT_SERVER", "SIMULATE_CONSOLE"))
             generalConfig.setIfNotExists("whitelist.name_rule", """[\S]*""")
         }
-        if (generalConfig.getInt("version", null) < 19) {
-            generalConfig.setIfNotExists("whitelist.bypass_permission", "aqqbot.bypass.whitelist")
-        }
-        if (generalConfig.getInt("version", null) < 20) {
-            generalConfig.setIfNotExists("notify.player_death.enable", false)
-            generalConfig.setIfNotExists("notify.player_death.message", "[AQQBot] \${playerName}(\${userId}) 因 \${deathMessage} 死亡了!")
-        }
+        // config version 20
+        generalConfig.setIfNotExists("whitelist.bypass_permission", "aqqbot.bypass.whitelist")
+        // config version 21
+        generalConfig.setIfNotExists("notify.player_death.enable", false)
+        generalConfig.setIfNotExists("notify.player_death.message", "[AQQBot] \${playerName}(\${userId}) 因 \${deathMessage} 死亡了!")
+        // config version 22
+        generalConfig.setIfNotExists("information.at.enable", true)
+        generalConfig.setIfNotExists("information.at.message", mutableListOf("@\${player}", "\${player}"))
+        generalConfig.setIfNotExists("information.at.action", mutableListOf("playsound block.bell.use master \${player}",
+            "title @a subtitle {\"text\":\"[AQQBot] \${userId} @了你!\",\"color\":\"gold\"}"))
     }
 
     fun loadGeneralConfig(plugin: AQQBot) {
@@ -110,7 +113,7 @@ interface ConfigProvider {
     fun getDataFolder(): File
 
     fun configNeedUpdate(): Boolean {
-        if (generalConfig.getInt("version", null) != 21) {
+        if (generalConfig.getInt("version", null) != 22) {
             val file = File(getDataFolder(), "config_new.yml")
             this.javaClass.getResource("/config.yml")?.let { file.writeText(it.readText()) }
             return true
