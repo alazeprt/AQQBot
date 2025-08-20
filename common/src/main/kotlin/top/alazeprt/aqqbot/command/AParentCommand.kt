@@ -11,6 +11,7 @@ class AParentCommand(val plugin: AQQBot) : ACommand {
             SubHelp(plugin).onCommand(command, sender, args)
         } else when (args[0]) {
             "status" -> SubStatus(plugin).onCommand(command, sender, args)
+            "send" -> SubSend(plugin).onCommand(command, sender, args)
             "whitelist" -> if (args.size == 1) {
                 SubHelp(plugin).onCommand(command, sender, args)
             } else when (args[1]) {
@@ -28,7 +29,7 @@ class AParentCommand(val plugin: AQQBot) : ACommand {
 
     override fun onComplete(args: List<String>): List<String> {
         return when (args.size) {
-            1 -> listOf("whitelist", "status", "help", "reload")
+            1 -> listOf("whitelist", "status", "help", "reload", "send")
             2 -> return when (args[0]) {
                 "whitelist" -> listOf("bind", "unbind", "reset", "query", "info")
                 else -> emptyList()
