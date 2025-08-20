@@ -1,0 +1,68 @@
+name: "插件漏洞"
+description: "插件的某些功能无法正常使用或出现异常行为"
+labels: "bug"
+body:
+- type: checkboxes
+  id: "checks"
+  attributes:
+    label: "检查项"
+    description: "请逐个检查下列项目, 并勾选确认"
+    options:
+      - label: "我已经检查过 [Issues 列表](https://github.com/alazeprt/AQQBot/issues), 未发现有与此相关的问题"
+        required: true
+      - label: "我已经使用最新 [开发版](https://github.com/alazeprt/AQQBot/actions) 进行测试, 仍然存在问题"
+        required: true
+      - label: "我已经在只安装 AQQBot 插件的相同版本服务端下进行复现, 该问题仍然存在"
+        required: false
+      - label: "我已经在只安装 AQQBot 的插件的不同版本服务端下进行复现, 该问题仍然存在"
+        required: false
+- type: input
+  id: "system"
+  attributes:
+    label: 操作系统信息
+    description: "请提供你所使用的操作系统的详细信息 (一般可通过 `uname -a` 获取, Windows 可通过 `systeminfo` 获取)"
+  validations:
+    required: true
+- type: input
+  id: "java"
+  attributes:
+    label: Java 版本
+    description: "请提供你所使用的 Java 的详细信息 (一般可通过 `java -version` 获取)"
+  validations:
+    required: true
+- type: input
+  id: "server"
+  attributes:
+    label: 服务端版本
+    description: "请提供你所使用的服务端版本号 (一般可通过 `/version` 指令获取)"
+  validations:
+    required: true
+- type: input
+  id: "plugin"
+  attributes:
+    label: 插件版本
+    description: "请提供你所使用的 AQQBot 插件的版本号 (一般可通过 `/version AQQBot` 或 `/aqqbot status` 指令获取, 若使用的是开发版请精确到 commit 哈希号)"
+  validations:
+    required: true
+- type: textarea
+  id: "description"
+  attributes:
+    label: 描述
+    description: "详细描述具体的问题"
+  validations:
+    required: true
+- type: textarea
+  id: "reproduce"
+  attributes:
+    label: 复现步骤
+    description: "详细描述问题如何复现 (在出现问题前进行了哪些操作)"
+  validations:
+    required: true
+- type: textarea
+  id: "yml-4"
+  attributes:
+    label: 日志与附件
+    description: "提供服务端日志 (一般为 `logs/latest.log` 文件) 及其它任何有用的信息 (如截图)"
+    placeholder: "先点击这个文本框, 然后再将文件直接拖拽到文本框中以上传"
+  validations:
+    required: true

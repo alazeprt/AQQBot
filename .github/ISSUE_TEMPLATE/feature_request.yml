@@ -1,0 +1,25 @@
+name: "新功能请求"
+description: "请求添加新功能或改进现有功能"
+labels: "feature"
+body:
+- type: checkboxes
+  id: "checks"
+  attributes:
+    label: "检查项"
+    description: "请逐个检查下列项目, 并勾选确认"
+    options:
+      - label: "我已经检查过 [Issues 列表](https://github.com/alazeprt/AQQBot/issues), 未发现有与此相关的请求"
+        required: true
+      - label: "我已经使用最新 [开发版](https://github.com/alazeprt/AQQBot/actions) 进行测试, 仍然没有该项功能"
+        required: true
+      - label: "我已经检查过 [Discussions 列表](https://github.com/alazeprt/AQQBot/discussions), 未发现有与此相关的讨论"
+        required: true
+      - label: "该功能无法通过如自定义指令等功能来实现, 或该功能可以通过现有功能实现但较为繁琐"
+        required: false
+- type: textarea
+  id: "description"
+  attributes:
+    label: 描述
+    description: "详细描述你对新功能的想法"
+  validations:
+    required: true
