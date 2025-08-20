@@ -30,7 +30,7 @@ class SubSend(val plugin: AQQBot): ACommand {
         } catch (e: NumberFormatException) {
             val invalidIdMessage = plugin.messageManager.get(
                 "game.send.invalid_group_id",
-                mapOf("group_id" to args[1]),
+                mapOf("groupId" to args[1]),
                 null
             )
             sender.sendMessage(AFormatter.pluginToChat(invalidIdMessage))
@@ -41,7 +41,7 @@ class SubSend(val plugin: AQQBot): ACommand {
 
         val successMessage = plugin.messageManager.get(
             "game.send.success",
-            mapOf("group_id" to groupId.toString()),
+            mapOf("groupId" to groupId.toString()),
             null
         )
         sender.sendMessage(AFormatter.pluginToChat(successMessage))    }
