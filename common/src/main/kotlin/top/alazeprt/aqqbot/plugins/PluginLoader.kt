@@ -4,6 +4,7 @@ import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.api.AQQBotAPI
 import top.alazeprt.aqqbot.api.event.game.PluginStartEvent
 import top.alazeprt.aqqbot.api.event.game.PluginStopEvent
+import top.alazeprt.aqqbot.bot.BotManager
 import top.alazeprt.aqqbot.util.LogLevel
 import javax.script.Compilable
 import javax.script.ScriptEngine
@@ -38,6 +39,7 @@ class PluginLoader(val plugin: AQQBot) {
         }
         expose("plugin", plugin)
         expose("eventManager", eventManager)
+        expose("botManager", BotManager)
         eventManager.load()
         val compilable = engine as Compilable
         if (plugin.getDataFolder().resolve("plugins").isDirectory) {

@@ -87,15 +87,30 @@ declare interface APIEvent {
 
 }
 
+/**
+ * 群消息事件 (AOneBot)
+ */
 declare class GroupMessageEvent {
+    /**
+     * 发送者群昵称
+     */
     getSenderNickname(): string
 
+    /**
+     * 发送者 QQ 号
+     */
     getSenderId(): number
 
+    /**
+     * 发送的消息
+     */
     getMessage(): string
 
     getMessageId(): number
 
+    /**
+     * 发送的消息所在的群号
+     */
     getGroupId(): number
 
     getTime(): number
@@ -105,14 +120,36 @@ declare class GroupMessageEvent {
     getFont(): number
 }
 
+declare class BotManager {
+    /**
+     * 发送群消息
+     * @param groupId 群号
+     * @param message 消息内容
+     */
+    sendGroupMessage(groupId: number, message: string): void;
+
+    /**
+     * 发送私聊消息
+     * @param userId QQ 号
+     * @param message 消息内容
+     */
+    sendPrivateMessage(userId: number, message: string): void;
+}
+
 declare interface Cancelable {
     cancel(): void;
 }
 
+/**
+ * QQ 群收到消息事件
+ */
 declare class ReceiveMessageEvent implements APIEvent {
     readonly event: GroupMessageEvent;
 }
 
+/**
+ * QQ 群绑定处理前事件
+ */
 declare class PreBindEvent implements Cancelable, APIEvent {
     readonly groupId: number;
     readonly operatorId: number;
@@ -122,6 +159,9 @@ declare class PreBindEvent implements Cancelable, APIEvent {
     cancel(): void;
 }
 
+/**
+ * QQ 群解绑处理前事件
+ */
 declare class PreUnbindEvent implements Cancelable, APIEvent {
     readonly groupId: number;
     readonly operatorId: number;
@@ -131,6 +171,9 @@ declare class PreUnbindEvent implements Cancelable, APIEvent {
     cancel(): void;
 }
 
+/**
+ * QQ 群获取服务器信息处理前事件
+ */
 declare class PreInformationEvent implements Cancelable, APIEvent {
     readonly groupId: number;
     readonly userId: number;
@@ -139,6 +182,9 @@ declare class PreInformationEvent implements Cancelable, APIEvent {
     cancel(): void;
 }
 
+/**
+ * QQ 群远程执行命令处理前事件
+ */
 declare class PreRemoteCommandEvent implements Cancelable, APIEvent {
     readonly groupId: number;
     readonly senderId: number;
@@ -147,6 +193,9 @@ declare class PreRemoteCommandEvent implements Cancelable, APIEvent {
     cancel(): void;
 }
 
+/**
+ * QQ 群绑定处理后事件
+ */
 declare class PostBindEvent implements APIEvent {
     readonly groupId: number;
     readonly operatorId: number;
@@ -157,6 +206,9 @@ declare class PostBindEvent implements APIEvent {
     getReasonMsg(): string;
 }
 
+/**
+ * QQ 群解绑处理后事件
+ */
 declare class PostUnbindEvent implements APIEvent {
     readonly groupId: number;
     readonly operatorId: number;
@@ -167,6 +219,9 @@ declare class PostUnbindEvent implements APIEvent {
     getReasonMsg(): string;
 }
 
+/**
+ * QQ 群获取服务器信息处理后事件
+ */
 declare class PostInformationEvent implements APIEvent {
     readonly groupId: number;
     readonly userId: number;
@@ -176,6 +231,9 @@ declare class PostInformationEvent implements APIEvent {
     getReasonMsg(): string;
 }
 
+/**
+ * QQ 群远程执行命令处理后事件
+ */
 declare class PostRemoteCommandEvent implements APIEvent {
     readonly groupId: number;
     readonly senderId: number;
@@ -185,6 +243,9 @@ declare class PostRemoteCommandEvent implements APIEvent {
     getReasonMsg(): string;
 }
 
+/**
+ * 玩家加入服务器处理前事件
+ */
 declare class PrePlayerJoinEvent implements Cancelable, APIEvent {
     readonly name: string;
     readonly userId: number;
@@ -193,6 +254,9 @@ declare class PrePlayerJoinEvent implements Cancelable, APIEvent {
     cancel(reason: string): void;
 }
 
+/**
+ * 玩家加入服务器处理后事件
+ */
 declare class PostPlayerJoinEvent implements APIEvent {
     readonly name: string;
     readonly userId: number;
@@ -201,11 +265,17 @@ declare class PostPlayerJoinEvent implements APIEvent {
     getReasonMsg(): string;
 }
 
+/**
+ * 玩家退出服务器事件
+ */
 declare class PlayerQuitEvent implements APIEvent {
     readonly name: string;
     readonly userId: number;
 }
 
+/**
+ * 玩家聊天处理前事件
+ */
 declare class PrePlayerChatEvent implements APIEvent {
     readonly name: string;
     readonly userId: number;
@@ -214,6 +284,9 @@ declare class PrePlayerChatEvent implements APIEvent {
     cancel(): void;
 }
 
+/**
+ * 玩家聊天处理后事件
+ */
 declare class PostPlayerChatEvent implements APIEvent {
     readonly name: string;
     readonly userId: number;
@@ -223,16 +296,25 @@ declare class PostPlayerChatEvent implements APIEvent {
     getReasonMsg(): string;
 }
 
+/**
+ * 玩家死亡事件
+ */
 declare class PlayerDeathEvent implements APIEvent {
     readonly name: string;
     readonly userId: number;
     readonly reason: string;
 }
 
+/**
+ * 插件启动时触发的事件
+ */
 declare class PluginStartEvent implements APIEvent {
 
 }
 
+/**
+ * 插件停止时触发的事件
+ */
 declare class PluginStopEvent implements APIEvent {
 
 }
@@ -246,3 +328,8 @@ declare const plugin: AQQBot
  * AQQBot 事件管理器
  */
 declare const eventManager: EventManager
+
+/**
+ * AQQBot 机器人管理器
+ */
+declare const botManager: BotManager
