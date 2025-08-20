@@ -2,7 +2,7 @@
 # 可使用 /aqqbot reload 重载
 
 ## 配置文件版本, 请勿修改!!!
-version: 20
+version: 21
 
 # 存储相关配置 (重启后生效)
 storage:
@@ -206,6 +206,14 @@ notify:
 
     # 离开时发送的消息:
     leave: "[AQQBot] ${playerName}(${userId}) 离开了服务器!"
+
+  # 玩家死亡通知
+  player_death:
+    # 是否开启该功能
+    enable: true
+
+    # 发送的消息:
+    message: "[AQQBot] ${playerName}(${userId}) 因 ${deathMessage} 死亡了!"
 
 # 服务器命令远程执行
 # * 该功能仅支持Bukkit类服务端

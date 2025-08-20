@@ -29,21 +29,20 @@ object AEventUtil {
 
     fun playerStatusHandler(plugin: AQQBot, player: APlayer, isJoin: Boolean) {
         val playerName = player.getName()
-        if (plugin.generalConfig.getBoolean("notify.player_status.enable", null)) {
-            val qq: Long = plugin.getQQByPlayer(plugin.adapter!!.getOfflinePlayer(playerName))?: -1L
-            plugin.submitAsync {
-                plugin.enableGroups.forEach {
-                    val messagePath = "notify.player_status.${if (isJoin) "join" else "leave"}"
-                    plugin.debugModule?.debugLogger?.log("send the $playerName's ${if (isJoin) "join" else "leave"} message to group ${it.key}")
-                    val message = if (plugin.generalConfig.getStringList(messagePath, it.key.toLong()).isEmpty())
-                        plugin.generalConfig.getString(messagePath, it.key.toLong())?: ""
-                    else plugin.generalConfig.getStringList(messagePath, it.key.toLong()).random()
-                    BotProvider.getBot()?.action(
-                        SendGroupMessage(it.key.toLong(), plugin.setPlaceholders(player, message)
-                            .replace("\${playerName}", playerName)
-                            .replace("\${userId}", qq.toString()), true)
-                    )
-                }
+        val qq: Long = plugin.getQQByPlayer(plugin.adapter!!.getOfflinePlayer(playerName))?: -1L
+        plugin.submitAsync {
+            plugin.enableGroups.forEach {
+                if (!plugin.generalConfig.getBoolean("notify.player_status.enable", it.key.toLong())) return@forEach
+                val messagePath = "notify.player_status.${if (isJoin) "join" else "leave"}"
+                plugin.debugModule?.debugLogger?.log("send the $playerName's ${if (isJoin) "join" else "leave"} message to group ${it.key}")
+                val message = if (plugin.generalConfig.getStringList(messagePath, it.key.toLong()).isEmpty())
+                    plugin.generalConfig.getString(messagePath, it.key.toLong())?: ""
+                else plugin.generalConfig.getStringList(messagePath, it.key.toLong()).random()
+                BotProvider.getBot()?.action(
+                    SendGroupMessage(it.key.toLong(), plugin.setPlaceholders(player, message)
+                        .replace("\${playerName}", playerName)
+                        .replace("\${userId}", qq.toString()), true)
+                )
             }
         }
     }

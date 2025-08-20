@@ -75,6 +75,10 @@ interface ConfigProvider {
         if (generalConfig.getInt("version", null) < 19) {
             generalConfig.setIfNotExists("whitelist.bypass_permission", "aqqbot.bypass.whitelist")
         }
+        if (generalConfig.getInt("version", null) < 20) {
+            generalConfig.setIfNotExists("notify.player_death.enable", false)
+            generalConfig.setIfNotExists("notify.player_death.message", "[AQQBot] \${playerName}(\${userId}) 因 \${deathMessage} 死亡了!")
+        }
     }
 
     fun loadGeneralConfig(plugin: AQQBot) {
@@ -106,7 +110,7 @@ interface ConfigProvider {
     fun getDataFolder(): File
 
     fun configNeedUpdate(): Boolean {
-        if (generalConfig.getInt("version", null) != 19) {
+        if (generalConfig.getInt("version", null) != 21) {
             val file = File(getDataFolder(), "config_new.yml")
             this.javaClass.getResource("/config.yml")?.let { file.writeText(it.readText()) }
             return true

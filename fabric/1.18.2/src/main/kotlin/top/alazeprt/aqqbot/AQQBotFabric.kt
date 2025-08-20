@@ -6,7 +6,7 @@ import com.alessiodp.libby.LibraryManager
 import com.mojang.brigadier.arguments.StringArgumentType
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
-import net.fabricmc.fabric.api.event.EventFactory
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
 import net.fabricmc.loader.api.FabricLoader
@@ -25,6 +25,7 @@ import top.alazeprt.aqqbot.config.MessageManager
 import top.alazeprt.aqqbot.data.DataProvider
 import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.drivers.Web2ImageDriver
+import top.alazeprt.aqqbot.event.ADeathEvent
 import top.alazeprt.aqqbot.event.AJoinEvent
 import top.alazeprt.aqqbot.event.AQuitEvent
 import top.alazeprt.aqqbot.plugins.PluginLoader
@@ -57,6 +58,10 @@ class AQQBotFabric : ModInitializer, AQQBot {
         }
         ServerPlayConnectionEvents.DISCONNECT.register { handler, server ->
             AQuitEvent(this, FabricPlayer(handler.player)).handle()
+        }
+        ServerPlayerEvents.ALLOW_DEATH.register { player, source, _ ->
+            ADeathEvent(this, FabricPlayer(player), source.name).handle()
+            true
         }
     }
 

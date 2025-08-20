@@ -3,7 +3,9 @@ package top.alazeprt.aqqbot.event
 import io.github.hello09x.fakeplayer.core.Main
 import io.github.hello09x.fakeplayer.core.manager.FakeplayerManager
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerQuitEvent
@@ -42,5 +44,16 @@ class BukkitEventHandler(val plugin: AQQBotBukkit) : Listener {
             }
         }
         AQuitEvent(plugin, BukkitPlayer(event.player)).handle()
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    fun onDeath(event: PlayerDeathEvent) {
+        if (plugin.fakePlayer) {
+            val manager = Main.getInjector().getInstance(FakeplayerManager::class.java)
+            if (manager.isFake(event.entity)) {
+                return
+            }
+        }
+        ADeathEvent(plugin, BukkitPlayer(event.entity), event.deathMessage?: "未知原因").handle()
     }
 }

@@ -6,6 +6,8 @@ import com.alessiodp.libby.LibraryManager
 import com.mojang.brigadier.arguments.StringArgumentType
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
@@ -14,6 +16,7 @@ import net.kyori.adventure.platform.fabric.FabricServerAudiences
 import net.kyori.adventure.text.TextComponent
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.command.CommandManager
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -26,6 +29,7 @@ import top.alazeprt.aqqbot.data.DataProvider
 import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.drivers.Web2ImageDriver
 import top.alazeprt.aqqbot.event.AChatEvent
+import top.alazeprt.aqqbot.event.ADeathEvent
 import top.alazeprt.aqqbot.event.AJoinEvent
 import top.alazeprt.aqqbot.event.AQuitEvent
 import top.alazeprt.aqqbot.plugins.PluginLoader
@@ -60,6 +64,12 @@ class AQQBotFabric : ModInitializer, AQQBot {
         }
         ServerMessageEvents.CHAT_MESSAGE.register { message, entity, parameters ->
             AChatEvent(this, FabricPlayer(entity), message.content.string).handle()
+        }
+        ServerLivingEntityEvents.AFTER_DEATH.register { player, source ->
+            if (player is ServerPlayerEntity) {
+                ADeathEvent(this, FabricPlayer(player), source.name).handle()
+            }
+            true
         }
     }
 
