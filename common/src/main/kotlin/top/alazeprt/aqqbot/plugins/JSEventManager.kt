@@ -3,6 +3,14 @@ package top.alazeprt.aqqbot.plugins
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.api.AQQBotAPI
 import top.alazeprt.aqqbot.api.event.SubscribeAQQBotEvent
+import top.alazeprt.aqqbot.api.event.game.PlayerDeathEvent
+import top.alazeprt.aqqbot.api.event.game.PlayerQuitEvent
+import top.alazeprt.aqqbot.api.event.game.PluginStartEvent
+import top.alazeprt.aqqbot.api.event.game.PluginStopEvent
+import top.alazeprt.aqqbot.api.event.game.PostPlayerChatEvent
+import top.alazeprt.aqqbot.api.event.game.PostPlayerJoinEvent
+import top.alazeprt.aqqbot.api.event.game.PrePlayerChatEvent
+import top.alazeprt.aqqbot.api.event.game.PrePlayerJoinEvent
 import top.alazeprt.aqqbot.api.event.qq.PostBindEvent
 import top.alazeprt.aqqbot.api.event.qq.PostInformationEvent
 import top.alazeprt.aqqbot.api.event.qq.PostRemoteCommandEvent
@@ -77,4 +85,28 @@ class JSEventManager(val plugin: AQQBot) {
 
     @SubscribeAQQBotEvent
     fun onReceiveMessage(event: ReceiveMessageEvent) = callEvent("ReceiveMessageEvent", event)
+
+    @SubscribeAQQBotEvent
+    fun onPrePlayerJoin(event: PrePlayerJoinEvent) = callEvent("PrePlayerJoinEvent", event)
+
+    @SubscribeAQQBotEvent
+    fun onPostPlayerJoin(event: PostPlayerJoinEvent) = callEvent("PostPlayerJoinEvent", event)
+
+    @SubscribeAQQBotEvent
+    fun onPrePlayerChat(event: PrePlayerChatEvent) = callEvent("PrePlayerChatEvent", event)
+
+    @SubscribeAQQBotEvent
+    fun onPostPlayerChat(event: PostPlayerChatEvent) = callEvent("PostPlayerChatEvent", event)
+
+    @SubscribeAQQBotEvent
+    fun onPlayerQuit(event: PlayerQuitEvent) = callEvent("PlayerQuitEvent", event)
+
+    @SubscribeAQQBotEvent
+    fun onPlayerDeath(event: PlayerDeathEvent) = callEvent("PlayerDeathEvent", event)
+
+    @SubscribeAQQBotEvent
+    fun onPluginStart(event: PluginStartEvent) = callEvent("PluginStartEvent", event)
+
+    @SubscribeAQQBotEvent
+    fun onPluginStop(event: PluginStopEvent) = callEvent("PluginStopEvent", event)
 }

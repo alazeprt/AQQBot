@@ -2,12 +2,15 @@ package top.alazeprt.aqqbot.event
 
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.AQQBot
+import top.alazeprt.aqqbot.api.AQQBotAPI
+import top.alazeprt.aqqbot.api.event.game.PlayerDeathEvent
 import top.alazeprt.aqqbot.bot.BotProvider
 import top.alazeprt.aqqbot.profile.APlayer
 
 class ADeathEvent(val plugin: AQQBot, private val player: APlayer, private val reason: String): AEvent {
     override fun handle() {
         plugin.debugModule?.debugLogger?.log("receive death message: ${player.getName()} died, reason: $reason")
+        AQQBotAPI.fireEvent(PlayerDeathEvent(player.getName(), plugin.getQQByPlayer(player.getName())?: -1, reason))
         plugin.submitAsync {
             plugin.enableGroups.forEach {
                 if (!plugin.generalConfig.getBoolean("notify.player_death.enable", it.key.toLong())) return@forEach

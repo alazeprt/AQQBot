@@ -2,6 +2,8 @@ package top.alazeprt.aqqbot.plugins
 
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.api.AQQBotAPI
+import top.alazeprt.aqqbot.api.event.game.PluginStartEvent
+import top.alazeprt.aqqbot.api.event.game.PluginStopEvent
 import top.alazeprt.aqqbot.util.LogLevel
 import javax.script.Compilable
 import javax.script.ScriptEngine
@@ -46,6 +48,7 @@ class PluginLoader(val plugin: AQQBot) {
                 compiled.eval()
             }
         }
+        AQQBotAPI.fireEvent(PluginStartEvent())
     }
 
     fun expose(name: String, instance: Any) {
@@ -53,6 +56,7 @@ class PluginLoader(val plugin: AQQBot) {
     }
 
     fun unload() {
+        AQQBotAPI.fireEvent(PluginStopEvent())
         eventManager.unload()
     }
 }

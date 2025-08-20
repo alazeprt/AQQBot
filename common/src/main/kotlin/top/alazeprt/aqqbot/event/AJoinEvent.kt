@@ -1,6 +1,10 @@
 package top.alazeprt.aqqbot.event
 
 import top.alazeprt.aqqbot.AQQBot
+import top.alazeprt.aqqbot.api.AQQBotAPI
+import top.alazeprt.aqqbot.api.event.game.PostPlayerJoinEvent
+import top.alazeprt.aqqbot.api.event.game.PrePlayerJoinEvent
+import top.alazeprt.aqqbot.api.event.game.reason.JoinFailedReason
 import top.alazeprt.aqqbot.event.AEventUtil.playerStatusHandler
 import top.alazeprt.aqqbot.event.AEventUtil.whitelistHandler
 import top.alazeprt.aqqbot.profile.APlayer
@@ -9,10 +13,18 @@ import java.util.function.Consumer
 class AJoinEvent(val plugin: AQQBot, private val player: APlayer, val kickMethod: Consumer<String>) : AEvent {
     override fun handle() {
         plugin.debugModule?.debugLogger?.log("${player.getName()} joined the game")
+        val event = PrePlayerJoinEvent(this, player.getName(), plugin.getQQByPlayer(player)?: -1)
+        AQQBotAPI.fireEvent(event)
+        if (event.isCanceled) {
+            AQQBotAPI.fireEvent(PostPlayerJoinEvent(player.getName(), plugin.getQQByPlayer(player)?: -1, true,
+                JoinFailedReason.CANCEL_BY_PLUGIN))
+            return
+        }
         var kickMessage = ""
         val handle1 = whitelistHandler(plugin, player.getName()) {
             plugin.debugModule?.debugLogger?.log("kick ${player.getName()} because unbind")
             kickMessage = it
+            AQQBotAPI.fireEvent(PostPlayerJoinEvent(player.getName(), -1, true, JoinFailedReason.UNBIND))
         }
         if (handle1 && !player.hasPermission(plugin.generalConfig.getString("whitelist.bypass_permission", null))) {
             kickMethod.accept(kickMessage)
@@ -28,6 +40,7 @@ class AJoinEvent(val plugin: AQQBot, private val player: APlayer, val kickMethod
                 }
             }
         }
+        AQQBotAPI.fireEvent(PostPlayerJoinEvent(player.getName(), plugin.getQQByPlayer(player)?: -1, false, null))
     }
 
 

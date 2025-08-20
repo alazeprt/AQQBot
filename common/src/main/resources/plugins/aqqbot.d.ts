@@ -185,6 +185,58 @@ declare class PostRemoteCommandEvent implements APIEvent {
     getReasonMsg(): string;
 }
 
+declare class PrePlayerJoinEvent implements Cancelable, APIEvent {
+    readonly name: string;
+    readonly userId: number;
+
+    cancel(): void;
+    cancel(reason: string): void;
+}
+
+declare class PostPlayerJoinEvent implements APIEvent {
+    readonly name: string;
+    readonly userId: number;
+    readonly isCanceled: boolean;
+
+    getReasonMsg(): string;
+}
+
+declare class PlayerQuitEvent implements APIEvent {
+    readonly name: string;
+    readonly userId: number;
+}
+
+declare class PrePlayerChatEvent implements APIEvent {
+    readonly name: string;
+    readonly userId: number;
+    readonly message: string;
+
+    cancel(): void;
+}
+
+declare class PostPlayerChatEvent implements APIEvent {
+    readonly name: string;
+    readonly userId: number;
+    readonly message: string;
+    readonly isCanceled: boolean;
+
+    getReasonMsg(): string;
+}
+
+declare class PlayerDeathEvent implements APIEvent {
+    readonly name: string;
+    readonly userId: number;
+    readonly reason: string;
+}
+
+declare class PluginStartEvent implements APIEvent {
+
+}
+
+declare class PluginStopEvent implements APIEvent {
+
+}
+
 /**
  * AQQBot 插件对象
  */
