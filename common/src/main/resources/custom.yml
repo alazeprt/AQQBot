@@ -70,6 +70,11 @@ mspt:
 cpu:
   enable: true
   command: ["/cpu", "cpu", "/cpu占用", "cpu占用", "/cpu占用率", "cpu占用率", "CPU", "/CPU"]
+  # 你可以在这里设置执行该命令所需的权限
+  # 若不设置, 请留空
+  # 该功能需要 LuckPerms 插件
+  # * 未绑定用户默认没有权限
+  permission: ""
   execute: [""]
   unbind_execute: [""]
   choose_account: 1

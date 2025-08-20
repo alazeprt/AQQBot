@@ -30,6 +30,7 @@ dependencies {
     compileOnly("org.java-websocket:Java-WebSocket:1.5.7")
     compileOnly("com.microsoft.playwright:playwright:1.53.0")
     compileOnly("org.openjdk.nashorn:nashorn-core:15.6")
+    compileOnly("net.luckperms:api:5.4")
 }
 
 tasks.withType<JavaCompile> {

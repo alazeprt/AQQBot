@@ -325,8 +325,9 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
             val format = customConfig.getBoolean("$it.format")
             val choose_account = if (customConfig.getInt("$it.choose_account") == 0) 1
             else customConfig.getInt("$it.choose_account")
+            val permission = customConfig.getString("$it.permission") ?: ""
             customCommands.add(ABukkitCustom(this, it, command, execute, unbind_execute, output, unbind_output, image,
-                unbind_image, web, unbind_web, format, choose_account, enable))
+                unbind_image, web, unbind_web, format, choose_account, enable, permission))
         }
     }
 

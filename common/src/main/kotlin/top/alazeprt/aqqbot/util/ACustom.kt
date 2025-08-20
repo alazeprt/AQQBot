@@ -1,5 +1,7 @@
 package top.alazeprt.aqqbot.util
 
+import net.luckperms.api.LuckPermsProvider
+import net.luckperms.api.node.NodeType
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.bot.BotProvider
@@ -8,20 +10,28 @@ import top.alazeprt.aqqbot.profile.AOfflinePlayer
 abstract class ACustom(val plugin: AQQBot, val name: String, var command: List<String>, var execute: List<String>,
                        var unbind_execute: List<String>, var output: List<String>, var unbind_output: List<String>,
                        var image: AImage?, var unbind_image: AImage?, var web: AWeb?, var unbind_web: AWeb?,
-                       var format: Boolean, var account: Int, var enable: Boolean) {
+                       var format: Boolean, var account: Int, var enable: Boolean, var permission: String) {
     fun handle(input: String, userId: String, groupId: String): Boolean {
         if (!enable) return false
         val map = matches(input)?: return false
-        val player: List<String> = plugin.getPlayerByQQ(userId.toLong()).map { it.getName() }
+        val player: List<AOfflinePlayer> = plugin.getPlayerByQQ(userId.toLong())
         if (player.isEmpty()) {
+            if (permission.isBlank()) return false
             handleUnbind(userId, groupId, map)
         } else {
-            handleBind(userId, groupId, map, player)
+            return handleBind(userId, groupId, map, player)
         }
         return true
     }
 
-    private fun handleBind(userId: String, groupId: String, map: Map<String, String>, player: List<String>) {
+    private fun handleBind(userId: String, groupId: String, map: Map<String, String>, player: List<AOfflinePlayer>): Boolean {
+        val choice = player[if (player.size < account) 0 else account - 1]
+        val playerName = choice.getName()
+        if (plugin.luckperms && permission.isNotBlank()) {
+            val user = LuckPermsProvider.get().userManager.loadUser(choice.getUUID()).get()
+            val permissions = user.nodes.filter { NodeType.PERMISSION.matches(it) }.filter { it.value == true }.map { it.key }
+            if (!permissions.contains(permission)) return false
+        }
         var outputString = mapFormat(output.joinToString("\n"), map)
         val imageMap = mutableMapOf<AImageElement, String>()
         image?.elements?.forEach {
@@ -67,7 +77,6 @@ abstract class ACustom(val plugin: AQQBot, val name: String, var command: List<S
                     value.replace("\$executes[${it.key}]", it.value?: "")
                 }
             }
-            val playerName = player[if (player.size < account) 0 else account - 1]
             outputString = setPlaceholders(plugin.adapter!!.getOfflinePlayer(playerName), outputString)
             if (format) {
                 outputString = AFormatter.pluginClear(outputString)
@@ -102,6 +111,7 @@ abstract class ACustom(val plugin: AQQBot, val name: String, var command: List<S
             }
             BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), "[CQ:image,file=base64://$base64]"))
         }
+        return true
     }
 
     fun handleUnbind(userId: String, groupId: String, map: Map<String, String>) {

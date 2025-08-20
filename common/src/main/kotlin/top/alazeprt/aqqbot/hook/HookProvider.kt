@@ -1,5 +1,6 @@
 package top.alazeprt.aqqbot.hook
 
+import net.luckperms.api.LuckPermsProvider
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.LogLevel
@@ -9,6 +10,8 @@ interface HookProvider {
     var spark: Boolean
 
     var fakePlayer: Boolean
+
+    var luckperms: Boolean
 
     var loadSparkCount: Int
 
@@ -44,10 +47,20 @@ interface HookProvider {
         plugin.log(LogLevel.INFO, "[Hook] minecraft-fakeplayer has been loaded successfully!")
     }
 
+    fun loadLuckPerms(plugin: AQQBot) {
+        try {
+            LuckPermsProvider.get()
+        } catch (ignored: ClassNotFoundException) {
+            return
+        }
+        plugin.log(LogLevel.INFO, "[Hook] luckperms has been loaded successfully!")
+    }
+
     fun setPlaceholders(player: APlayer, message: String): String
 
     fun loadHook(plugin: AQQBot) {
         loadSpark(plugin)
         loadFakeplayer(plugin)
+        loadLuckPerms(plugin)
     }
 }

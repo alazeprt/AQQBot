@@ -327,8 +327,9 @@ class AQQBotFabric : ModInitializer, AQQBot {
             val format = customConfig.getBoolean("$it.format")
             val choose_account = if (customConfig.getInt("$it.choose_account") == 0) 1
             else customConfig.getInt("$it.choose_account")
+            val permission = customConfig.getString("$it.permission") ?: ""
             customCommands.add(AFabricCustom(
-                this, it, command, execute, unbind_execute, output, unbind_output, image, unbind_image, format, web, unbind_web, choose_account, enable))
+                this, it, command, execute, unbind_execute, output, unbind_output, image, unbind_image, format, web, unbind_web, choose_account, enable, permission))
         }
     }
 
