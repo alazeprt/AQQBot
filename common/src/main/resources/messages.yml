@@ -57,8 +57,8 @@ game:
   already_exists: "&c[AQQBot] ${playerName} 已经被 ${anotherUserId} 占用了!"
   send:
     usage: "&e[AQQBot] 用法: /aqqbot send <群号> <消息>"
-    invalid_group_id: "&c[AQQBot] 非法的群号: ${group_id}"
-    success: "&a[AQQBot] 消息已成功发送至群 ${group_id}"
+    invalid_group_id: "&c[AQQBot] 非法的群号: ${groupId}"
+    success: "&a[AQQBot] 消息已成功发送至群 ${groupId}"
   query_result:
     - "&a[AQQBot] 查询结果: "
     - "&bQQ号: ${userId}"
