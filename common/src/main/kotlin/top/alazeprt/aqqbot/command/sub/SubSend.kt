@@ -22,8 +22,13 @@ class SubSend(val plugin: AQQBot): ACommand {
             sender.sendMessage(Component.text("用法: /aqqbot send <群号> <消息>"))
             return
         }
-        val groupId = args[1].toLong()
-        val message = args[2]
+        val groupId = try {
+            args[1].toLong()
+        } catch (e: NumberFormatException) {
+            sender.sendMessage(Component.text("无效的群号: ${args[1]}", NamedTextColor.RED))
+            return
+        }
+        val message = args.drop(2).joinToString(" ")
         BotProvider.getBot()!!.action(SendGroupMessage(groupId, message))
         sender.sendMessage(Component.text("消息已发送到群 $groupId", NamedTextColor.GREEN))
     }
