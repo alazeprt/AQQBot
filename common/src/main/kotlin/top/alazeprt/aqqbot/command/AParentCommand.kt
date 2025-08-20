@@ -32,7 +32,6 @@ class AParentCommand(val plugin: AQQBot) : ACommand {
             1 -> listOf("whitelist", "status", "help", "reload", "send")
             2 -> return when (args[0]) {
                 "whitelist" -> listOf("bind", "unbind", "reset", "query", "info")
-                "send" -> listOf("<groupId>")
                 else -> emptyList()
             }
             3 -> return when (args[0]) {
@@ -43,7 +42,6 @@ class AParentCommand(val plugin: AQQBot) : ACommand {
                     "reset" -> listOf("qq", "player")
                     else -> emptyList()
                 }
-                "send" -> listOf("<message>")
                 else -> emptyList()
             }
             else -> emptyList()
