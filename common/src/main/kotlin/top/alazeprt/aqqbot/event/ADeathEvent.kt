@@ -18,7 +18,7 @@ class ADeathEvent(val plugin: AQQBot, private val player: APlayer, private val r
                     SendGroupMessage(it.key.toLong(), plugin.setPlaceholders(player, plugin.generalConfig.getString("notify.player_death.message", it.key.toLong()))
                         .replace("\${playerName}", player.getName())
                         .replace("\${userId}", plugin.getQQByPlayer(player).toString())
-                        .replace("\${reason}", reason), true)
+                        .replace("\${deathMessage}", reason), true)
                 )
             }
         }
