@@ -7,9 +7,12 @@ import top.alazeprt.aonebot.event.Listener
 import top.alazeprt.aonebot.event.SubscribeBotEvent
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
 import top.alazeprt.aonebot.event.notice.GroupMemberDecreaseEvent
+import top.alazeprt.aonebot.event.request.GroupRequestEvent
+import top.alazeprt.aonebot.event.request.GroupRequestType
 import top.alazeprt.aonebot.result.GroupMember
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.api.AQQBotAPI
+import top.alazeprt.aqqbot.api.event.qq.AGroupRequestEvent
 import top.alazeprt.aqqbot.api.event.qq.ReceiveMessageEvent
 import top.alazeprt.aqqbot.bot.BotProvider
 import top.alazeprt.aqqbot.handler.CommandHandler
@@ -161,5 +164,15 @@ class AQBListener(val plugin: AQQBot) : Listener {
             }
         }
         return null
+    }
+
+    @SubscribeBotEvent
+    fun onGroupRequest(event: GroupRequestEvent) {
+        val selfId = event.selfId
+        val userId = event.userId
+        val groupId = event.groupId
+        val comment = event.comment
+        val isInvite = event.subType == GroupRequestType.INVITE
+        AQQBotAPI.fireEvent(AGroupRequestEvent(selfId, userId, groupId, comment, isInvite))
     }
 }

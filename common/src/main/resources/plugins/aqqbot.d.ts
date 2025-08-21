@@ -320,6 +320,17 @@ declare class PluginStopEvent implements APIEvent {
 }
 
 /**
+ * 收到申请入群时触发的事件
+ */
+declare class GroupRequestEvent implements APIEvent {
+    readonly selfId: number;
+    readonly groupId: number;
+    readonly userId: number;
+    readonly comment: string;
+    readonly isInvite: boolean;
+}
+
+/**
  * AQQBot 插件对象
  */
 declare const plugin: AQQBot

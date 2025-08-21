@@ -11,6 +11,7 @@ import top.alazeprt.aqqbot.api.event.game.PostPlayerChatEvent
 import top.alazeprt.aqqbot.api.event.game.PostPlayerJoinEvent
 import top.alazeprt.aqqbot.api.event.game.PrePlayerChatEvent
 import top.alazeprt.aqqbot.api.event.game.PrePlayerJoinEvent
+import top.alazeprt.aqqbot.api.event.qq.AGroupRequestEvent
 import top.alazeprt.aqqbot.api.event.qq.PostBindEvent
 import top.alazeprt.aqqbot.api.event.qq.PostInformationEvent
 import top.alazeprt.aqqbot.api.event.qq.PostRemoteCommandEvent
@@ -109,4 +110,7 @@ class JSEventManager(val plugin: AQQBot) {
 
     @SubscribeAQQBotEvent
     fun onPluginStop(event: PluginStopEvent) = callEvent("PluginStopEvent", event)
+
+    @SubscribeAQQBotEvent
+    fun onGroupRequest(event: AGroupRequestEvent) = callEvent("GroupRequestEvent", event)
 }
