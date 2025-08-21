@@ -13,6 +13,8 @@ class FileDataProvider(val plugin: AQQBot) : DataProvider {
     private lateinit var dataConfig: FileConfiguration
     val dataMap: MutableMap<String, MutableList<String>> = ConcurrentHashMap()
 
+    override fun loadDataDependencies() {}
+
     override fun loadData(type: DataStorageType) {
         dataConfig = YamlConfiguration.loadConfiguration(file)
         dataConfig.getKeys(false).forEach {

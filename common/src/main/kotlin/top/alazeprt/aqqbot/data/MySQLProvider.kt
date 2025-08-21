@@ -1,5 +1,6 @@
 package top.alazeprt.aqqbot.data
 
+import com.alessiodp.libby.Library
 import me.regadpole.config.DatabaseSource
 import taboolib.module.database.*
 import top.alazeprt.aconfiguration.file.YamlConfiguration
@@ -11,6 +12,35 @@ class MySQLProvider(plugin: AQQBot) : DatabaseDataProvider(plugin) {
     override lateinit var host: Host<*>
     override lateinit var table: Table<*, *>
     override lateinit var dataSource: DataSource
+
+    override fun loadDataDependencies() {
+        val databaseLib = Library.builder()
+            .groupId("com{}github{}alazeprt")
+            .artifactId("taboolib-database")
+            .version("1.0.4")
+            .relocate("com{}google{}common", "top{}alazeprt{}aqqbot{}lib{}com{}google{}common")
+            .build()
+        val hikaricpLib = Library.builder()
+            .groupId("com{}zaxxer")
+            .artifactId("HikariCP")
+            .version("4.0.3")
+            .resolveTransitiveDependencies(true)
+            .build()
+        val guavaLib = Library.builder()
+            .groupId("com{}google{}guava")
+            .artifactId("guava")
+            .version("21.0")
+            .relocate("com{}google{}common", "top{}alazeprt{}aqqbot{}lib{}com{}google{}common")
+            .resolveTransitiveDependencies(true)
+            .build()
+        val mysqlLib = Library.builder()
+            .groupId("com{}mysql")
+            .artifactId("mysql-connector-j")
+            .version("8.3.0")
+            .resolveTransitiveDependencies(true)
+            .build()
+        plugin.libraryManager.loadLibraries(hikaricpLib, guavaLib, mysqlLib, databaseLib)
+    }
 
     override fun loadData(type: DataStorageType) {
         val config = plugin.generalConfig

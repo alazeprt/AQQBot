@@ -1,6 +1,5 @@
 package top.alazeprt.aqqbot.hook
 
-import net.luckperms.api.LuckPermsProvider
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.LogLevel
@@ -41,6 +40,7 @@ interface HookProvider {
     fun loadFakeplayer(plugin: AQQBot) {
         try {
             Class.forName("io.github.hello09x.fakeplayer.core.Main")
+            fakePlayer = true
         } catch (ignored: ClassNotFoundException) {
             return
         }
@@ -49,7 +49,8 @@ interface HookProvider {
 
     fun loadLuckPerms(plugin: AQQBot) {
         try {
-            LuckPermsProvider.get()
+            Class.forName("net.luckperms.api.LuckPermsProvider")
+            luckperms = true
         } catch (ignored: ClassNotFoundException) {
             return
         }

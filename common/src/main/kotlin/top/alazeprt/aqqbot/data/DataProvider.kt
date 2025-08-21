@@ -5,6 +5,8 @@ import top.alazeprt.aqqbot.profile.AOfflinePlayer
 interface DataProvider {
     fun loadData(type: DataStorageType)
 
+    fun loadDataDependencies()
+
     fun getStorageType(): DataStorageType
 
     fun saveData(type: DataStorageType)
