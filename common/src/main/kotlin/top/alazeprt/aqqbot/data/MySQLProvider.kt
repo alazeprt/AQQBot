@@ -43,6 +43,7 @@ class MySQLProvider(plugin: AQQBot) : DatabaseDataProvider(plugin) {
     }
 
     override fun loadData(type: DataStorageType) {
+        loadDataDependencies()
         val config = plugin.generalConfig
         val host = HostSQL(config.getString("storage.mysql.host", null),
             config.getInt("storage.mysql.port", null).toString(),

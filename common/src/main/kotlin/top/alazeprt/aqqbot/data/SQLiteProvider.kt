@@ -43,6 +43,7 @@ class SQLiteProvider(plugin: AQQBot) : DatabaseDataProvider(plugin) {
     }
 
     override fun loadData(type: DataStorageType) {
+        loadDataDependencies()
         val host = HostSQLite(File(plugin.getDataFolder(), plugin.generalConfig.getString("storage.sqlite.file", null)))
         val dataSourceFile = File(plugin.getDataFolder(), "datasource.yml")
         if (!dataSourceFile.exists()) {
