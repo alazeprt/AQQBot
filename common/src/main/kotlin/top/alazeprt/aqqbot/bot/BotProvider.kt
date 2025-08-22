@@ -17,7 +17,7 @@ object BotProvider {
         }
         try {
             val client = WebsocketBotClient(uri)
-            client.connect()
+            client.connect(3000L)
             botClient = client
             if (botClient?.eventList?.contains(aqbListener) == false) {
                 botClient?.registerEvent(aqbListener)
@@ -34,7 +34,7 @@ object BotProvider {
         }
         try {
             val client = WebsocketBotClient(uri, token)
-            client.connect()
+            client.connect(3000L)
             botClient = client
             if (botClient?.eventList?.contains(aqbListener) == false) {
                 botClient?.registerEvent(aqbListener)

@@ -2,7 +2,9 @@ package top.alazeprt.aqqbot
 
 import com.alessiodp.libby.Library
 import com.alessiodp.libby.LibraryManager
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.event.ClickEvent
 import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.adapter.AQQBotAdapter
@@ -202,7 +204,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         val aonebotLib = Library.builder()
             .groupId("com{}github{}alazeprt")
             .artifactId("AOneBot")
-            .version("1.0.18-beta")
+            .version("1.0.19-beta")
             .relocate("com{}google{}code{}gson", "top{}alazeprt{}aonebot{}lib{}com{}google")
             .resolveTransitiveDependencies(true)
             .build()
