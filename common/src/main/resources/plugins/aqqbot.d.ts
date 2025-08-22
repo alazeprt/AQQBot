@@ -331,6 +331,26 @@ declare class GroupRequestEvent implements APIEvent {
 }
 
 /**
+ * 新成员加入群时触发的事件
+ */
+declare class GroupMemberIncreaseEvent implements APIEvent {
+    readonly selfId: number;
+    readonly groupId: number;
+    readonly userId: number;
+    readonly operatorId: number;
+}
+
+/**
+ * 成员退出群时触发的事件
+ */
+declare class GroupMemberDecreaseEvent implements APIEvent {
+    readonly selfId: number;
+    readonly groupId: number;
+    readonly userId: number;
+    readonly operatorId: number;
+}
+
+/**
  * AQQBot 插件对象
  */
 declare const plugin: AQQBot
