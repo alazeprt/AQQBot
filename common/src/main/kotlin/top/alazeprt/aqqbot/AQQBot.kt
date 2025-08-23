@@ -106,21 +106,10 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
             }
         }
         log(LogLevel.INFO, "Connecting to the bot...")
-        if (botConfig.getString("access_token").isNullOrBlank()) {
-            loadBot(
-                this,
-                URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port"))
-            )
-        } else {
-            loadBot(
-                this,
-                URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")),
-                botConfig.getString("access_token")
-            )
-        }
         submitTimerAsync(0L, botConfig.getLong("check_interval") * 20) {
+            val starting = false
             if (getBot()?.isConnected != true) {
-                debugModule?.debugLogger?.log("Bot disconnected, trying to reconnect...")
+                if (starting) debugModule?.debugLogger?.log("Bot disconnected, trying to reconnect...")
                 if (botConfig.getString("access_token").isNullOrBlank()) {
                     loadBot(
                         this,
@@ -132,6 +121,17 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
                         URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")),
                         botConfig.getString("access_token")
                     )
+                }
+                if (!starting && getBot() != null && getBot()!!.isConnected()) {
+                    enableGroups.forEach {
+                        if (!generalConfig.getBoolean("notify.server_status.enable", it.key.toLong())) return@forEach
+                        debugModule?.debugLogger?.log("Plugin initialized, sending server status message to ${it.key}")
+                        getBot()!!.action(SendGroupMessage(it.key.toLong(),
+                            if (generalConfig.getStringList("notify.server_status.start", it.key.toLong()).isEmpty())
+                                generalConfig.getString("notify.server_status.start", it.key.toLong())
+                            else generalConfig.getStringList("notify.server_status.start", it.key.toLong()).random()
+                        ))
+                    }
                 }
             }
         }
@@ -166,17 +166,6 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         log(LogLevel.INFO, "Loading plugins...")
         pluginLoader = PluginLoader(this)
         pluginLoader.load()
-        if (getBot() != null && getBot()!!.isConnected()) {
-            enableGroups.forEach {
-                if (!generalConfig.getBoolean("notify.server_status.enable", it.key.toLong())) return@forEach
-                debugModule?.debugLogger?.log("Plugin initialized, sending server status message to ${it.key}")
-                getBot()!!.action(SendGroupMessage(it.key.toLong(),
-                    if (generalConfig.getStringList("notify.server_status.start", it.key.toLong()).isEmpty())
-                        generalConfig.getString("notify.server_status.start", it.key.toLong())
-                    else generalConfig.getStringList("notify.server_status.start", it.key.toLong()).random()
-                ))
-            }
-        }
     }
 
     override fun loadDataDependencies() {
