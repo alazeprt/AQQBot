@@ -55,7 +55,11 @@ class AQBListener(val plugin: AQQBot) : Listener {
                             }
                         }
                     } else if (jsonObject.get("type").asString == "face") {
-                        message += "表情包-"
+                        message += "[表情包]"
+                    } else if (jsonObject.get("type").asString == "forward") {
+                        message += "[聊天记录]"
+                    } else {
+                        message += "[未知内容]"
                     }
                 }
                 plugin.debugModule?.debugLogger?.log("receive message from ${event.groupId} which is sent by ${event.senderId}: $message")
