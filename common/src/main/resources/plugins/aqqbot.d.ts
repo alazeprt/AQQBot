@@ -436,3 +436,8 @@ declare const eventManager: EventManager
  * AQQBot 机器人管理器
  */
 declare const botManager: BotManager
+
+/**
+ * 插件 (JavaScript) 脚本版本
+ */
+declare const version: string

@@ -1,5 +1,7 @@
 package top.alazeprt.aqqbot.plugins
 
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.api.AQQBotAPI
 import top.alazeprt.aqqbot.api.event.game.PluginStartEvent
@@ -13,6 +15,7 @@ import javax.script.ScriptEngineManager
 class PluginLoader(val plugin: AQQBot) {
     private var engine: ScriptEngine? = null
     private val eventManager = JSEventManager(plugin)
+    private val version = 1;
 
     fun load() {
         try {
@@ -40,13 +43,25 @@ class PluginLoader(val plugin: AQQBot) {
         expose("plugin", plugin)
         expose("eventManager", eventManager)
         expose("botManager", BotManager)
+        expose("version", version)
         eventManager.load()
         val compilable = engine as Compilable
         if (plugin.getDataFolder().resolve("plugins").isDirectory) {
-            plugin.getDataFolder().resolve("plugins").listFiles { file -> file.name.endsWith(".js") }.forEach { file ->
-                plugin.log(LogLevel.INFO, "Loading plugin ${file.name}")
-                val script = file.readText()
-                val compiled = compilable.compile(script)
+            plugin.getDataFolder().resolve("plugins").listFiles { file -> file.isDirectory }.forEach { dir ->
+                plugin.log(LogLevel.INFO, "Reading the information of plugin directory ${dir.name}")
+                val manifest = dir.resolve("manifest.json")
+                if (!manifest.isFile) return@forEach
+                val manifestContent = Gson().fromJson(manifest.readText(), JsonObject::class.java)
+                val version = manifestContent.get("version").asInt
+                if (version > this.version) {
+                    plugin.log(LogLevel.WARN, "Your plugin doesn't support the script version $version (supported version is <= ${this.version}), please update your plugin!")
+                    return@forEach
+                }
+                val name = manifestContent.get("name").asString
+                val script = dir.resolve(manifestContent.get("entrypoint").asString)
+                if (!script.isFile) return@forEach
+                plugin.log(LogLevel.INFO, "Loading plugin $name")
+                val compiled = compilable.compile(script.readText())
                 compiled.eval()
             }
         }
