@@ -52,15 +52,17 @@ class PluginLoader(val plugin: AQQBot) {
                 val manifest = dir.resolve("manifest.json")
                 if (!manifest.isFile) return@forEach
                 val manifestContent = Gson().fromJson(manifest.readText(), JsonObject::class.java)
-                val version = manifestContent.get("version").asInt
-                if (version > this.version) {
-                    plugin.log(LogLevel.WARN, "Your plugin doesn't support the script version $version (supported version is <= ${this.version}), please update your plugin!")
+                val schemaVersion = manifestContent.get("schema_version").asInt
+                if (schemaVersion > this.version) {
+                    plugin.log(LogLevel.WARN, "Your plugin doesn't support the script schema version $schemaVersion (supported version is <= ${this.version}), please update your plugin!")
                     return@forEach
                 }
-                val name = manifestContent.get("name").asString
+                val name = if (manifestContent.has("name")) manifestContent.get("name").asString else dir.name
+                val author = if (manifestContent.has("author")) manifestContent.get("author").asString else "Unknown"
+                val version = if (manifestContent.has("version")) manifestContent.get("version").asString else "Unknown"
                 val script = dir.resolve(manifestContent.get("entrypoint").asString)
                 if (!script.isFile) return@forEach
-                plugin.log(LogLevel.INFO, "Loading plugin $name")
+                plugin.log(LogLevel.INFO, "Loading plugin $name version $version by $author")
                 val compiled = compilable.compile(script.readText())
                 compiled.eval()
             }

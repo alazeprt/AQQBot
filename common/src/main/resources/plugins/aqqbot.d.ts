@@ -1,3 +1,6 @@
+// AQQBot 接口定义文件
+// 版本 (schema_version): 1
+
 declare interface AQQBot {
 
     readonly adapter: Adapter;
@@ -436,8 +439,3 @@ declare const eventManager: EventManager
  * AQQBot 机器人管理器
  */
 declare const botManager: BotManager
-
-/**
- * 插件 (JavaScript) 脚本版本
- */
-declare const version: string
