@@ -1,4 +1,7 @@
 declare interface AQQBot {
+
+    readonly adapter: Adapter;
+
     /**
      * 输出日志
      * @param level 日志等级 (0 代表 trace, 1 代表 debug, 2 代表 info, 3 代表 warn, 4 代表 error, 5 代表 fatal)
@@ -65,6 +68,33 @@ declare interface AQQBot {
      * @param qq QQ 号
      */
     getPlayerNameByQQ(qq: number): string[];
+
+    /**
+     * 解析文字内容
+     * @param message 文字内容
+     * @param player 玩家对象
+     *
+     * @return 解析结果
+     */
+    setPlaceholders(player: APlayer, message: string): string;
+}
+
+declare interface Adapter {
+    getOfflinePlayer(name: string): AOfflinePlayer;
+
+    getOnlinePlayer(name: string): APlayer;
+
+    getPlayerList(): APlayer[];
+
+    broadcastMessage(message: string): void;
+}
+
+declare interface AOfflinePlayer {
+    getName(): string;
+}
+
+declare interface APlayer extends AOfflinePlayer {
+    kick(reason: string): void;
 }
 
 declare interface EventManager {
@@ -134,6 +164,48 @@ declare class BotManager {
      * @param message 消息内容
      */
     sendPrivateMessage(userId: number, message: string): void;
+
+    /**
+     * 获取群成员 QQ 号列表
+     * @param groupId 群号
+     * @param callback 回调函数, 接收参数: 群成员 QQ 列表
+     */
+    getGroupMemberList(groupId: number, callback: (memberList: number[]) => void): void;
+
+    /**
+     * 获取群成员信息
+     * @param groupId 群号
+     * @param userId QQ 号
+     * @param callback 回调函数, 接收参数: 群成员信息
+     */
+    getGroupMemberInfo(groupId: number, userId: number, callback: (memberInfo: GroupMemberInfo) => void): void;
+}
+
+declare interface GroupMemberInfo {
+    /**
+     * 群昵称
+     */
+    getCard(): string;
+
+    getJoinTime(): number;
+
+    getLastSentTime(): number;
+
+    getLevel(): string;
+
+    getTitle(): string;
+
+    getMember(): Member;
+}
+
+declare interface Member {
+    getAge(): number;
+
+    getArea(): string;
+
+    getNickname(): string;
+
+    getSex(): string;
 }
 
 declare interface Cancelable {
