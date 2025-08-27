@@ -8,7 +8,7 @@ import top.alazeprt.aqqbot.profile.ASender
 
 class SubMarket(val plugin: AQQBot) : ACommand {
     override fun onCommand(command: String, sender: ASender, args: List<String>) {
-        if (!sender.hasPermission("aqqbot.market")) {
+        if (!sender.hasPermission("aqqbot.command.market")) {
             sender.sendMessage(Component.text("你没有权限使用此命令!", NamedTextColor.RED))
             return
         }

@@ -8,7 +8,7 @@ import top.alazeprt.aqqbot.profile.ASender
 
 class SubScripts(val plugin: AQQBot): ACommand {
     override fun onCommand(command: String, sender: ASender, args: List<String>) {
-        if (!sender.hasPermission("aqqbot.scripts")) {
+        if (!sender.hasPermission("aqqbot.command.scripts")) {
             sender.sendMessage(Component.text("你没有权限使用此命令!", NamedTextColor.RED))
             return
         }
