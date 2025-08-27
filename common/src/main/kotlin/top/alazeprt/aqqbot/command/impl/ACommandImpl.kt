@@ -10,7 +10,7 @@ class ACommandImpl(val plugin: AQQBot) {
     fun startReload(): Long {
         val s = System.currentTimeMillis()
         plugin.log(LogLevel.INFO, "Reloading AQQBot...")
-        plugin.reload()
+        plugin.reload(null)
         val time = System.currentTimeMillis() - s
         plugin.log(LogLevel.INFO, "Reloaded AQQBot in $time ms")
         return time

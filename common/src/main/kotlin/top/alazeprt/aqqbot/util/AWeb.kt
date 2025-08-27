@@ -12,11 +12,15 @@ import java.util.*
 
 class AWeb(val path: File, val width: Int, val height: Int, val delay: Long = 2000, val placeholders: MutableMap<String, String>) {
     fun render(plugin: AQQBot, map: MutableMap<String, String>): ByteArray? {
-        val tmpsFolder = Files.createTempDirectory("aqqbot-web").toFile()
-        path.copyRecursively(tmpsFolder, true, map)
-        val image = plugin.webDriver.convertToImage(tmpsFolder, width, height, delay)
-        tmpsFolder.deleteRecursively()
-        return image
+        try {
+            val tmpsFolder = Files.createTempDirectory("aqqbot-web").toFile()
+            path.copyRecursively(tmpsFolder, true, map)
+            val image = plugin.webDriver.convertToImage(tmpsFolder, width, height, delay)
+            tmpsFolder.deleteRecursively()
+            return image
+        } catch (ignored: Exception) {
+            return null
+        }
     }
 
     fun sendToGroup(player: AOfflinePlayer?, groupId: Long, plugin: AQQBot, map: MutableMap<String, String>) {

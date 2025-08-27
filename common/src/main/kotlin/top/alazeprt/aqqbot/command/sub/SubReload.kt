@@ -12,7 +12,6 @@ class SubReload(val plugin: AQQBot): ACommand {
             sender.sendMessage(Component.text("你没有权限使用该命令!", NamedTextColor.RED))
             return
         }
-        plugin.reload()
-        sender.sendMessage(Component.text("插件配置重载成功!", NamedTextColor.GREEN))
+        plugin.reload(sender)
     }
 }

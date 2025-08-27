@@ -5,6 +5,7 @@ import com.alessiodp.libby.LibraryManager
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.event.ClickEvent
+import net.kyori.adventure.text.format.NamedTextColor
 import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.adapter.AQQBotAdapter
@@ -22,6 +23,7 @@ import top.alazeprt.aqqbot.drivers.Web2ImageDriver
 import top.alazeprt.aqqbot.hook.HookProvider
 import top.alazeprt.aqqbot.plugins.PluginLoader
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
+import top.alazeprt.aqqbot.profile.ASender
 import top.alazeprt.aqqbot.task.TaskProvider
 import top.alazeprt.aqqbot.util.AExecution
 import top.alazeprt.aqqbot.util.AFormatter
@@ -226,40 +228,43 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         unloadDebug()
     }
 
-    fun reload() {
-        pluginLoader.unload()
+    fun reload(player: ASender?) {
         loadConfig(this)
         sender.clear()
         setSender()
         unloadBot()
-        if (botConfig.getString("access_token").isNullOrBlank()) {
-            loadBot(
-                this,
-                URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port"))
-            )
-        } else {
-            loadBot(
-                this,
-                URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")),
-                botConfig.getString("access_token")
-            )
-        }
         WebhookProvider.stop()
-        if (generalConfig.getBoolean("webhook.enable", null)) {
-            WebhookProvider.create(this, InetSocketAddress(
-                generalConfig.getString("webhook.host", null),
-                generalConfig.getInt("webhook.port", null)))
-            WebhookProvider.start()
-            try {
-                serverUUID = UUID.fromString(generalConfig.getString("webhook.server_uuid", null))
-            } catch (e: Exception) {
-                serverUUID = UUID.randomUUID()
-                generalConfig.set("webhook.server_uuid", serverUUID.toString())
-                generalConfig.generalConfig.save(File(getDataFolder(), "config.yml"))
+        submitAsync {
+            pluginLoader.unload()
+            if (botConfig.getString("access_token").isNullOrBlank()) {
+                loadBot(
+                    this,
+                    URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port"))
+                )
+            } else {
+                loadBot(
+                    this,
+                    URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")),
+                    botConfig.getString("access_token")
+                )
             }
+            if (generalConfig.getBoolean("webhook.enable", null)) {
+                WebhookProvider.create(this, InetSocketAddress(
+                    generalConfig.getString("webhook.host", null),
+                    generalConfig.getInt("webhook.port", null)))
+                WebhookProvider.start()
+                try {
+                    serverUUID = UUID.fromString(generalConfig.getString("webhook.server_uuid", null))
+                } catch (e: Exception) {
+                    serverUUID = UUID.randomUUID()
+                    generalConfig.set("webhook.server_uuid", serverUUID.toString())
+                    generalConfig.generalConfig.save(File(getDataFolder(), "config.yml"))
+                }
+            }
+            reloadDebug()
+            pluginLoader.load()
+            player?.sendMessage(Component.text("插件配置重载成功!", NamedTextColor.GREEN))
         }
-        reloadDebug()
-        pluginLoader.load()
     }
 
     fun loadDebug() {

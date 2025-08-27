@@ -15,7 +15,7 @@ import javax.script.ScriptEngineManager
 class PluginLoader(val plugin: AQQBot) {
     private var engine: ScriptEngine? = null
     private val eventManager = JSEventManager(plugin)
-    private val version = 1;
+    private val version = 1
 
     fun load() {
         try {

@@ -321,9 +321,11 @@ class AQQBotFabric : ModInitializer, AQQBot {
                 unbind_web = AWeb(File(getDataFolder().resolve("web"), path), width, height, delay, placeholdersMap)
             }
             if ((web != null || unbind_web != null) && enable) {
-                webDriver = Web2ImageDriver(this)
-                webDriver.loadDependencies()
-                webDriver.downloadDrivers()
+                submitAsync {
+                    webDriver = Web2ImageDriver(this)
+                    webDriver.loadDependencies()
+                    webDriver.downloadDrivers()
+                }
             }
             val format = customConfig.getBoolean("$it.format")
             val choose_account = if (customConfig.getInt("$it.choose_account") == 0) 1
