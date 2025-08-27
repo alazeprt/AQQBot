@@ -6,12 +6,12 @@ import java.nio.file.Files
 import java.util.zip.ZipFile
 
 object ACompressUtil {
-    fun unzipJar(jarFile: File, outputDir: File) {
-        require(jarFile.exists() && jarFile.isFile) { "Unknown jar file: ${jarFile.absolutePath}" }
+    fun unzip(file: File, outputDir: File) {
+        require(file.exists() && file.isFile) { "Unknown jar file: ${file.absolutePath}" }
         Files.createDirectories(outputDir.toPath())
         require(outputDir.isDirectory) { "Failed to create directory: ${outputDir.absolutePath}" }
 
-        ZipFile(jarFile).use { zip ->
+        ZipFile(file).use { zip ->
             for (entry in zip.entries()) {
                 val targetFile = outputDir.resolve(entry.name).normalize().absoluteFile
                 require(targetFile.toPath().startsWith(outputDir.toPath().normalize())) {

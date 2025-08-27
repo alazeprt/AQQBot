@@ -1,6 +1,5 @@
 package top.alazeprt.aqqbot
 
-import com.alessiodp.libby.Library
 import com.alessiodp.libby.LibraryManager
 import com.alessiodp.libby.VelocityLibraryManager
 import com.google.inject.Inject
@@ -28,11 +27,13 @@ import top.alazeprt.aqqbot.drivers.Web2ImageDriver
 import top.alazeprt.aqqbot.event.AChatEvent
 import top.alazeprt.aqqbot.event.AJoinEvent
 import top.alazeprt.aqqbot.event.AQuitEvent
-import top.alazeprt.aqqbot.plugins.PluginLoader
+import top.alazeprt.aqqbot.scripts.ScriptLoader
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.*
 import java.io.File
+import java.io.FileInputStream
+import java.io.InputStreamReader
 import java.nio.file.Path
 import java.time.Duration
 import java.util.*
@@ -90,7 +91,7 @@ class AQQBotVelocity : AQQBot {
     override var spark: Boolean = false
     override var luckperms: Boolean = false
 
-    override lateinit var pluginLoader: PluginLoader
+    override lateinit var scriptLoader: ScriptLoader
 
     @Inject
     fun AQQBotVelocity(server: ProxyServer?, logger: Logger?, @DataDirectory dataDirectory: Path,
@@ -138,7 +139,8 @@ class AQQBotVelocity : AQQBot {
             saveResource("custom.yml", false)
         }
         customCommands = mutableListOf()
-        customConfig = YamlConfiguration.loadConfiguration(file)
+        val reader = InputStreamReader(FileInputStream(file), Charsets.UTF_8)
+        customConfig = YamlConfiguration.loadConfiguration(reader)
         customConfig.getKeys(false).forEach {
             val enable = customConfig.getBoolean("$it.enable")
             val command = customConfig.getStringList("$it.command")

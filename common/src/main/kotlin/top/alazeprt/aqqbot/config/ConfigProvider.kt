@@ -6,6 +6,8 @@ import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.util.ACustom
 import top.alazeprt.aqqbot.util.GroupConfiguration
 import java.io.File
+import java.io.FileInputStream
+import java.io.InputStreamReader
 import java.nio.file.Files
 
 interface ConfigProvider {
@@ -89,7 +91,8 @@ interface ConfigProvider {
         if (!file.exists()) {
             saveResource("config.yml", false)
         }
-        generalConfig = GroupConfiguration(plugin, YamlConfiguration.loadConfiguration(file))
+        val reader = InputStreamReader(FileInputStream(file), Charsets.UTF_8)
+        generalConfig = GroupConfiguration(plugin, YamlConfiguration.loadConfiguration(reader))
     }
 
     fun loadMessageConfig() {
@@ -97,7 +100,8 @@ interface ConfigProvider {
         if (!file.exists()) {
             saveResource("messages.yml", false)
         }
-        messageConfig = YamlConfiguration.loadConfiguration(file)
+        val reader = InputStreamReader(FileInputStream(file), Charsets.UTF_8)
+        messageConfig = YamlConfiguration.loadConfiguration(reader)
     }
 
     fun loadBotConfig() {
@@ -105,7 +109,8 @@ interface ConfigProvider {
         if (!file.exists()) {
             saveResource("bot.yml", false)
         }
-        botConfig = YamlConfiguration.loadConfiguration(file)
+        val reader = InputStreamReader(FileInputStream(file), Charsets.UTF_8)
+        botConfig = YamlConfiguration.loadConfiguration(reader)
     }
 
     fun loadCustomConfig()

@@ -22,6 +22,12 @@ class AParentCommand(val plugin: AQQBot) : ACommand {
                 "reset" -> SubReset(plugin).onCommand(command, sender, args)
                 else -> SubHelp(plugin).onCommand(command, sender, args)
             }
+            "market" -> if (args.size !in 2..4) {
+                SubHelp(plugin).onCommand(command, sender, args)
+            } else SubMarket(plugin).onCommand(command, sender, args)
+            "scripts" -> if (args.size !in 2..3) {
+                SubHelp(plugin).onCommand(command, sender, args)
+            } else SubScripts(plugin).onCommand(command, sender, args)
             "reload" -> SubReload(plugin).onCommand(command, sender, args)
             else -> SubHelp(plugin).onCommand(command, sender, args)
         }
@@ -29,8 +35,10 @@ class AParentCommand(val plugin: AQQBot) : ACommand {
 
     override fun onComplete(args: List<String>): List<String> {
         return when (args.size) {
-            1 -> listOf("whitelist", "status", "help", "reload", "send")
+            1 -> listOf("whitelist", "status", "help", "reload", "send", "market", "scripts")
             2 -> return when (args[0]) {
+                "market" -> listOf("list", "info", "install", "update")
+                "scripts" -> listOf("list", "download", "info", "reload", "load")
                 "whitelist" -> listOf("bind", "unbind", "reset", "query", "info")
                 else -> emptyList()
             }

@@ -1,4 +1,4 @@
-package top.alazeprt.aqqbot.plugins
+package top.alazeprt.aqqbot.scripts
 
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.api.AQQBotAPI
@@ -24,7 +24,6 @@ import top.alazeprt.aqqbot.api.event.qq.PreRemoteCommandEvent
 import top.alazeprt.aqqbot.api.event.qq.PreUnbindEvent
 import top.alazeprt.aqqbot.api.event.qq.ReceiveMessageEvent
 import top.alazeprt.aqqbot.util.LogLevel
-import java.lang.reflect.Method
 
 class JSEventManager(val plugin: AQQBot) {
     private val listeners = mutableMapOf<String, MutableList<Any>>()

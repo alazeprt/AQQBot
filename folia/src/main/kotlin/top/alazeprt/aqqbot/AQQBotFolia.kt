@@ -20,11 +20,13 @@ import top.alazeprt.aqqbot.data.DataProvider
 import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.drivers.Web2ImageDriver
 import top.alazeprt.aqqbot.event.FoliaEventHandler
-import top.alazeprt.aqqbot.plugins.PluginLoader
+import top.alazeprt.aqqbot.scripts.ScriptLoader
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.*
 import java.io.File
+import java.io.FileInputStream
+import java.io.InputStreamReader
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
@@ -70,7 +72,7 @@ class AQQBotFolia : JavaPlugin(), AQQBot {
     override var spark: Boolean = false
     override var luckperms: Boolean = false
 
-    override lateinit var pluginLoader: PluginLoader
+    override lateinit var scriptLoader: ScriptLoader
 
     override var loadSparkCount: Int = 0
 
@@ -198,7 +200,8 @@ class AQQBotFolia : JavaPlugin(), AQQBot {
             saveResource("custom.yml", false)
         }
         customCommands = mutableListOf()
-        customConfig = YamlConfiguration.loadConfiguration(file)
+        val reader = InputStreamReader(FileInputStream(file), Charsets.UTF_8)
+        customConfig = YamlConfiguration.loadConfiguration(reader)
         customConfig.getKeys(false).forEach {
             val enable = customConfig.getBoolean("$it.enable")
             val command = customConfig.getStringList("$it.command")

@@ -1,13 +1,11 @@
 package top.alazeprt.aqqbot
 
 import com.alessiodp.libby.FabricLibraryManager
-import com.alessiodp.libby.Library
 import com.alessiodp.libby.LibraryManager
 import com.mojang.brigadier.arguments.StringArgumentType
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents
@@ -32,11 +30,13 @@ import top.alazeprt.aqqbot.event.AChatEvent
 import top.alazeprt.aqqbot.event.ADeathEvent
 import top.alazeprt.aqqbot.event.AJoinEvent
 import top.alazeprt.aqqbot.event.AQuitEvent
-import top.alazeprt.aqqbot.plugins.PluginLoader
+import top.alazeprt.aqqbot.scripts.ScriptLoader
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.*
 import java.io.File
+import java.io.FileInputStream
+import java.io.InputStreamReader
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -113,7 +113,7 @@ class AQQBotFabric : ModInitializer, AQQBot {
 
     override var loadSparkCount: Int = 0
 
-    override lateinit var pluginLoader: PluginLoader
+    override lateinit var scriptLoader: ScriptLoader
 
     companion object {
         const val MOD_ID: String = "aqqbot"
@@ -163,7 +163,8 @@ class AQQBotFabric : ModInitializer, AQQBot {
             saveResource("custom.yml", false)
         }
         customCommands = mutableListOf()
-        customConfig = YamlConfiguration.loadConfiguration(file)
+        val reader = InputStreamReader(FileInputStream(file), Charsets.UTF_8)
+        customConfig = YamlConfiguration.loadConfiguration(reader)
         customConfig.getKeys(false).forEach {
             val enable = customConfig.getBoolean("$it.enable")
             val command = customConfig.getStringList("$it.command")

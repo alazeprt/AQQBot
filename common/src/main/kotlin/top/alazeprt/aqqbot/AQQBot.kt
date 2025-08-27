@@ -4,13 +4,11 @@ import com.alessiodp.libby.Library
 import com.alessiodp.libby.LibraryManager
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
-import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.adapter.AQQBotAdapter
 import top.alazeprt.aqqbot.api.AQQBotAPI
-import top.alazeprt.aqqbot.api.webhook.AQQBotWebhookServer
 import top.alazeprt.aqqbot.api.webhook.WebhookProvider
 import top.alazeprt.aqqbot.bot.BotProvider.getBot
 import top.alazeprt.aqqbot.bot.BotProvider.loadBot
@@ -21,7 +19,7 @@ import top.alazeprt.aqqbot.data.*
 import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.drivers.Web2ImageDriver
 import top.alazeprt.aqqbot.hook.HookProvider
-import top.alazeprt.aqqbot.plugins.PluginLoader
+import top.alazeprt.aqqbot.scripts.ScriptLoader
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.profile.ASender
 import top.alazeprt.aqqbot.task.TaskProvider
@@ -64,7 +62,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
     override var messageConfig: FileConfiguration
     override var botConfig: FileConfiguration
 
-    var pluginLoader: PluginLoader
+    var scriptLoader: ScriptLoader
 
     fun enable() {
         AQQBotAPI.setInstance(this)
@@ -166,8 +164,8 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
             }
         }
         log(LogLevel.INFO, "Loading plugins...")
-        pluginLoader = PluginLoader(this)
-        pluginLoader.load()
+        scriptLoader = ScriptLoader(this)
+        scriptLoader.load()
     }
 
     override fun loadDataDependencies() {
@@ -206,7 +204,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
 
     fun disable() {
         log(LogLevel.INFO, "Unloading plugins...")
-        pluginLoader.unload()
+        scriptLoader.unload(false)
         log(LogLevel.INFO, "Disconnecting bot...")
         if (getBot() != null && getBot()!!.isConnected) {
             enableGroups.forEach {
@@ -235,7 +233,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         unloadBot()
         WebhookProvider.stop()
         submitAsync {
-            pluginLoader.unload()
+            scriptLoader.unload(true)
             if (botConfig.getString("access_token").isNullOrBlank()) {
                 loadBot(
                     this,
@@ -262,7 +260,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
                 }
             }
             reloadDebug()
-            pluginLoader.load()
+            scriptLoader.load()
             player?.sendMessage(Component.text("插件配置重载成功!", NamedTextColor.GREEN))
         }
     }

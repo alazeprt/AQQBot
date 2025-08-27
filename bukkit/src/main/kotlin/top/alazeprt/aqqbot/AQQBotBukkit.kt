@@ -21,11 +21,13 @@ import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.drivers.Web2ImageDriver
 import top.alazeprt.aqqbot.event.BukkitEventHandler
 import top.alazeprt.aqqbot.hook.AQQBotExpansion
-import top.alazeprt.aqqbot.plugins.PluginLoader
+import top.alazeprt.aqqbot.scripts.ScriptLoader
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.*
 import java.io.File
+import java.io.FileInputStream
+import java.io.InputStreamReader
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -72,7 +74,7 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
 
     override var loadSparkCount: Int = 0
 
-    override lateinit var pluginLoader: PluginLoader
+    override lateinit var scriptLoader: ScriptLoader
 
     val taskList: MutableList<BukkitTaskCancelable> = mutableListOf()
 
@@ -234,7 +236,8 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
             saveResource("custom.yml", false)
         }
         customCommands = mutableListOf()
-        customConfig = YamlConfiguration.loadConfiguration(file)
+        val reader = InputStreamReader(FileInputStream(file), Charsets.UTF_8)
+        customConfig = YamlConfiguration.loadConfiguration(reader)
         customConfig.getKeys(false).forEach {
             val enable = customConfig.getBoolean("$it.enable")
             val command = customConfig.getStringList("$it.command")

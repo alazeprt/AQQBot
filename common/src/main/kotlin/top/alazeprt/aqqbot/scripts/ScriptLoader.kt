@@ -1,4 +1,4 @@
-package top.alazeprt.aqqbot.plugins
+package top.alazeprt.aqqbot.scripts
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -7,15 +7,22 @@ import top.alazeprt.aqqbot.api.AQQBotAPI
 import top.alazeprt.aqqbot.api.event.game.PluginStartEvent
 import top.alazeprt.aqqbot.api.event.game.PluginStopEvent
 import top.alazeprt.aqqbot.bot.BotManager
+import top.alazeprt.aqqbot.scripts.market.MarketManager
 import top.alazeprt.aqqbot.util.LogLevel
 import javax.script.Compilable
 import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
 
-class PluginLoader(val plugin: AQQBot) {
-    private var engine: ScriptEngine? = null
+class ScriptLoader(val plugin: AQQBot) {
+    internal var engine: ScriptEngine? = null
     private val eventManager = JSEventManager(plugin)
-    private val version = 1
+    internal val pluginList = mutableListOf<ScriptPlugin>()
+    val scriptManager = ScriptManager(plugin)
+    val marketManager = MarketManager(plugin)
+
+    companion object {
+        const val version = 1
+    }
 
     fun load() {
         try {
@@ -53,17 +60,20 @@ class PluginLoader(val plugin: AQQBot) {
                 if (!manifest.isFile) return@forEach
                 val manifestContent = Gson().fromJson(manifest.readText(), JsonObject::class.java)
                 val schemaVersion = manifestContent.get("schema_version").asInt
-                if (schemaVersion > this.version) {
-                    plugin.log(LogLevel.WARN, "Your plugin doesn't support the script schema version $schemaVersion (supported version is <= ${this.version}), please update your plugin!")
+                if (schemaVersion > version) {
+                    plugin.log(LogLevel.WARN, "Your plugin doesn't support the script schema version $schemaVersion (supported version is <= ${version}), please update your plugin!")
                     return@forEach
                 }
                 val name = if (manifestContent.has("name")) manifestContent.get("name").asString else dir.name
-                val author = if (manifestContent.has("author")) manifestContent.get("author").asString else "Unknown"
-                val version = if (manifestContent.has("version")) manifestContent.get("version").asString else "Unknown"
-                val script = dir.resolve(manifestContent.get("entrypoint").asString)
-                if (!script.isFile) return@forEach
+                val author = if (manifestContent.has("author")) manifestContent.get("author").asString else null
+                val version = if (manifestContent.has("version")) manifestContent.get("version").asString else null
+                val description = if (manifestContent.has("description")) manifestContent.get("description").asString else null
+                val scriptFile = dir.resolve(manifestContent.get("entrypoint").asString)
+                if (!scriptFile.isFile) return@forEach
+                val script = ScriptPlugin(schemaVersion, name, author, version, description, dir.name, manifestContent.get("entrypoint").asString)
+                pluginList.add(script)
                 plugin.log(LogLevel.INFO, "Loading plugin $name version $version by $author")
-                val compiled = compilable.compile(script.readText())
+                val compiled = compilable.compile(scriptFile.readText())
                 compiled.eval()
             }
         }
@@ -74,8 +84,9 @@ class PluginLoader(val plugin: AQQBot) {
         engine?.put(name, instance)
     }
 
-    fun unload() {
-        AQQBotAPI.fireEvent(PluginStopEvent())
+    fun unload(reload: Boolean) {
+        if (!reload) AQQBotAPI.fireEvent(PluginStopEvent())
+        pluginList.clear()
         eventManager.unload()
     }
 }

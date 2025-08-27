@@ -38,7 +38,7 @@ class Web2ImageDriver(val plugin: AQQBot) {
             val driverFile = libFolder.resolve("com").resolve("microsoft").resolve("playwright")
                 .resolve("driver-bundle").resolve("1.53.0").resolve("driver-bundle-1.53.0.jar")
             val tmpFolder = Files.createTempDirectory("aqqbot-driver")
-            ACompressUtil.unzipJar(driverFile, tmpFolder.toFile())
+            ACompressUtil.unzip(driverFile, tmpFolder.toFile())
             val decompressedDriverFolder = tmpFolder.resolve("driver").resolve(platformDir())
             decompressedDriverFolder.toFile().copyRecursively(driverFolder)
             plugin.log(LogLevel.INFO, "Decompressed drivers to: ${driverFolder.absolutePath}")
