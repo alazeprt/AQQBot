@@ -36,3 +36,5 @@ include("fabric:1.21.8")
 findProject(":fabric:1.21.8")?.name = "1.21.8"
 include("fabric:1.21.5")
 findProject(":fabric:1.21.5")?.name = "1.21.5"
+include("fabric:1.21")
+findProject(":fabric:1.21")?.name = "1.21"
