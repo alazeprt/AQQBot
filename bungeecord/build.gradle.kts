@@ -1,0 +1,55 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    kotlin("jvm")
+    id("com.gradleup.shadow") version "8.3.0"
+}
+
+group = "top.alazeprt.aqqbot"
+version = properties["version"] as String
+
+repositories {
+    maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://jitpack.io")
+    maven("https://repo.lucko.me/")
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+    maven("https://oss.sonatype.org/content/repositories/snapshots")
+    maven("https://repo.opencollab.dev/main/")
+    mavenCentral()
+}
+
+dependencies {
+    implementation(project(":common"))
+    implementation("com.github.alazeprt:AConfiguration:1.2")
+    compileOnly("net.kyori:adventure-platform-bungeecord:4.4.1")
+    implementation("com.alessiodp.libby:libby-bungee:2.0.0-SNAPSHOT")
+    implementation("org.bstats:bstats-bungeecord:3.0.2")
+    compileOnly("net.md-5:bungeecord-api:1.16-R0.5-SNAPSHOT")
+    compileOnly("me.lucko:spark-api:0.1-SNAPSHOT")
+    compileOnly(fileTree("libs"))
+}
+
+tasks.jar {
+    archiveFileName.set("AQQBot-${archiveFileName.get()}")
+}
+
+tasks.shadowJar {
+    archiveFileName.set("AQQBot-${archiveFileName.get()}")
+    relocate("org.bstats", "top.alazeprt.aqqbot.lib.bstats")
+}
+
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+}
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        jvmTarget = "17"
+        freeCompilerArgs = listOf("-Xjvm-default=all")
+    }
+}
+
+configure<JavaPluginConvention> {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
