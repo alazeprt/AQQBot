@@ -35,6 +35,7 @@ subprojects {
     repositories {
         maven("https://repo.lucko.me/")
         maven("https://jitpack.io")
+        maven("https://maven.nucleoid.xyz/")
         maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
         mavenCentral()
     }
@@ -45,6 +46,7 @@ subprojects {
         modImplementation("net.fabricmc:fabric-loader:0.14.7")
         modImplementation("net.fabricmc:fabric-language-kotlin:1.12.3+kotlin.2.0.21")
         modImplementation("net.fabricmc.fabric-api:fabric-api:${properties["fabric_version"]}")
+        modImplementation(include("eu.pb4:placeholder-api:${properties["placeholder_version"]}")!!)
 
         include(implementation(project(":common"))!!)
         include(implementation("net.kyori:adventure-platform-fabric:${properties["adventure_version"]}")!!)

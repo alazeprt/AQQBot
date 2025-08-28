@@ -3,6 +3,7 @@ package top.alazeprt.aqqbot
 import com.alessiodp.libby.FabricLibraryManager
 import com.alessiodp.libby.LibraryManager
 import com.mojang.brigadier.arguments.StringArgumentType
+import eu.pb4.placeholders.PlaceholderAPI
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents
@@ -64,6 +65,9 @@ class AQQBotFabric : ModInitializer, AQQBot {
             ADeathEvent(this, FabricPlayer(player), source.name).handle()
             true
         }
+        try {
+            Class.forName("eu.pb4.placeholders.PlaceholderAPI")
+        } catch (ignored: ClassNotFoundException) {}
     }
 
     override var debugModule: ADebug? = null
@@ -106,6 +110,8 @@ class AQQBotFabric : ModInitializer, AQQBot {
 
     override var spark: Boolean = false
     override var luckperms: Boolean = false
+
+    var placeholderSupport: Boolean = false
 
     override var loadSparkCount: Int = 0
 
@@ -295,7 +301,9 @@ class AQQBotFabric : ModInitializer, AQQBot {
     }
 
     override fun setPlaceholders(player: APlayer, message: String): String {
-        return message
+        return if (placeholderSupport) {
+            PlaceholderAPI.parseText(Text.of(message), server.playerManager.getPlayer(player.getName())).string
+        } else message
     }
 
     override fun submit(task: Runnable): Cancelable {
