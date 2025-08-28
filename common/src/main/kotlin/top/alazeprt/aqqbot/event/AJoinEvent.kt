@@ -30,6 +30,13 @@ class AJoinEvent(val plugin: AQQBot, private val player: APlayer, val kickMethod
             kickMethod.accept(kickMessage)
         } else if (handle1) {
             plugin.debugModule?.debugLogger?.log("allow ${player.getName()} to join because bypass permission")
+            playerStatusHandler(plugin, player, true)
+            if (plugin.configNeedUpdate() && player.hasPermission("aqqbot.admin")) {
+                plugin.submitLater(20) {
+                    player.sendMessage("§a检测到你正在使用 AQQBot 的低版本配置文件, 这可能会引起一些问题")
+                    player.sendMessage("§a插件已自动释放新版本配置文件并命名为 config_new.yml, 请根据你的旧版本配置文件 (config.yml) 修改该文件并重命名为 config.yml, 最后执行 /aqqbot reload 应用修改")
+                }
+            }
         }
         if (!handle1) {
             playerStatusHandler(plugin, player, true)
