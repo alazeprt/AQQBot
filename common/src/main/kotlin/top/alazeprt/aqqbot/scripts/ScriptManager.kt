@@ -83,8 +83,10 @@ class ScriptManager(val plugin: AQQBot) {
         sender.sendMessage(Component.text("[AQQBot] 尝试从 $url 下载脚本 ...").color(NamedTextColor.GREEN))
         val scriptFolder = plugin.getDataFolder().resolve("plugins")
         val tmpFile = scriptFolder.resolve(UUID.randomUUID().toString() + ".zip")
+        plugin.log(LogLevel.DEBUG, "Downloading plugin from $url to $tmpFile")
         ARemoteUtil.downloadToFile(url, tmpFile)
         sender.sendMessage(Component.text("[AQQBot] 解压文件中 ...").color(NamedTextColor.GREEN))
+        plugin.log(LogLevel.DEBUG, "Decompressing plugin $tmpFile")
         ACompressUtil.unzip(tmpFile, scriptFolder)
         sender.sendMessage(Component.text("[AQQBot] 尝试加载所有 plugins 文件夹内未加载的插件 ...").color(NamedTextColor.GREEN))
         val originList = plugin.scriptLoader.pluginList.map { it.directory }

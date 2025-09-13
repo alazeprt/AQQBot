@@ -12,21 +12,24 @@ class SubMarket(val plugin: AQQBot) : ACommand {
             sender.sendMessage(Component.text("你没有权限使用此命令!", NamedTextColor.RED))
             return
         }
-        when (args[1]) {
-            "list" -> plugin.scriptLoader.marketManager.list(sender)
-            "info" -> if (args.size == 3) {
-                plugin.scriptLoader.marketManager.info(sender, args[2], null)
-            } else if (args.size == 4) {
-                plugin.scriptLoader.marketManager.info(sender, args[2], args[3])
-            } else SubHelp(plugin).onCommand(command, sender, args)
-            "install" -> if (args.size == 3) {
-                plugin.scriptLoader.marketManager.install(sender, args[2], null)
-            } else if (args.size == 4) {
-                plugin.scriptLoader.marketManager.install(sender, args[2], args[3])
-            } else SubHelp(plugin).onCommand(command, sender, args)
-            "update" -> if (args.size == 3) {
-                plugin.scriptLoader.marketManager.update(sender, args[2])
-            } else SubHelp(plugin).onCommand(command, sender, args)
+        plugin.submitAsync {
+            when (args[1]) {
+                "list" -> plugin.scriptLoader.marketManager.list(sender)
+                "info" -> if (args.size == 3) {
+                    plugin.scriptLoader.marketManager.info(sender, args[2], null)
+                } else if (args.size == 4) {
+                    plugin.scriptLoader.marketManager.info(sender, args[2], args[3])
+                } else SubHelp(plugin).onCommand(command, sender, args)
+                "install" -> if (args.size == 3) {
+                    plugin.scriptLoader.marketManager.install(sender, args[2], null)
+                } else if (args.size == 4) {
+                    plugin.scriptLoader.marketManager.install(sender, args[2], args[3])
+                } else SubHelp(plugin).onCommand(command, sender, args)
+                "update" -> if (args.size == 3) {
+                    plugin.scriptLoader.marketManager.update(sender, args[2])
+                } else SubHelp(plugin).onCommand(command, sender, args)
+                else -> SubHelp(plugin).onCommand(command, sender, args)
+            }
         }
     }
 

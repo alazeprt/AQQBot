@@ -12,18 +12,20 @@ class SubScripts(val plugin: AQQBot): ACommand {
             sender.sendMessage(Component.text("你没有权限使用此命令!", NamedTextColor.RED))
             return
         }
-        when (args[1]) {
-            "list" -> plugin.scriptLoader.scriptManager.list(sender)
-            "download" -> if (args.size == 3) {
-                plugin.scriptLoader.scriptManager.download(sender, args[2])
-            } else SubHelp(plugin).onCommand(command, sender, args)
-            "info" -> if (args.size == 3) {
-                plugin.scriptLoader.scriptManager.info(sender, args[2])
-            } else SubHelp(plugin).onCommand(command, sender, args)
-            "reload" -> plugin.scriptLoader.scriptManager.reload(sender)
-            "load" -> if (args.size == 3) {
-                plugin.scriptLoader.scriptManager.load(sender, args[2])
-            } else SubHelp(plugin).onCommand(command, sender, args)
+        plugin.submitAsync {
+            when (args[1]) {
+                "list" -> plugin.scriptLoader.scriptManager.list(sender)
+                "download" -> if (args.size == 3) {
+                    plugin.scriptLoader.scriptManager.download(sender, args[2])
+                } else SubHelp(plugin).onCommand(command, sender, args)
+                "info" -> if (args.size == 3) {
+                    plugin.scriptLoader.scriptManager.info(sender, args[2])
+                } else SubHelp(plugin).onCommand(command, sender, args)
+                "reload" -> plugin.scriptLoader.scriptManager.reload(sender)
+                "load" -> if (args.size == 3) {
+                    plugin.scriptLoader.scriptManager.load(sender, args[2])
+                } else SubHelp(plugin).onCommand(command, sender, args)
+            }
         }
     }
 }

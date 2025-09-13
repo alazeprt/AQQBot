@@ -193,7 +193,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         val aonebotLib = Library.builder()
             .groupId("com{}github{}alazeprt")
             .artifactId("AOneBot")
-            .version("1.0.19-beta")
+            .version("1.0.20-beta")
             .relocate("com{}google{}code{}gson", "top{}alazeprt{}aonebot{}lib{}com{}google")
             .resolveTransitiveDependencies(true)
             .build()
