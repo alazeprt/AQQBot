@@ -26,7 +26,6 @@ class AFormatter(val plugin: AQQBot) {
                     keyValueMap[key] = value
                 }
                 val urlString = keyValueMap["url"]
-                HttpsURLConnection.setDefaultHostnameVerifier { _, _ -> true }
                 val url = URL(urlString ?: return@forEach)
                 val path = keyValueMap["path"] ?: "words"
                 val connection = url.openConnection() as? HttpsURLConnection ?: URL(urlString).openConnection() as HttpURLConnection
